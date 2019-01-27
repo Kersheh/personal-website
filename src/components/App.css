@@ -1,0 +1,8 @@
+.component-app {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  height: 100%;
+  color: #9ac23d;
+  background-color: #232334;
+}
