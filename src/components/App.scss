@@ -1,0 +1,14 @@
+@import 'src/scss/colors';
+
+.app {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  background-color: $color-ebony;
+  -webkit-font-smoothing: antialiased;
+
+  .content {
+    padding-top: 60px;
+  }
+}

@@ -1,0 +1,18 @@
+@import './scss/colors';
+
+html {
+  height: 100%;
+  font-size: 16px;
+}
+
+body {
+  background-color: $color-ebony;
+  margin: 0;
+  padding: 0;
+  font-family: sans-serif;
+  height: 100%;
+}
+
+#root {
+  height: 100%;
+}

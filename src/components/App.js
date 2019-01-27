@@ -1,20 +1,14 @@
 import React from 'react';
-import './App.css';
+import Terminal from './Terminal/Terminal';
+import './App.scss';
 
 class App extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      total: null,
-      next: null,
-      operation: null,
-    };
-  }
-
   render() {
     return (
-      <div className='component-app'>
-        Velkommen!
+      <div className='app'>
+        <div className='content'>
+          <Terminal></Terminal>
+        </div>
       </div>
     );
   }
