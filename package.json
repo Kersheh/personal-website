@@ -8,6 +8,7 @@
     "dev": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
+    "lint": "eslint src",
     "eject": "react-scripts eject",
     "deploy": "npm run build && gcloud app deploy"
   },
@@ -26,6 +27,7 @@
   },
   "devDependencies": {
     "chai": "^4.2.0",
+    "eslint-plugin-react": "^7.12.4",
     "node-sass": "^4.11.0",
     "react-scripts": "^2.1.3"
   },

@@ -50,10 +50,11 @@
     height: 18px;
     font-size: 14px;
     letter-spacing: 1px;
-    color: $color-white;
+    color: rgba($color-white, .8);
     font-family: 'Courier new', 'Courier', monospace;
 
     &__info {
+      font-weight: 600;
       padding-right: 10px;
     }
 
@@ -82,6 +83,7 @@
 
     &__cursor {
       display: inline-block;
+      position: relative;
       background-color: $color-white;
       vertical-align: top;
       width: 10px;
