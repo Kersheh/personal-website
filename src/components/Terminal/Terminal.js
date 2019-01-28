@@ -104,7 +104,7 @@ class Terminal extends React.Component {
           this.setState({
             value: prevValue,
             historyIndex: this.state.historyIndex - 1,
-            cursorIndex: prevValue.length
+            cursorIndex: 0
           });
 
           this._updateInputLength(prevValue.length, 10);
