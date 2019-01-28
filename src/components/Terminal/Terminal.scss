@@ -10,6 +10,14 @@
   position: relative;
   top: 0px;
 
+  a {
+    color: rgba($color-white, .7);
+
+    &:hover {
+      color: $color-medium-electric-blue;
+    }
+  }
+
   &-bar {
     background: #E0E8F0;
     height: 30px;

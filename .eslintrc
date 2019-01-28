@@ -17,6 +17,7 @@
     "plugin:react/recommended"
   ],
   "rules": {
-    "default-case": 0
+    "default-case": 0,
+    "react/prop-types": 0
   }
 }

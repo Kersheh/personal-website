@@ -1,29 +1,12 @@
 import React from 'react';
-// import commands from '../../helpers/commands';
+import TerminalRow from './TerminalRow/TerminalRow';
+import TerminalInfo from './TerminalInfo/TerminalInfo';
+
+import commands from '../../helpers/commands';
 
 import './Terminal.scss';
 
-function TerminalInfo() {
-  const INFO = 'guest@matthewbreckon.com $';
-
-  return (
-    <span className='terminal-row__info'>{INFO}</span>
-  );
-}
-
-function TerminalRow(props) {
-  const info = props.info ? <TerminalInfo></TerminalInfo> : '';
-  const command = props.command ? <span>{props.command}</span> : '';
-
-  return (
-    <div className='terminal-row'>
-      {info}
-      <span className='terminal-row__history'>{command}</span>
-    </div>
-  );
-}
-
-class Terminal extends React.Component {
+export default class Terminal extends React.Component {
   static displayName = 'Terminal';
 
   constructor(props) {
@@ -77,19 +60,30 @@ class Terminal extends React.Component {
     this._updateInputLength(e.target.value.length, 10);
   }
 
-  onKeyPress(e) {
+  async onKeyPress(e) {
     // eslint-disable-next-line
     if(e.key === 'Enter') {
       this.setState({
         value: '',
         bufferValue: '',
-        history: this.state.history.concat(e.target.value),
+        history: this.state.history.concat({ std: 'in', msg: e.target.value }),
         historyIndex: this.state.historyIndex + 1,
         cursorIndex: 0
       });
 
       this._updateInputLength(0, 0);
       this._updateCursorLocation(0, 0);
+
+      try {
+        const response = await commands.submit(e.target.value);
+        this.setState({
+          history: this.state.history.concat({ std: 'out', msg: response })
+        });
+      } catch(err) {
+        this.setState({
+          history: this.state.history.concat({ std: 'out', msg: err.message })
+        });
+      }
     }
   }
 
@@ -99,7 +93,7 @@ class Terminal extends React.Component {
       // History upwards
       case 'ArrowUp': {
         if(this.state.historyIndex > 0) {
-          const prevValue = this.state.history[this.state.historyIndex - 1];
+          const prevValue = this.state.history[this.state.historyIndex - 1].msg;
 
           this.setState({
             value: prevValue,
@@ -126,7 +120,7 @@ class Terminal extends React.Component {
           this._updateInputLength(bufferValue.length, 10);
           this._updateCursorLocation(bufferValue.length, bufferValue.length);
         } else if(this.state.historyIndex < this.state.history.length - 1) {
-          const nextValue = this.state.history[this.state.historyIndex + 1];
+          const nextValue = this.state.history[this.state.historyIndex + 1].msg;
 
           this.setState({
             value: nextValue,
@@ -174,16 +168,17 @@ class Terminal extends React.Component {
         </div>
 
         <div className='terminal-body' onClick={this.onTerminalClick}>
-          {this.state.history.map((cmd, i) =>
-            <TerminalRow info="true" key={i} command={cmd}></TerminalRow>
+          {this.state.history.map((item, i) =>
+            <TerminalRow io={item.std} key={i} command={item.msg}></TerminalRow>
           )}
 
           <div className='terminal-row'>
             <TerminalInfo></TerminalInfo>
-            <input id="test" ref={this.inputRef} onChange={this.updateInput} autoFocus
+            <input ref={this.inputRef} onChange={this.updateInput}
                    className='terminal-row__input' value={this.state.value}
                    onKeyPress={this.onKeyPress} onKeyDown={this.onKeyDown}
                    type='text' spellCheck='false' maxLength='60'
+                   autoFocus autoComplete='off'
                    onBlur={() => this.updateFocus(false)}
                    onFocus={() => this.updateFocus(true)}>
             </input>
@@ -196,5 +191,3 @@ class Terminal extends React.Component {
     );
   }
 }
-
-export default Terminal;
