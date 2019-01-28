@@ -1,3 +1,6 @@
+# config
+.editorconfig
+
 # gcloud
 .gcloudignore
 
@@ -7,3 +10,7 @@
 
 # node
 node_modules/
+
+# non-production directories
+src/
+photoshop/

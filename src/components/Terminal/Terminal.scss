@@ -88,9 +88,9 @@
       height: 18px;
       animation: blink 1s step-end infinite;
 
-      // &[disabled] {
-      //   display: none;
-      // }
+      &[disabled] {
+        display: none;
+      }
     }
 
     @-webkit-keyframes blink {

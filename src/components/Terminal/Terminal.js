@@ -3,7 +3,10 @@ import React from 'react';
 import './Terminal.scss';
 
 function TerminalInfo() {
-  return <span className='terminal-row__info'>guest@matthewbreckon.com $</span>;
+  const INFO = 'guest@matthewbreckon.com $';
+  return (
+    <span className='terminal-row__info'>{INFO}</span>
+  );
 }
 
 function TerminalRow(props) {
@@ -24,8 +27,9 @@ class Terminal extends React.Component {
     super(props);
     this.state = {
       value: '',
+      isFocused: true,
       history: [],
-      isFocused: true
+      historyIndex: 0
     };
 
     this.updateFocus = this.updateFocus.bind(this);
