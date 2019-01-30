@@ -1,9 +1,9 @@
-import git from './commands/git';
+import github from './commands/github';
 
 const COMMANDS = {
-  git: {
-    cmd: 'git',
-    run: git
+  github: {
+    cmd: 'github',
+    run: github
   }
 };
 
@@ -16,4 +16,4 @@ export default class Commands {
       throw new Error(`command '${command}' not found`);
     }
   }
-};
+}

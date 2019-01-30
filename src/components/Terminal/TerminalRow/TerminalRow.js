@@ -1,11 +1,12 @@
 import React from 'react';
 import TerminalInfo from '../TerminalInfo/TerminalInfo';
-
 import urlRegex from 'url-regex';
 
 import '../Terminal.scss';
 
 export default class TerminalRow extends React.Component {
+  static displayName = 'TerminalRow';
+
   constructor(props) {
     super(props);
 

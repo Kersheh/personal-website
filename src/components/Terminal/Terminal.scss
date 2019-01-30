@@ -1,15 +1,6 @@
 @import 'src/scss/colors';
 
 .terminal {
-  background: $color-daintree;
-  border-radius: 8px 8px;
-  min-width: 900px;
-  max-width: 900px;
-  width: 100%;
-  margin: 0 auto;
-  position: relative;
-  top: 0px;
-
   a {
     color: rgba($color-white, .7);
 

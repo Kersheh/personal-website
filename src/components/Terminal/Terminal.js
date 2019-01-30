@@ -11,45 +11,46 @@ export default class Terminal extends React.Component {
 
   constructor(props) {
     super(props);
+
     this.state = {
       value: '',
       bufferValue: '',
       isFocused: true,
       history: [],
       historyIndex: 0,
-      cursorIndex: 0
+      cursorIndex: 0,
+      cursorLocationPx: 0,
+      inputLengthPx: 0
     };
 
     this.inputRef = React.createRef();
-    this.cursorRef = React.createRef();
-
-    this.onTerminalClick = this.onTerminalClick.bind(this);
-    this.updateFocus = this.updateFocus.bind(this);
-    this.updateInput = this.updateInput.bind(this);
-    this.onKeyPress = this.onKeyPress.bind(this);
-    this.onKeyDown = this.onKeyDown.bind(this);
   }
 
-  _updateInputLength(characters, width) {
-    this.inputRef.current.setAttribute('style', `width: ${characters * width}px`);
+  componentDidMount() {
+    this.props.setDraggableTarget('.terminal-bar');
   }
 
-  _updateCursorLocation(length, index) {
-    const position = (length - index) * -10;
-    this.cursorRef.current.setAttribute('style', `left: ${position}px`);
+  updateInputLength = (characters, width) => {
+    this.setState({ inputLengthPx: characters * width });
   }
 
-  onTerminalClick() {
+  updateCursorLocation = (length, index) => {
+    this.setState({ cursorLocationPx: (length - index) * -10 });
+  }
+
+  onTerminalClick = () => {
     this.inputRef.current.focus();
   }
 
-  updateFocus(focus) {
-    this.setState({
-      isFocused: focus
-    });
+  onBlur = () => {
+    this.setState({ isFocused: false });
   }
 
-  updateInput(e) {
+  onFocus = () => {
+    this.setState({ isFocused: true });
+  }
+
+  updateInput = (e) => {
     this.setState({
       value: e.target.value,
       bufferValue: e.target.value,
@@ -57,10 +58,10 @@ export default class Terminal extends React.Component {
       cursorIndex: this.state.cursorIndex + 1
     });
 
-    this._updateInputLength(e.target.value.length, 10);
+    this.updateInputLength(e.target.value.length, 10);
   }
 
-  async onKeyPress(e) {
+  onKeyPress = async (e) => {
     // eslint-disable-next-line
     if(e.key === 'Enter') {
       this.setState({
@@ -71,8 +72,8 @@ export default class Terminal extends React.Component {
         cursorIndex: 0
       });
 
-      this._updateInputLength(0, 0);
-      this._updateCursorLocation(0, 0);
+      this.updateInputLength(0, 0);
+      this.updateCursorLocation(0, 0);
 
       try {
         const response = await commands.submit(e.target.value);
@@ -87,7 +88,7 @@ export default class Terminal extends React.Component {
     }
   }
 
-  onKeyDown(e) {
+  onKeyDown = (e) => {
     // eslint-disable-next-line
     switch(e.key) {
       // History upwards
@@ -101,8 +102,8 @@ export default class Terminal extends React.Component {
             cursorIndex: 0
           });
 
-          this._updateInputLength(prevValue.length, 10);
-          this._updateCursorLocation(prevValue.length, 0);
+          this.updateInputLength(prevValue.length, 10);
+          this.updateCursorLocation(prevValue.length, 0);
         }
         break;
       }
@@ -117,8 +118,8 @@ export default class Terminal extends React.Component {
             cursorIndex: bufferValue.length
           });
 
-          this._updateInputLength(bufferValue.length, 10);
-          this._updateCursorLocation(bufferValue.length, bufferValue.length);
+          this.updateInputLength(bufferValue.length, 10);
+          this.updateCursorLocation(bufferValue.length, bufferValue.length);
         } else if(this.state.historyIndex < this.state.history.length - 1) {
           const nextValue = this.state.history[this.state.historyIndex + 1].msg;
 
@@ -128,8 +129,8 @@ export default class Terminal extends React.Component {
             cursorIndex: nextValue.length
           });
 
-          this._updateInputLength(nextValue.length, 10);
-          this._updateCursorLocation(nextValue.length, nextValue.length);
+          this.updateInputLength(nextValue.length, 10);
+          this.updateCursorLocation(nextValue.length, nextValue.length);
         }
         break;
       }
@@ -140,7 +141,7 @@ export default class Terminal extends React.Component {
             cursorIndex: this.state.cursorIndex - 1
           });
 
-          this._updateCursorLocation(this.state.value.length, this.state.cursorIndex - 1);
+          this.updateCursorLocation(this.state.value.length, this.state.cursorIndex - 1);
         }
         break;
       }
@@ -151,7 +152,7 @@ export default class Terminal extends React.Component {
             cursorIndex: this.state.cursorIndex + 1
           });
 
-          this._updateCursorLocation(this.state.value.length, this.state.cursorIndex + 1);
+          this.updateCursorLocation(this.state.value.length, this.state.cursorIndex + 1);
         }
         break;
       }
@@ -159,6 +160,13 @@ export default class Terminal extends React.Component {
   }
 
   render() {
+    const onHandlers = {
+      onBlur: this.onBlur,
+      onFocus: this.onFocus,
+      onKeyPress: (e) => this.onKeyPress(e),
+      onKeyDown: (e) => this.onKeyDown(e)
+    };
+
     return (
       <div className='terminal'>
         <div className='terminal-bar'>
@@ -174,15 +182,13 @@ export default class Terminal extends React.Component {
 
           <div className='terminal-row'>
             <TerminalInfo></TerminalInfo>
-            <input ref={this.inputRef} onChange={this.updateInput}
+            <input ref={this.inputRef} style={{ width: this.state.inputLengthPx }}
                    className='terminal-row__input' value={this.state.value}
-                   onKeyPress={this.onKeyPress} onKeyDown={this.onKeyDown}
-                   type='text' spellCheck='false' maxLength='60'
-                   autoFocus autoComplete='off'
-                   onBlur={() => this.updateFocus(false)}
-                   onFocus={() => this.updateFocus(true)}>
+                   onChange={this.updateInput} type='text' spellCheck='false'
+                   maxLength='60' autoFocus={this.props.autoFocus} autoComplete='off' {...onHandlers}>
             </input>
-            <span ref={this.cursorRef} className='terminal-row__cursor'
+            <span style={{ left: this.state.cursorLocationPx }}
+                  className='terminal-row__cursor'
                   disabled={!this.state.isFocused}>
             </span>
           </div>
