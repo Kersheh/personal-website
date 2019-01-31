@@ -1,9 +1,14 @@
 import github from './commands/github';
+import linkedin from './commands/linkedin';
 
 const COMMANDS = {
   github: {
     cmd: 'github',
     run: github
+  },
+  linkedin: {
+    cmd: 'linkedin',
+    run: linkedin
   }
 };
 
