@@ -1,4 +1,5 @@
 import React from 'react';
+import { isArray } from 'lodash';
 import TerminalRow from './TerminalRow/TerminalRow';
 import TerminalInfo from './TerminalInfo/TerminalInfo';
 
@@ -77,8 +78,12 @@ export default class Terminal extends React.Component {
 
       try {
         const response = await commands.submit(e.target.value);
-        this.setState({
-          history: this.state.history.concat({ std: 'out', msg: response })
+        const messages = isArray(response) ? response : [response];
+
+        messages.forEach(message => {
+          this.setState({
+            history: this.state.history.concat({ std: 'out', msg: message })
+          });
         });
       } catch(err) {
         this.setState({
