@@ -16,8 +16,18 @@ export default class Window extends React.Component {
     };
   }
 
-  onBlur = () => {
-    this.setState({ isFocused: false });
+  componentDidMount() {
+    document.addEventListener('mousedown', this.outsideClickHandler);
+  }
+
+  componentWillUnmount() {
+    document.removeEventListener('mousedown', this.outsideClickHandler);
+  }
+
+  outsideClickHandler = e => {
+    if(this.node && !this.node.contains(e.target)) {
+      this.setState({ isFocused: false });
+    }
   }
 
   onFocus = () => {
@@ -37,8 +47,12 @@ export default class Window extends React.Component {
 
     return (
       <Draggable handle={this.state.draggableHandle}>
-        <div className='window' disabled={!this.state.isFocused} {...onWindowHandlers}
-             style={{ zIndex: this.state.isFocused ? this.props.windowsCount : this.props.index }}>
+        <div className='window' disabled={!this.state.isFocused}
+             ref={node => this.node = node} {...onWindowHandlers}
+             style={{
+               zIndex: this.state.isFocused ? this.props.windowsCount : this.props.index,
+               top: this.props.index * 128 + 32, left: this.props.index * 128 + 32
+             }}>
           <Terminal autoFocus={this.props.isFocused}
                     setDraggableTarget={this.setDraggableTarget}></Terminal>
         </div>

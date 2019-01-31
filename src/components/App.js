@@ -11,7 +11,7 @@ export default class App extends React.Component {
     super();
 
     this.state = {
-      windows: fill(Array(1), { isFocused: false }).map((window, i) => ({ isFocused: i === 0 }))
+      windows: fill(Array(2), { isFocused: false }).map((window, i) => ({ isFocused: i === 0 }))
     };
   }
 

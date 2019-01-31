@@ -2,10 +2,11 @@
 
 .app {
   height: 100%;
-  display: flex;
+  position: relative;
   flex-direction: column;
   flex-wrap: wrap;
   background-color: $color-ebony;
+  overflow: hidden;
   -webkit-font-smoothing: antialiased;
 
   .content {

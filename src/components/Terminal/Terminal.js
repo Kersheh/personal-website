@@ -182,13 +182,13 @@ export default class Terminal extends React.Component {
 
           <div className='terminal-row'>
             <TerminalInfo></TerminalInfo>
-            <input ref={this.inputRef} style={{ width: this.state.inputLengthPx }}
-                   className='terminal-row__input' value={this.state.value}
+            <input className='terminal-row__input' value={this.state.value}
+                   ref={this.inputRef} style={{ width: this.state.inputLengthPx }}
                    onChange={this.updateInput} type='text' spellCheck='false'
                    maxLength='60' autoFocus={this.props.autoFocus} autoComplete='off' {...onHandlers}>
             </input>
-            <span style={{ left: this.state.cursorLocationPx }}
-                  className='terminal-row__cursor'
+            <span className='terminal-row__cursor'
+                  style={{ left: this.state.cursorLocationPx }}
                   disabled={!this.state.isFocused}>
             </span>
           </div>

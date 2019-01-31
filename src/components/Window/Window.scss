@@ -6,10 +6,9 @@
   min-width: 900px;
   max-width: 900px;
   width: 100%;
-  margin: 0 auto;
-  position: relative;
-  top: 0px;
-  border: solid 0.5px rgba($color-black, 0.1);
+  position: absolute;
+  top: 0;
+  border: solid .5px rgba($color-black, 0.1);
   opacity: 1;
 
   &[disabled] {
