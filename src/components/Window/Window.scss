@@ -14,4 +14,33 @@
   &[disabled] {
     opacity: 0.8;
   }
+
+  &-bar {
+    background: #E0E8F0;
+    height: 30px;
+    border-radius: 8px 8px 0 0;
+    padding-left: 10px;
+    text-align: left;
+
+    .button {
+      border: rgba($color-black, .2) .5px solid;
+      height: 13px;
+      width: 13px;
+      border-radius: 50%;
+      display: inline-block;
+      margin: 8px;
+
+      &--red {
+        background-color: $color-carnation;
+      }
+
+      &--yellow {
+        background-color: $color-pastel-orange;
+      }
+
+      &--green {
+        background-color: $color-dull-lime;
+      }
+    }
+  }
 }

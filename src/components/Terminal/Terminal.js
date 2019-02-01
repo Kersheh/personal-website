@@ -27,10 +27,6 @@ export default class Terminal extends React.Component {
     this.inputRef = React.createRef();
   }
 
-  componentDidMount() {
-    this.props.setDraggableTarget('.terminal-bar');
-  }
-
   updateInputLength = (characters, width) => {
     this.setState({ inputLengthPx: characters * width });
   }
@@ -174,12 +170,6 @@ export default class Terminal extends React.Component {
 
     return (
       <div className='terminal'>
-        <div className='terminal-bar'>
-          <span className='button button--red'></span>
-          <span className='button button--yellow'></span>
-          <span className='button button--green'></span>
-        </div>
-
         <div className='terminal-body' onClick={this.onTerminalClick}>
           {this.state.history.map((item, i) =>
             <TerminalRow io={item.std} key={i} command={item.msg}></TerminalRow>

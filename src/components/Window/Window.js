@@ -11,8 +11,7 @@ export default class Window extends React.Component {
     super(props);
 
     this.state = {
-      isFocused: this.props.isFocused,
-      draggableHandle: ''
+      isFocused: this.props.isFocused
     };
   }
 
@@ -35,10 +34,6 @@ export default class Window extends React.Component {
     this.props.updateWindows(this.props.index);
   }
 
-  setDraggableTarget = (target) => {
-    this.setState({ draggableHandle: target });
-  }
-
   render() {
     const onWindowHandlers = {
       onBlur: this.onBlur,
@@ -46,13 +41,19 @@ export default class Window extends React.Component {
     };
 
     return (
-      <Draggable handle={this.state.draggableHandle}>
+      <Draggable handle='.window-bar'>
         <div className='window' disabled={!this.state.isFocused}
              ref={node => this.node = node} {...onWindowHandlers}
              style={{
                zIndex: this.state.isFocused ? this.props.windowsCount : this.props.index,
                top: this.props.index * 128 + 32, left: this.props.index * 128 + 32
              }}>
+          <div className='window-bar'>
+            <span className='button button--red'></span>
+            <span className='button button--yellow'></span>
+            <span className='button button--green'></span>
+          </div>
+
           <Terminal autoFocus={this.props.isFocused}
                     setDraggableTarget={this.setDraggableTarget}></Terminal>
         </div>
