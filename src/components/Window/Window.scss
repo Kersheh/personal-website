@@ -2,13 +2,13 @@
 
 .window {
   background: $color-daintree;
+  border: solid .5px rgba($color-black, 0.1);
   border-radius: 8px 8px;
   min-width: 900px;
   max-width: 900px;
   width: 100%;
   position: absolute;
   top: 0;
-  border: solid .5px rgba($color-black, 0.1);
   opacity: 1;
 
   &[disabled] {
@@ -16,7 +16,7 @@
   }
 
   &-bar {
-    background: #E0E8F0;
+    background: $color-mystic;
     height: 30px;
     border-radius: 8px 8px 0 0;
     padding-left: 10px;
@@ -32,14 +32,26 @@
 
       &--red {
         background-color: $color-carnation;
+
+        &-hover {
+
+        }
       }
 
       &--yellow {
         background-color: $color-pastel-orange;
+
+        &:hover {
+
+        }
       }
 
       &--green {
         background-color: $color-dull-lime;
+
+        &-hover {
+
+        }
       }
     }
   }

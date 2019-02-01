@@ -14,3 +14,6 @@ node_modules/
 # non-production directories
 src/
 photoshop/
+
+# misc
+.DS_Store

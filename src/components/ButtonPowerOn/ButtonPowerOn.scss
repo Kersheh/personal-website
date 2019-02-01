@@ -1,0 +1,17 @@
+@import 'src/scss/colors';
+
+$power-on-background: rgba($color-white, .7);
+
+.button {
+  &-power-on {
+    background-color: $power-on-background;
+    width: 64px;
+    border: 1px solid $power-on-background;
+    border-radius: 50%;
+
+    &:hover {
+      opacity: .5;
+      cursor: pointer;
+    }
+  }
+}

@@ -1,6 +1,6 @@
 import React from 'react';
-import { fill } from 'lodash';
-import Window from './Window/Window';
+import Desktop from './Desktop/Desktop';
+import ButtonPowerOn from './ButtonPowerOn/ButtonPowerOn';
 
 import './App.scss';
 
@@ -11,29 +11,23 @@ export default class App extends React.Component {
     super();
 
     this.state = {
-      windows: fill(Array(2), { isFocused: false }).map((window, i) => ({ isFocused: i === 0 }))
+      poweredOn: false
     };
   }
 
-  updateWindows = (i) => {
-    const windows = this.state.windows.map(() => ({ isFocused: false }));
-    windows[i].isFocused = true;
-
-    this.setState({
-      windows: windows
-    });
+  powerOn = () => {
+    this.setState({ poweredOn: true });
   }
 
   render() {
     return (
       <div className='app'>
-        <div className='content'>
-          {this.state.windows.map((item, i) =>
-            <Window key={i} index={i} isFocused={item.isFocused}
-                    updateWindows={this.updateWindows}
-                    windowsCount={this.state.windows.length}></Window>
-          )}
-        </div>
+        {this.state.poweredOn ?
+          <Desktop></Desktop> :
+          <div className='app-button__container'>
+            <ButtonPowerOn onClickHandler={this.powerOn}></ButtonPowerOn>
+          </div>
+        }
       </div>
     );
   }

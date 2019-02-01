@@ -1,6 +1,7 @@
 import React from 'react';
 import Draggable from 'react-draggable';
 import Terminal from '../Terminal/Terminal';
+import WindowButton from './WindowButton/WindowButton';
 
 import './Window.scss';
 
@@ -34,6 +35,10 @@ export default class Window extends React.Component {
     this.props.updateWindows(this.props.index);
   }
 
+  handleButtonClick = () => {
+    // TODO: functionality on button click
+  }
+
   render() {
     const onWindowHandlers = {
       onBlur: this.onBlur,
@@ -49,9 +54,9 @@ export default class Window extends React.Component {
                top: this.props.index * 128 + 32, left: this.props.index * 128 + 32
              }}>
           <div className='window-bar'>
-            <span className='button button--red'></span>
-            <span className='button button--yellow'></span>
-            <span className='button button--green'></span>
+            <WindowButton color='red' onButtonClick={this.handleButtonClick}></WindowButton>
+            <WindowButton color='yellow' onButtonClick={this.handleButtonClick}></WindowButton>
+            <WindowButton color='green' onButtonClick={this.handleButtonClick}></WindowButton>
           </div>
 
           <Terminal autoFocus={this.props.isFocused}
