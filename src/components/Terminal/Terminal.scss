@@ -17,7 +17,7 @@
     text-align: left;
 
     .button {
-      border: rgba($color-black, 0.2) 0.5px solid;
+      border: rgba($color-black, 0.2) .5px solid;
       height: 13px;
       width: 13px;
       border-radius: 50%;
@@ -73,7 +73,7 @@
       color: transparent;
       text-shadow: 0 0 0 $color-white;
       position: relative;
-      left: 0.1px;
+      left: .1px;
 
       &:focus {
         outline: none;
@@ -95,15 +95,15 @@
     }
 
     @-webkit-keyframes blink {
-      0% { opacity: 1.0; }
-      50% { opacity: 0.0; }
-      100% { opacity: 1.0; }
+      0% { opacity: 1; }
+      50% { opacity: 0; }
+      100% { opacity: 1; }
     }
 
     @keyframes blink {
-      0% { opacity: 1.0; }
-      50% { opacity: 0.0; }
-      100% { opacity: 1.0; }
+      0% { opacity: 1; }
+      50% { opacity: 0; }
+      100% { opacity: 1; }
     }
   }
 }

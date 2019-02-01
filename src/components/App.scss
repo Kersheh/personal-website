@@ -7,7 +7,9 @@
   flex-wrap: wrap;
   background-color: $color-ebony;
   overflow: hidden;
-  -webkit-font-smoothing: antialiased;
+  background-image: url('../scss/images/background.jpg');
+  background-repeat: no-repeat;
+  background-size: cover;
 
   .content {
     padding-top: 60px;
