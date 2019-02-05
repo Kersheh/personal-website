@@ -10,6 +10,19 @@ $power-on-background: rgba($color-white, .7);
 
     &__on {
       width: 64px;
+      animation: pulse 2s infinite;
+
+      @keyframes pulse {
+        0% {
+          box-shadow: 0 0 0 0 rgba($power-on-background, .4);
+        }
+        70% {
+          box-shadow: 0 0 0 30px rgba($color-black, 0);
+        }
+        100% {
+          box-shadow: 0 0 0 0 rgba($color-black, 0);
+        }
+      }
     }
 
     &__off {
