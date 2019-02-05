@@ -54,7 +54,7 @@ export default class Desktop extends React.Component {
 
   render() {
     return (
-      <div className={'desktop' + (this.state.powerOn ? '' : ' turn-off')}>
+      <div className={'desktop' + (this.state.powerOn ? '' : ' turn-off')} ref={node => this.node = node}>
         <div className='content'>
           <ButtonPower on={false} onClickHandler={this.timedPowerOff}></ButtonPower>
           <Icon iconName='iterm' onDoubleClickHandler={() => this.openNewWindow('iterm')}></Icon>
@@ -62,7 +62,7 @@ export default class Desktop extends React.Component {
           {this.state.windows.map((item, i) => {
             return item === null ? item : (
               <Window key={i} index={i} uuid={item.uuid} isFocused={item.isFocused}
-                      updateWindows={this.updateWindows}
+                      updateWindows={this.updateWindows} parentNode={this.node}
                       windowsCount={this.state.windows.length}
                       closeWindow={this.closeWindow}></Window>
             );

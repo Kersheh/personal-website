@@ -12,6 +12,8 @@ export default class Window extends React.Component {
     super(props);
 
     this.state = {
+      initX: Math.floor(Math.random() * this.props.parentNode.offsetHeight * .5),
+      initY: Math.floor(Math.random() * this.props.parentNode.offsetWidth * .5),
       isFocused: this.props.isFocused
     };
   }
@@ -55,7 +57,7 @@ export default class Window extends React.Component {
              ref={node => this.node = node} {...onWindowHandlers}
              style={{
                zIndex: this.state.isFocused ? this.props.windowsCount + 1 : this.props.index,
-               top: this.props.index * 128 + 32, left: this.props.index * 128 + 32
+               top: this.state.initX, left: this.state.initY
              }}>
           <div className='window-bar'>
             <WindowButton color='red' onButtonClick={this.closeWindow}></WindowButton>
