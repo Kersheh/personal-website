@@ -1,7 +1,5 @@
 @import 'src/scss/colors';
 
-$screen-background: #121010;
-
 .desktop {
   height: 100%;
   position: relative;
@@ -15,16 +13,15 @@ $screen-background: #121010;
 
   // flicker
   &::after {
-    content: ' ';
+    content: '';
     display: block;
     position: absolute;
     top: 0;
     left: 0;
     bottom: 0;
     right: 0;
-    background: transparentize($screen-background, .9);
+    background: transparentize($color-onyx, .9);
     opacity: 0;
-    z-index: 2;
     pointer-events: none;
     animation: flicker 0.15s infinite;
   }
@@ -38,21 +35,20 @@ $screen-background: #121010;
     left: 0;
     bottom: 0;
     right: 0;
-    background: linear-gradient(transparentize($screen-background,1) 50%, transparentize(darken($screen-background,10),0.75) 50%), linear-gradient(90deg,transparentize(#ff0000,0.94),transparentize(#00ff00,0.98),transparentize(#0000ff,0.94));
-    z-index: 2;
+    background: linear-gradient(transparentize($color-onyx, 1) 50%, transparentize(darken($color-onyx, 10), .75) 50%), linear-gradient(90deg, transparentize($color-red, .94), transparentize($color-green, .98), transparentize($color-blue, .94));
     background-size: 100% 2px, 3px 100%;
     pointer-events: none;
   }
 
   .content {
-    padding-top: 60px;
+    padding: 20px;
   }
 
   @keyframes flicker {
     $steps: 20;
     @for $i from 0 through $steps {
-      #{percentage($i*(1/$steps))} {
-        opacity:random();
+      #{percentage($i * (1 / $steps))} {
+        opacity: random();
       }
     }
   }

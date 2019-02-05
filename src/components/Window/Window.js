@@ -39,6 +39,10 @@ export default class Window extends React.Component {
     // TODO: functionality on button click
   }
 
+  closeWindow = () => {
+    this.props.closeWindow(this.props.uuid);
+  }
+
   render() {
     const onWindowHandlers = {
       onBlur: this.onBlur,
@@ -50,11 +54,11 @@ export default class Window extends React.Component {
         <div className='window' disabled={!this.state.isFocused}
              ref={node => this.node = node} {...onWindowHandlers}
              style={{
-               zIndex: this.state.isFocused ? this.props.windowsCount : this.props.index,
+               zIndex: this.state.isFocused ? this.props.windowsCount + 1 : this.props.index,
                top: this.props.index * 128 + 32, left: this.props.index * 128 + 32
              }}>
           <div className='window-bar'>
-            <WindowButton color='red' onButtonClick={this.handleButtonClick}></WindowButton>
+            <WindowButton color='red' onButtonClick={this.closeWindow}></WindowButton>
             <WindowButton color='yellow' onButtonClick={this.handleButtonClick}></WindowButton>
             <WindowButton color='green' onButtonClick={this.handleButtonClick}></WindowButton>
           </div>

@@ -19,11 +19,15 @@ export default class App extends React.Component {
     this.setState({ poweredOn: true });
   }
 
+  powerOff = () => {
+    this.setState({ poweredOn: false });
+  }
+
   render() {
     return (
       <div className='app'>
         {this.state.poweredOn ?
-          <Desktop></Desktop> :
+          <Desktop powerOff={this.powerOff}></Desktop> :
           <div className='app-button__container'>
             <ButtonPowerOn onClickHandler={this.powerOn}></ButtonPowerOn>
           </div>
