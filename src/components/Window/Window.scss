@@ -24,24 +24,45 @@
 
     .button {
       border: rgba($color-black, .2) .5px solid;
-      height: 13px;
-      width: 13px;
+      height: 14px;
+      width: 14px;
       border-radius: 50%;
       display: inline-block;
       margin: 8px;
+      cursor: pointer;
 
       &--red {
         background-color: $color-carnation;
+        position: relative;
 
-        &-hover {
+        &.hover {
+          &:before,
+          &:after {
+            content: '';
+            position: absolute;
+            width: 9px;
+            height: 1px;
+            background-color: rgba($color-black, .7);
+            top: 7px;
+            box-shadow: 0 0 2px 0 #ccc;
+          }
 
+          &:before {
+            transform: rotate(45deg);
+            left: 2.5px;
+          }
+
+          &:after {
+            transform: rotate(-45deg);
+            right: 2.5px;
+          }
         }
       }
 
       &--yellow {
         background-color: $color-pastel-orange;
 
-        &:hover {
+        &.hover {
 
         }
       }
@@ -49,7 +70,7 @@
       &--green {
         background-color: $color-dull-lime;
 
-        &-hover {
+        &.hover {
 
         }
       }
