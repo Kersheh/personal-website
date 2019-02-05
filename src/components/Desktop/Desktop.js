@@ -3,6 +3,7 @@ import { get } from 'lodash';
 import uuid from 'uuid';
 import Window from '../Window/Window';
 import Icon from '../Icon/Icon';
+import ButtonPower from '../ButtonPower/ButtonPower';
 
 import './Desktop.scss';
 
@@ -13,7 +14,8 @@ export default class Desktop extends React.Component {
     super();
 
     this.state = {
-      windows: []
+      windows: [],
+      powerOn: true
     };
   }
 
@@ -45,10 +47,16 @@ export default class Desktop extends React.Component {
     this.setState({ windows: windows });
   }
 
+  timedPowerOff = () => {
+    this.setState({ powerOn: false });
+    setTimeout(this.props.powerOff, 550);
+  }
+
   render() {
     return (
-      <div className='desktop'>
+      <div className={'desktop' + (this.state.powerOn ? '' : ' turn-off')}>
         <div className='content'>
+          <ButtonPower on={false} onClickHandler={this.timedPowerOff}></ButtonPower>
           <Icon iconName='iterm' onDoubleClickHandler={() => this.openNewWindow('iterm')}></Icon>
 
           {this.state.windows.map((item, i) => {

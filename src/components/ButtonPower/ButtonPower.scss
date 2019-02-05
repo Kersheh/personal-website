@@ -3,11 +3,21 @@
 $power-on-background: rgba($color-white, .7);
 
 .button {
-  &-power-on {
+  &-power {
     background-color: $power-on-background;
     border: 1px solid $power-on-background;
-    width: 64px;
     border-radius: 50%;
+
+    &__on {
+      width: 64px;
+    }
+
+    &__off {
+      position: fixed;
+      width: 24px;
+      top: 20px;
+      right: 20px;
+    }
 
     &:hover {
       background-color: $color-white;

@@ -1,6 +1,6 @@
 import React from 'react';
 import Desktop from './Desktop/Desktop';
-import ButtonPowerOn from './ButtonPowerOn/ButtonPowerOn';
+import ButtonPower from './ButtonPower/ButtonPower';
 
 import './App.scss';
 
@@ -29,7 +29,7 @@ export default class App extends React.Component {
         {this.state.poweredOn ?
           <Desktop powerOff={this.powerOff}></Desktop> :
           <div className='app-button__container'>
-            <ButtonPowerOn onClickHandler={this.powerOn}></ButtonPowerOn>
+            <ButtonPower on={true} onClickHandler={this.powerOn}></ButtonPower>
           </div>
         }
       </div>
