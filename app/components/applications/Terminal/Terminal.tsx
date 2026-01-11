@@ -1,12 +1,6 @@
 'use client';
 
-import {
-  useState,
-  useRef,
-  KeyboardEvent,
-  ChangeEvent,
-  useEffect
-} from 'react';
+import { useState, useRef, KeyboardEvent, ChangeEvent, useEffect } from 'react';
 import { isArray } from 'lodash';
 import TerminalRow from './TerminalRow/TerminalRow';
 import TerminalInfo from './TerminalInfo/TerminalInfo';
@@ -37,6 +31,8 @@ const Terminal = ({
   const [inputHistoryIndex, setInputHistoryIndex] = useState(0);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const promptRef = useRef<HTMLSpanElement>(null);
+  const [promptWidth, setPromptWidth] = useState(0);
 
   useEffect(() => {
     if (scrollContainerRef.current) {
@@ -44,6 +40,12 @@ const Terminal = ({
         scrollContainerRef.current.scrollHeight;
     }
   }, [history, value]);
+
+  useEffect(() => {
+    if (promptRef.current) {
+      setPromptWidth(promptRef.current.offsetWidth);
+    }
+  }, []);
 
   const contentHeight = Math.max(120, height ?? 360);
 
@@ -59,14 +61,22 @@ const Terminal = ({
           <TerminalRow io={item.std} key={i} command={item.msg} />
         ))}
 
-        <div className="text-base tracking-wider text-white/80 font-['Courier_new',_'Courier',_monospace] flex flex-wrap items-start">
-          <TerminalInfo />
-          <div className="flex-1 min-w-0 relative">
-            <span className="invisible whitespace-pre-wrap break-all tracking-[1.5px]">{value || ' '}</span>
+        <div className="text-base tracking-wider text-white/80 font-['Courier_new',_'Courier',_monospace] relative">
+          <span className="absolute left-0 top-0">
+            <TerminalInfo ref={promptRef} />
+          </span>
+          <div className="min-w-0 w-full relative">
+            <span
+              className="invisible whitespace-pre-wrap break-all tracking-[1.5px] block"
+              style={{ textIndent: promptWidth }}
+            >
+              {value || ' '}
+            </span>
             <textarea
-              className="font-['Courier_new',_'Courier',_monospace] text-base tracking-[1.5px] p-0 border-none bg-transparent text-white/80 absolute inset-0 w-full h-full resize-none overflow-hidden focus:outline-none caret-white whitespace-pre-wrap break-all"
+              className="font-['Courier_new',_'Courier',_monospace] text-base tracking-[1.5px] p-0 border-none bg-transparent text-white/80 absolute top-0 left-0 w-full resize-none focus:outline-none caret-white whitespace-pre-wrap break-all"
               value={value}
               ref={inputRef}
+              style={{ textIndent: `${promptWidth + 8}px`, height: '100%' }}
               onChange={(e: ChangeEvent<HTMLTextAreaElement>) => {
                 const newValue = e.target.value.replace(/\n/g, '');
                 setValue(newValue);

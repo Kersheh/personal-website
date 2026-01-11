@@ -1,13 +1,19 @@
 'use client';
 
-import { useState } from 'react';
+import { forwardRef, useState } from 'react';
 
-const TerminalInfo = () => {
+const TerminalInfo = forwardRef<HTMLSpanElement, {}>((_props, ref) => {
   const [host] = useState(() =>
     typeof window !== 'undefined' ? window.location.host : 'matthewbreckon.com'
   );
 
-  return <span className="font-semibold pr-2.5">guest@{host} $</span>;
-};
+  return (
+    <span ref={ref} className="font-semibold">
+      guest@{host} $ 
+    </span>
+  );
+});
+
+TerminalInfo.displayName = 'TerminalInfo';
 
 export default TerminalInfo;
