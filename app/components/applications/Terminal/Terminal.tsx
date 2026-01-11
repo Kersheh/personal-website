@@ -5,8 +5,7 @@ import {
   useRef,
   KeyboardEvent,
   ChangeEvent,
-  useEffect,
-  useCallback
+  useEffect
 } from 'react';
 import { isArray } from 'lodash';
 import TerminalRow from './TerminalRow/TerminalRow';
@@ -25,8 +24,6 @@ interface TerminalProps {
   height?: number;
 }
 
-const CHAR_WIDTH = 10;
-
 const Terminal = ({
   autoFocus,
   closeWindow,
@@ -35,33 +32,18 @@ const Terminal = ({
 }: TerminalProps) => {
   const [value, setValue] = useState('');
   const [bufferValue, setBufferValue] = useState('');
-  const [isFocused, setIsFocused] = useState(true);
   const [history, setHistory] = useState<HistoryItem[]>([]);
   const [inputHistory, setInputHistory] = useState<string[]>([]);
   const [inputHistoryIndex, setInputHistoryIndex] = useState(0);
-  const [cursorOffset, setCursorOffset] = useState(0);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
-
-  const updateCursorPosition = useCallback(() => {
-    if (inputRef.current) {
-      const cursorPos = inputRef.current.selectionStart || 0;
-      const inputLength = inputRef.current.value.length;
-      const offset = (inputLength - cursorPos) * -CHAR_WIDTH;
-      setCursorOffset(offset);
-    }
-  }, []);
-
-  useEffect(() => {
-    updateCursorPosition();
-  }, [updateCursorPosition]);
 
   useEffect(() => {
     if (scrollContainerRef.current) {
       scrollContainerRef.current.scrollTop =
         scrollContainerRef.current.scrollHeight;
     }
-  }, [history]);
+  }, [history, value]);
 
   const contentHeight = Math.max(120, height ?? 360);
 
@@ -69,7 +51,7 @@ const Terminal = ({
     <div className="[&_a]:text-white/70 [&_a:hover]:text-[#009fef]">
       <div
         ref={scrollContainerRef}
-        className="p-2.5 overflow-x-auto overflow-y-scroll"
+        className="p-2.5 overflow-y-scroll"
         style={{ height: contentHeight, willChange: 'height' }}
         onClick={() => inputRef.current?.focus()}
       >
@@ -77,142 +59,106 @@ const Terminal = ({
           <TerminalRow io={item.std} key={i} command={item.msg} />
         ))}
 
-        <div className="h-[18px] text-base tracking-wider text-white/80 font-['Courier_new',_'Courier',_monospace] whitespace-nowrap">
+        <div className="text-base tracking-wider text-white/80 font-['Courier_new',_'Courier',_monospace] flex flex-wrap items-start">
           <TerminalInfo />
-          <input
-            className="font-['Courier_new',_'Courier',_monospace] text-base tracking-[1.5px] p-0 border-none bg-transparent inline-block text-transparent [text-shadow:0_0_0_white] relative md:left-[0.1px] focus:outline-none"
-            value={value}
-            ref={inputRef}
-            style={{ width: value.length * CHAR_WIDTH }}
-            onChange={(e: ChangeEvent<HTMLInputElement>) => {
-              setValue(e.target.value);
-              setBufferValue(e.target.value);
-              setInputHistoryIndex(inputHistory.length);
-              setTimeout(updateCursorPosition, 0);
-              setTimeout(() => {
-                if (inputRef.current && scrollContainerRef.current) {
-                  const inputRight = inputRef.current.offsetLeft + inputRef.current.offsetWidth;
-                  const containerWidth = scrollContainerRef.current.clientWidth;
-                  const currentScroll = scrollContainerRef.current.scrollLeft;
-                  
-                  if (inputRight > currentScroll + containerWidth) {
-                    scrollContainerRef.current.scrollLeft = inputRight - containerWidth + 20;
+          <div className="flex-1 min-w-0 relative">
+            <span className="invisible whitespace-pre-wrap break-all tracking-[1.5px]">{value || ' '}</span>
+            <textarea
+              className="font-['Courier_new',_'Courier',_monospace] text-base tracking-[1.5px] p-0 border-none bg-transparent text-white/80 absolute inset-0 w-full h-full resize-none overflow-hidden focus:outline-none caret-white whitespace-pre-wrap break-all"
+              value={value}
+              ref={inputRef}
+              onChange={(e: ChangeEvent<HTMLTextAreaElement>) => {
+                const newValue = e.target.value.replace(/\n/g, '');
+                setValue(newValue);
+                setBufferValue(newValue);
+                setInputHistoryIndex(inputHistory.length);
+              }}
+              spellCheck={false}
+              autoFocus={autoFocus}
+              autoComplete="off"
+              onKeyDown={async (e: KeyboardEvent<HTMLTextAreaElement>) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  const inputValue = (e.target as HTMLTextAreaElement).value;
+
+                  setValue('');
+                  setBufferValue('');
+                  setHistory([...history, { std: 'in', msg: inputValue }]);
+                  setInputHistory([...inputHistory, inputValue]);
+                  setInputHistoryIndex(inputHistory.length + 1);
+
+                  if (!inputValue.trim()) {
+                    return;
                   }
-                }
-              }, 0);
-            }}
-            type="text"
-            spellCheck={false}
-            maxLength={60}
-            autoFocus={autoFocus}
-            autoComplete="off"
-            onBlur={() => setIsFocused(false)}
-            onFocus={() => setIsFocused(true)}
-            onKeyDown={async (e: KeyboardEvent<HTMLInputElement>) => {
-              if (
-                [
-                  'ArrowLeft',
-                  'ArrowRight',
-                  'Home',
-                  'End',
-                  'Backspace',
-                  'Delete'
-                ].includes(e.key)
-              ) {
-                setTimeout(updateCursorPosition, 0);
-              }
 
-              if (e.key === 'Enter') {
-                e.preventDefault();
-                const inputValue = (e.target as HTMLInputElement).value;
+                  try {
+                    const response = await commands.submit(inputValue, {
+                      closeWindow,
+                      windowId,
+                      clearHistory: () => setHistory([])
+                    });
+                    const messages = isArray(response)
+                      ? response
+                      : response.split('\n');
 
-                setValue('');
-                setBufferValue('');
-                setHistory([...history, { std: 'in', msg: inputValue }]);
-                setInputHistory([...inputHistory, inputValue]);
-                setInputHistoryIndex(inputHistory.length + 1);
-                setCursorOffset(0);
-
-                if (!inputValue.trim()) {
+                    messages.forEach((message) => {
+                      setHistory((prev) => [
+                        ...prev,
+                        { std: 'out', msg: message }
+                      ]);
+                    });
+                  } catch (err) {
+                    setHistory((prev) => [
+                      ...prev,
+                      { std: 'out', msg: (err as Error).message }
+                    ]);
+                  }
                   return;
                 }
 
-                try {
-                  const response = await commands.submit(inputValue, {
-                    closeWindow,
-                    windowId,
-                    clearHistory: () => setHistory([])
-                  });
-                  const messages = isArray(response)
-                    ? response
-                    : response.split('\n');
+                switch (e.key) {
+                  case 'ArrowUp':
+                    e.preventDefault();
+                    if (inputHistoryIndex > 0) {
+                      const prevValue = inputHistory[inputHistoryIndex - 1];
+                      setValue(prevValue);
+                      setInputHistoryIndex(inputHistoryIndex - 1);
+                      setTimeout(() => {
+                        if (inputRef.current) {
+                          inputRef.current.selectionStart = prevValue.length;
+                          inputRef.current.selectionEnd = prevValue.length;
+                        }
+                      }, 0);
+                    }
+                    break;
 
-                  messages.forEach((message) => {
-                    setHistory((prev) => [
-                      ...prev,
-                      { std: 'out', msg: message }
-                    ]);
-                  });
-                } catch (err) {
-                  setHistory((prev) => [
-                    ...prev,
-                    { std: 'out', msg: (err as Error).message }
-                  ]);
+                  case 'ArrowDown':
+                    e.preventDefault();
+                    if (inputHistoryIndex === inputHistory.length - 1) {
+                      setValue(bufferValue);
+                      setInputHistoryIndex(inputHistory.length);
+                      setTimeout(() => {
+                        if (inputRef.current) {
+                          inputRef.current.selectionStart = bufferValue.length;
+                          inputRef.current.selectionEnd = bufferValue.length;
+                        }
+                      }, 0);
+                    } else if (inputHistoryIndex < inputHistory.length - 1) {
+                      const nextValue = inputHistory[inputHistoryIndex + 1];
+                      setValue(nextValue);
+                      setInputHistoryIndex(inputHistoryIndex + 1);
+                      setTimeout(() => {
+                        if (inputRef.current) {
+                          inputRef.current.selectionStart = nextValue.length;
+                          inputRef.current.selectionEnd = nextValue.length;
+                        }
+                      }, 0);
+                    }
+                    break;
                 }
-                return;
-              }
-
-              switch (e.key) {
-                case 'ArrowUp':
-                  e.preventDefault();
-                  if (inputHistoryIndex > 0) {
-                    const prevValue = inputHistory[inputHistoryIndex - 1];
-                    setValue(prevValue);
-                    setInputHistoryIndex(inputHistoryIndex - 1);
-                    setTimeout(() => {
-                      if (inputRef.current) {
-                        inputRef.current.selectionStart = prevValue.length;
-                        inputRef.current.selectionEnd = prevValue.length;
-                        updateCursorPosition();
-                      }
-                    }, 0);
-                  }
-                  break;
-
-                case 'ArrowDown':
-                  e.preventDefault();
-                  if (inputHistoryIndex === inputHistory.length - 1) {
-                    setValue(bufferValue);
-                    setInputHistoryIndex(inputHistory.length);
-                    setTimeout(() => {
-                      if (inputRef.current) {
-                        inputRef.current.selectionStart = bufferValue.length;
-                        inputRef.current.selectionEnd = bufferValue.length;
-                        updateCursorPosition();
-                      }
-                    }, 0);
-                  } else if (inputHistoryIndex < inputHistory.length - 1) {
-                    const nextValue = inputHistory[inputHistoryIndex + 1];
-                    setValue(nextValue);
-                    setInputHistoryIndex(inputHistoryIndex + 1);
-                    setTimeout(() => {
-                      if (inputRef.current) {
-                        inputRef.current.selectionStart = nextValue.length;
-                        inputRef.current.selectionEnd = nextValue.length;
-                        updateCursorPosition();
-                      }
-                    }, 0);
-                  }
-                  break;
-              }
-            }}
-            onClick={updateCursorPosition}
-          />
-          <span
-            className="inline-block relative bg-white align-top w-2.5 h-[18px] data-[disabled=true]:hidden animate-[blink_1s_step-end_infinite]"
-            style={{ left: cursorOffset }}
-            data-disabled={!isFocused}
-          />
+              }}
+            />
+          </div>
         </div>
       </div>
     </div>
