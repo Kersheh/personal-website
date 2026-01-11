@@ -28,8 +28,18 @@ const WindowButton = ({ color, onButtonClick }: WindowButtonProps) => {
           onButtonClick();
         }
       }}
-      onTouchStart={() => setHover(true)}
-      onTouchEnd={() => setHover(false)}
+      onTouchStart={(e) => {
+        e.stopPropagation();
+        setHover(true);
+      }}
+      onTouchEnd={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setHover(false);
+        if (onButtonClick) {
+          onButtonClick();
+        }
+      }}
     >
       {hover && color === 'red' && (
         <svg
