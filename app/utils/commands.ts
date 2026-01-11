@@ -58,14 +58,18 @@ export const COMMANDS: CommandRegistry = {
   }
 };
 
+interface SubmitOptions {
+  closeWindow?: (id: string) => void;
+  windowId?: string;
+  clearHistory?: () => void;
+}
+
 const submit = async (
   command: string,
-  closeWindow?: (id: string) => void,
-  windowId?: string,
-  clearHistory?: () => void
+  options: SubmitOptions = {}
 ): Promise<string> => {
   try {
-    return await COMMANDS[command].run({ closeWindow, windowId, clearHistory });
+    return await COMMANDS[command].run(options);
   } catch {
     throw new Error(`${command}: command not found (try \`help\`)`);
   }

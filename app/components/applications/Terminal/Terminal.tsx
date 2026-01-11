@@ -77,10 +77,10 @@ const Terminal = ({
           <TerminalRow io={item.std} key={i} command={item.msg} />
         ))}
 
-        <div className="h-[18px] text-sm tracking-wider text-white/80 font-['Courier_new',_'Courier',_monospace]">
+        <div className="h-[18px] text-base tracking-wider text-white/80 font-['Courier_new',_'Courier',_monospace]">
           <TerminalInfo />
           <input
-            className="font-['Courier_new',_'Courier',_monospace] text-sm tracking-[1.5px] p-0 border-none bg-transparent inline-block text-transparent [text-shadow:0_0_0_white] relative left-[0.1px] focus:outline-none"
+            className="font-['Courier_new',_'Courier',_monospace] text-base tracking-[1.5px] p-0 border-none bg-transparent inline-block text-transparent [text-shadow:0_0_0_white] relative left-[0.1px] focus:outline-none"
             value={value}
             ref={inputRef}
             style={{ width: value.length * CHAR_WIDTH }}
@@ -127,12 +127,11 @@ const Terminal = ({
                 }
 
                 try {
-                  const response = await commands.submit(
-                    inputValue,
+                  const response = await commands.submit(inputValue, {
                     closeWindow,
                     windowId,
-                    () => setHistory([])
-                  );
+                    clearHistory: () => setHistory([])
+                  });
                   const messages = isArray(response)
                     ? response
                     : response.split('\n');
