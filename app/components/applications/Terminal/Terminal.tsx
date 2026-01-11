@@ -70,7 +70,7 @@ const Terminal = ({
       <div
         ref={scrollContainerRef}
         className="p-2.5 overflow-x-hidden overflow-y-scroll"
-        style={{ height: contentHeight }}
+        style={{ height: contentHeight, willChange: 'height' }}
         onClick={() => inputRef.current?.focus()}
       >
         {history.map((item, i) => (

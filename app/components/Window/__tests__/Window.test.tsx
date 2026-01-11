@@ -166,9 +166,7 @@ describe('Window - Resize and Maximize', () => {
 
       await waitFor(
         () => {
-          expect((windowElement as HTMLElement).style.width).toBe(
-            initialWidth
-          );
+          expect((windowElement as HTMLElement).style.width).toBe(initialWidth);
         },
         { timeout: 500 }
       );

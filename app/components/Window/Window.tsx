@@ -39,6 +39,7 @@ const Window = ({
     (state) => state.setFocusedApp
   );
   const [isFocused, setIsFocused] = useState(initialFocused);
+  const [isAnimating, setIsAnimating] = useState(false);
 
   useEffect(() => {
     setIsFocused(initialFocused);
@@ -113,6 +114,8 @@ const Window = ({
     if (parentNode) {
       const desktopPadding = 20;
 
+      setIsAnimating(true);
+
       setPreviousState({
         width: size.width,
         height: size.height,
@@ -126,12 +129,16 @@ const Window = ({
       setSize({ width: maxWidth, height: maxHeight });
       setPosition({ x: -desktopPadding, y: 0 });
       setIsMaximized(true);
+
+      setTimeout(() => setIsAnimating(false), 300);
     }
   };
 
   const toggleMaximize = () => {
     if (parentNode) {
       const desktopPadding = 20;
+
+      setIsAnimating(true);
 
       if (isMaximized && previousState) {
         // Restore to previous size
@@ -155,6 +162,8 @@ const Window = ({
         setPosition({ x: -desktopPadding, y: 0 });
         setIsMaximized(true);
       }
+
+      setTimeout(() => setIsAnimating(false), 300);
     }
   };
 
@@ -248,9 +257,7 @@ const Window = ({
       }}
     >
       <div
-        className={`bg-daintree border border-black/10 rounded-lg absolute top-0 transition-opacity duration-200 ${
-          isFocused ? 'opacity-100' : 'opacity-60'
-        }`}
+        className={`bg-daintree border border-black/10 rounded-lg absolute top-0 transition-opacity duration-200 ${isFocused ? 'opacity-100' : 'opacity-60'} ${isAnimating ? 'transition-all duration-300 ease-in-out overflow-hidden' : ''}`}
         ref={nodeRef}
         data-window
         onClick={() => {
@@ -261,7 +268,8 @@ const Window = ({
         style={{
           zIndex: isFocused ? windowsCount + 1 : index,
           width: size.width,
-          height: size.height
+          height: size.height,
+          willChange: isAnimating ? 'width, height' : 'auto'
         }}
       >
         <div

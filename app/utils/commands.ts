@@ -21,11 +21,6 @@ export const COMMANDS: CommandRegistry = {
     description: 'Send me an email',
     run: email
   },
-  exit: {
-    cmd: 'exit',
-    description: 'Close this terminal',
-    run: exit
-  },
   clear: {
     cmd: 'clear',
     description: 'Clear the terminal screen',
@@ -41,13 +36,25 @@ export const COMMANDS: CommandRegistry = {
         ''
       ];
 
-      const commandLines = Object.values(COMMANDS).map((cmd) => {
-        const padding = ' '.repeat(Math.max(1, 9 - cmd.cmd.length));
-        return `${cmd.cmd}${padding}- ${cmd.description}`;
-      });
+      const commandLines = Object.values(COMMANDS)
+        .filter((cmd) => cmd.cmd !== 'exit' && cmd.cmd !== 'help')
+        .map((cmd) => {
+          const padding = ' '.repeat(Math.max(1, 9 - cmd.cmd.length));
+          return `${cmd.cmd}${padding}- ${cmd.description}`;
+        });
+
+      // Add exit at the bottom
+      const exitCmd = COMMANDS.exit;
+      const exitPadding = ' '.repeat(Math.max(1, 9 - exitCmd.cmd.length));
+      commandLines.push(`${exitCmd.cmd}${exitPadding}- ${exitCmd.description}`);
 
       return [...header, ...commandLines].join('\n');
     }
+  },
+  exit: {
+    cmd: 'exit',
+    description: 'Close this terminal',
+    run: exit
   }
 };
 
