@@ -2,7 +2,6 @@
 
 import { useMemo } from 'react';
 import TerminalInfo from '../TerminalInfo/TerminalInfo';
-import styles from '../Terminal.module.scss';
 
 interface StringPart {
   isUrl: boolean;
@@ -43,10 +42,10 @@ export default function TerminalRow({ io, command }: TerminalRowProps) {
   }, [io, command]);
 
   return (
-    <div className={styles['terminal-row']}>
+    <div className="h-[18px] text-sm tracking-wider text-white/80 font-['Courier_new',_'Courier',_monospace]">
       {io === 'in' && <TerminalInfo />}
 
-      <span className={styles['terminal-row__history']}>
+      <span className="tracking-[1.5px]">
         {commandParts.map((substring, i) =>
           substring.isUrl ? (
             <a

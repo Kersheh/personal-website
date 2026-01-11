@@ -5,7 +5,6 @@ import { isArray } from 'lodash';
 import TerminalRow from './TerminalRow/TerminalRow';
 import TerminalInfo from './TerminalInfo/TerminalInfo';
 import commands from '../../helpers/commands';
-import styles from './Terminal.module.scss';
 
 interface HistoryItem {
   std: 'in' | 'out';
@@ -133,16 +132,16 @@ export default function Terminal({ autoFocus }: TerminalProps) {
   };
 
   return (
-    <div className={styles.terminal}>
-      <div className={styles['terminal-body']} onClick={onTerminalClick}>
+    <div className="[&_a]:text-white/70 [&_a:hover]:text-[#009fef]">
+      <div className="p-2.5 h-[360px] overflow-x-hidden overflow-y-scroll" onClick={onTerminalClick}>
         {history.map((item, i) => (
           <TerminalRow io={item.std} key={i} command={item.msg} />
         ))}
 
-        <div className={styles['terminal-row']}>
+        <div className="h-[18px] text-sm tracking-wider text-white/80 font-['Courier_new',_'Courier',_monospace]">
           <TerminalInfo />
           <input
-            className={styles['terminal-row__input']}
+            className="font-['Courier_new',_'Courier',_monospace] text-sm tracking-[1.5px] w-0 p-0 border-none bg-transparent inline-block text-transparent [text-shadow:0_0_0_white] relative left-[0.1px] focus:outline-none"
             value={value}
             ref={inputRef}
             style={{ width: inputLengthPx }}
@@ -158,7 +157,7 @@ export default function Terminal({ autoFocus }: TerminalProps) {
             onKeyDown={onKeyDown}
           />
           <span
-            className={styles['terminal-row__cursor']}
+            className="inline-block relative bg-white align-top w-2.5 h-[18px] data-[disabled=true]:hidden animate-[blink_1s_step-end_infinite]"
             style={{ left: cursorLocationPx }}
             data-disabled={!isFocused}
           />

@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import styles from './Icon.module.scss';
 
 interface IconProps {
   iconName: string;
@@ -35,10 +34,15 @@ export default function Icon({ iconName, onDoubleClickHandler }: IconProps) {
 
   return (
     <div
-      className={`${styles.icon} ${styles[`icon-${iconName}`]}${isSelected ? ` ${styles.active}` : ''}`}
+      className={`w-16 h-16 p-0.5 bg-no-repeat bg-cover cursor-pointer border-2 rounded-[5%] ${
+        isSelected ? 'border-[#3f3f3f]' : 'border-transparent'
+      }`}
+      style={{ backgroundImage: `url(/images/icons/icon-${iconName}.png)` }}
       ref={nodeRef}
       onClick={onClick}
       onDoubleClick={onDoubleClick}
-    />
+    >
+      <div />
+    </div>
   );
 }

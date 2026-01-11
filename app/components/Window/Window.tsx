@@ -4,7 +4,6 @@ import { useState, useEffect, useRef } from 'react';
 import Draggable from 'react-draggable';
 import Terminal from '../Terminal/Terminal';
 import WindowButton from './WindowButton/WindowButton';
-import styles from './Window.module.scss';
 
 interface WindowProps {
   index: number;
@@ -63,7 +62,7 @@ export default function Window({
   return (
     <Draggable handle=".window-bar" nodeRef={nodeRef}>
       <div
-        className={styles.window}
+        className="bg-daintree border border-black/10 rounded-lg min-w-[900px] max-w-[900px] w-full absolute top-0 opacity-100 disabled:opacity-80"
         ref={nodeRef}
         onClick={onFocus}
         style={{
@@ -72,7 +71,7 @@ export default function Window({
           left: initY,
         }}
       >
-        <div className={`${styles['window-bar']} window-bar`}>
+        <div className="bg-mystic h-[30px] rounded-t-lg pl-2.5 text-left window-bar">
           <WindowButton color="red" onButtonClick={handleCloseWindow} />
           <WindowButton color="yellow" onButtonClick={handleButtonClick} />
           <WindowButton color="green" onButtonClick={handleButtonClick} />

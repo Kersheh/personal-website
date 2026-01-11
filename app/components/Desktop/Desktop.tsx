@@ -5,7 +5,6 @@ import { get } from 'lodash';
 import Window from '../Window/Window';
 import Icon from '../Icon/Icon';
 import ButtonPower from '../ButtonPower/ButtonPower';
-import styles from './Desktop.module.scss';
 
 let windowIdCounter = 0;
 
@@ -65,10 +64,27 @@ export default function Desktop({ powerOff }: DesktopProps) {
 
   return (
     <div
-      className={`${styles.desktop}${powerOn ? '' : ` ${styles['turn-off']}`}`}
+      className={`h-full relative overflow-hidden bg-cover bg-no-repeat ${
+        powerOn ? 'animate-turn-on' : 'animate-turn-off'
+      }`}
+      style={{ 
+        backgroundImage: 'url(/images/background.jpg)',
+        backgroundColor: '#282936'
+      }}
       ref={nodeRef}
     >
-      <div className={styles.content}>
+      {/* Scanlines */}
+      <div 
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background: 'linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06))',
+          backgroundSize: '100% 2px, 3px 100%'
+        }}
+      />
+      {/* Flicker */}
+      <div className="absolute inset-0 bg-onyx/10 opacity-0 pointer-events-none animate-flicker" />
+      
+      <div className="h-full p-5 overflow-hidden">
         <ButtonPower on={false} onClickHandler={timedPowerOff} />
         <Icon
           iconName="iterm"

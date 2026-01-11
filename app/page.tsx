@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import Desktop from './components/Desktop/Desktop';
 import ButtonPower from './components/ButtonPower/ButtonPower';
-import styles from './page.module.scss';
 
 export default function Home() {
   const [poweredOn, setPoweredOn] = useState(false);
@@ -17,11 +16,11 @@ export default function Home() {
   };
 
   return (
-    <div className={styles.app}>
+    <div className="h-full">
       {poweredOn ? (
         <Desktop powerOff={powerOff} />
       ) : (
-        <div className={styles['app--off']}>
+        <div className="h-full flex items-center justify-center animate-fadein">
           <ButtonPower on={true} onClickHandler={powerOn} />
         </div>
       )}

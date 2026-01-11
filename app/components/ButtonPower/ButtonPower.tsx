@@ -1,7 +1,5 @@
 'use client';
 
-import styles from './ButtonPower.module.scss';
-
 interface ButtonPowerProps {
   on: boolean;
   onClickHandler: () => void;
@@ -13,7 +11,9 @@ export default function ButtonPower({ on, onClickHandler }: ButtonPowerProps) {
     <img
       src="/images/icons/icon-power.svg"
       alt=""
-      className={`${styles['button-power']} ${on ? styles.on : styles.off}`}
+      className={`bg-white/70 border border-white/70 rounded-full hover:bg-white hover:border-white cursor-pointer ${
+        on ? 'w-16 animate-pulse-button' : 'fixed w-6 h-6 top-5 right-5 opacity-50'
+      }`}
       onClick={onClickHandler}
     />
   );
