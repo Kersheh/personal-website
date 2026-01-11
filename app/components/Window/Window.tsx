@@ -257,7 +257,7 @@ const Window = ({
       }}
     >
       <div
-        className={`bg-daintree border border-black/10 rounded-lg absolute top-0 transition-opacity duration-200 ${isFocused ? 'opacity-100' : 'opacity-60'} ${isAnimating ? 'transition-all duration-300 ease-in-out overflow-hidden' : ''}`}
+        className={`bg-daintree border border-black/10 rounded-lg absolute top-0 ${isAnimating ? 'transition-all duration-300 ease-in-out overflow-hidden' : 'transition-opacity duration-200'} ${isFocused ? 'opacity-100' : 'opacity-60'}`}
         ref={nodeRef}
         data-window
         onClick={() => {
@@ -282,7 +282,7 @@ const Window = ({
           }}
         >
           <WindowButton color="red" onButtonClick={() => closeWindow(id)} />
-          <WindowButton color="yellow" />
+          {/* <WindowButton color="yellow" /> */}
           <WindowButton color="green" onButtonClick={maximize} />
         </div>
 

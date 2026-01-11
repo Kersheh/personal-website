@@ -67,7 +67,7 @@ const submit = async (
   try {
     return await COMMANDS[command].run({ closeWindow, windowId, clearHistory });
   } catch {
-    throw new Error(`${command}: command not found (try help)`);
+    throw new Error(`${command}: command not found (try \`help\`)`);
   }
 };
 
