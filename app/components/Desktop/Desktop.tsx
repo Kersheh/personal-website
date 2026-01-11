@@ -27,11 +27,8 @@ const Desktop = ({ powerOff }: DesktopProps) => {
   const setFocusedApp = useDesktopApplicationStore(
     (state) => state.setFocusedApp
   );
-  const focusedWindowId = useDesktopApplicationStore(
-    (state) => state.focusedWindowId
-  );
 
-  const openNewWindow = (name: string) => {
+  const openNewWindow = useCallback((name: string) => {
     const updatedWindows = windows.map((window) =>
       window !== null ? { ...window, isFocused: false } : null
     );
@@ -41,9 +38,8 @@ const Desktop = ({ powerOff }: DesktopProps) => {
       isFocused: true,
       id: `window-${++windowIdCounter}`
     });
-
     setWindows(updatedWindows);
-  };
+  }, [windows]);
 
   useEffect(() => {
     const hasAnyFocusedWindow = windows.some((window) => window?.isFocused);
@@ -51,6 +47,23 @@ const Desktop = ({ powerOff }: DesktopProps) => {
       setFocusedApp(null);
     }
   }, [windows, setFocusedApp]);
+
+  const handleCloseWindow = useCallback(
+    (id: string) => {
+      const { focusedWindowId } = useDesktopApplicationStore.getState();
+
+      setWindows((currentWindows) =>
+        currentWindows.map((window) =>
+          id === get(window, 'id') ? null : window
+        )
+      );
+
+      if (focusedWindowId === id) {
+        setFocusedApp(null);
+      }
+    },
+    [setFocusedApp]
+  );
 
   const updateWindows = useCallback((i: number) => {
     setWindows((currentWindows) => {
@@ -91,17 +104,11 @@ const Desktop = ({ powerOff }: DesktopProps) => {
       <div className="absolute inset-0 bg-onyx/10 opacity-0 pointer-events-none animate-flicker" />
 
       <MenuBar
-        onPowerOff={() => {
+        onPowerOff={useCallback(() => {
           setPowerOn(false);
           setTimeout(powerOff, 550);
-        }}
-        onCloseWindow={(id) => {
-          const updatedWindows = windows.map((window) =>
-            id === get(window, 'id') ? null : window
-          );
-          setWindows(updatedWindows);
-          setFocusedApp(null);
-        }}
+        }, [powerOff])}
+        onCloseWindow={handleCloseWindow}
       />
 
       <div
@@ -130,18 +137,7 @@ const Desktop = ({ powerOff }: DesktopProps) => {
               updateWindows={updateWindows}
               parentNode={desktopRef.current}
               windowsCount={windows.length}
-              closeWindow={(id) => {
-                const updatedWindows = windows.map((window) =>
-                  id === get(window, 'id') ? null : window
-                );
-
-                setWindows(updatedWindows);
-
-                // clear focused app if the closed window was the focused one
-                if (id === focusedWindowId) {
-                  setFocusedApp(null);
-                }
-              }}
+              closeWindow={handleCloseWindow}
             />
           );
         })}

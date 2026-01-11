@@ -39,6 +39,10 @@ const Window = ({
     (state) => state.setFocusedApp
   );
   const [isFocused, setIsFocused] = useState(initialFocused);
+
+  useEffect(() => {
+    setIsFocused(initialFocused);
+  }, [initialFocused]);
   
   const initialWidth = Math.min(900, parentNode?.offsetWidth ?? 900);
   const initialHeight = 540;
@@ -88,11 +92,14 @@ const Window = ({
     const handleOutsideClick = (e: MouseEvent) => {
       const target = e.target as Node;
       const isMenuBarClick = (target as Element).closest?.('[data-menu-bar]');
+      const isAnyWindowClick = (target as Element).closest?.('[data-window]');
 
+      // Only unfocus when clicking outside all windows (desktop background)
       if (
         nodeRef.current &&
         !nodeRef.current.contains(target) &&
-        !isMenuBarClick
+        !isMenuBarClick &&
+        !isAnyWindowClick
       ) {
         setIsFocused(false);
         // unfocus all windows in Desktop state
@@ -107,6 +114,26 @@ const Window = ({
   }, [updateWindows]);
 
   const maximize = () => {
+    if (parentNode) {
+      const desktopPadding = 20;
+
+      setPreviousState({
+        width: size.width,
+        height: size.height,
+        x: position.x,
+        y: position.y
+      });
+
+      const maxWidth = parentNode.offsetWidth;
+      const maxHeight = parentNode.offsetHeight;
+
+      setSize({ width: maxWidth, height: maxHeight });
+      setPosition({ x: -desktopPadding, y: 0 });
+      setIsMaximized(true);
+    }
+  };
+
+  const toggleMaximize = () => {
     if (parentNode) {
       const desktopPadding = 20;
 
@@ -229,6 +256,7 @@ const Window = ({
           isFocused ? 'opacity-100' : 'opacity-60'
         }`}
         ref={nodeRef}
+        data-window
         onClick={() => {
           setIsFocused(true);
           updateWindows(index);
@@ -245,7 +273,7 @@ const Window = ({
           onDoubleClick={(e) => {
             const target = e.target as HTMLElement;
             if (!target.closest('span')) {
-              maximize();
+              toggleMaximize();
             }
           }}
         >

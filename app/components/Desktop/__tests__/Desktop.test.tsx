@@ -2,22 +2,21 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import Desktop from '@/app/components/Desktop/Desktop';
 
-jest.mock('@/app/store/desktopApplicationStore', () => ({
-  useDesktopApplicationStore: (
-    selector: (state: {
-      focusedApp: string | null;
-      focusedWindowId: string | null;
-      setFocusedApp: () => void;
-    }) => unknown
-  ) => {
-    const store = {
-      focusedApp: null,
-      focusedWindowId: null,
-      setFocusedApp: jest.fn()
-    };
-    return selector(store);
-  }
-}));
+jest.mock('@/app/store/desktopApplicationStore', () => {
+  const store = {
+    focusedApp: null,
+    focusedWindowId: null,
+    setFocusedApp: jest.fn()
+  };
+
+  const useDesktopApplicationStore = (
+    selector: (state: typeof store) => unknown
+  ) => selector(store);
+
+  (useDesktopApplicationStore as any).getState = () => store;
+
+  return { useDesktopApplicationStore };
+});
 
 const getWindows = () => document.querySelectorAll('.react-draggable');
 const isWindowFocused = (window: Element) =>

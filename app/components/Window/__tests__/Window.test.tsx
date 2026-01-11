@@ -90,16 +90,12 @@ describe('Window - Resize and Maximize', () => {
       });
     });
 
-    it('should restore to previous size when clicking maximize again', async () => {
+    it('should always maximize when clicking green button (no restore)', async () => {
       const parentNode = createMockParentNode(1070, 835);
       render(<Window {...defaultProps} parentNode={parentNode} />);
 
       const windowElement = document.querySelector('.react-draggable');
       const greenButton = document.querySelector('.bg-dull-lime');
-
-      const initialWidth = (windowElement as HTMLElement).style.width;
-      const initialHeight = (windowElement as HTMLElement).style.height;
-      const initialTransform = (windowElement as HTMLElement).style.transform;
 
       fireEvent.click(greenButton!);
 
@@ -107,16 +103,12 @@ describe('Window - Resize and Maximize', () => {
         expect((windowElement as HTMLElement).style.width).toBe('1070px');
       });
 
+      // Click again - should stay maximized
       fireEvent.click(greenButton!);
 
       await waitFor(() => {
-        expect((windowElement as HTMLElement).style.width).toBe(initialWidth);
-        expect((windowElement as HTMLElement).style.height).toBe(
-          initialHeight
-        );
-        expect((windowElement as HTMLElement).style.transform).toBe(
-          initialTransform
-        );
+        expect((windowElement as HTMLElement).style.width).toBe('1070px');
+        expect((windowElement as HTMLElement).style.height).toBe('835px');
       });
     });
 

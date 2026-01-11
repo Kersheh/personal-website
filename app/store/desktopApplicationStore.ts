@@ -11,6 +11,14 @@ export const useDesktopApplicationStore = create<DesktopApplicationState>(
     focusedApp: null,
     focusedWindowId: null,
     setFocusedApp: (appName, windowId = null) =>
-      set({ focusedApp: appName, focusedWindowId: windowId })
+      set((state) => {
+        if (
+          state.focusedApp === appName &&
+          state.focusedWindowId === windowId
+        ) {
+          return state;
+        }
+        return { focusedApp: appName, focusedWindowId: windowId };
+      })
   })
 );
