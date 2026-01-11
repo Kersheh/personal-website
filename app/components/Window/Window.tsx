@@ -15,20 +15,20 @@ interface WindowProps {
   closeWindow: (id: string) => void;
 }
 
-export default function Window({
+const Window = ({
   index,
   id,
   isFocused: initialFocused,
   parentNode,
   windowsCount,
   updateWindows,
-  closeWindow,
-}: WindowProps) {
+  closeWindow
+}: WindowProps) => {
   const [isFocused, setIsFocused] = useState(initialFocused);
-  const [initX] = useState(() => 
+  const [initX] = useState(() =>
     Math.floor(Math.random() * (parentNode?.offsetHeight ?? 600) * 0.5)
   );
-  const [initY] = useState(() => 
+  const [initY] = useState(() =>
     Math.floor(Math.random() * (parentNode?.offsetWidth ?? 800) * 0.5)
   );
   const nodeRef = useRef<HTMLDivElement>(null);
@@ -46,39 +46,31 @@ export default function Window({
     };
   }, []);
 
-  const onFocus = () => {
-    setIsFocused(true);
-    updateWindows(index);
-  };
-
-  const handleButtonClick = () => {
-    // TODO: functionality on button click
-  };
-
-  const handleCloseWindow = () => {
-    closeWindow(id);
-  };
-
   return (
     <Draggable handle=".window-bar" nodeRef={nodeRef}>
       <div
         className="bg-daintree border border-black/10 rounded-lg min-w-[900px] max-w-[900px] w-full absolute top-0 opacity-100 disabled:opacity-80"
         ref={nodeRef}
-        onClick={onFocus}
+        onClick={() => {
+          setIsFocused(true);
+          updateWindows(index);
+        }}
         style={{
           zIndex: isFocused ? windowsCount + 1 : index,
           top: initX,
-          left: initY,
+          left: initY
         }}
       >
         <div className="bg-mystic h-[30px] rounded-t-lg pl-2.5 text-left window-bar">
-          <WindowButton color="red" onButtonClick={handleCloseWindow} />
-          <WindowButton color="yellow" onButtonClick={handleButtonClick} />
-          <WindowButton color="green" onButtonClick={handleButtonClick} />
+          <WindowButton color="red" onButtonClick={() => closeWindow(id)} />
+          <WindowButton color="yellow" />
+          <WindowButton color="green" />
         </div>
 
         <Terminal autoFocus={isFocused} />
       </div>
     </Draggable>
   );
-}
+};
+
+export default Window;

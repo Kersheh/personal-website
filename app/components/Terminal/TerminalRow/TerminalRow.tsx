@@ -13,7 +13,7 @@ interface TerminalRowProps {
   command: string;
 }
 
-export default function TerminalRow({ io, command }: TerminalRowProps) {
+const TerminalRow = ({ io, command }: TerminalRowProps) => {
   const commandParts = useMemo<StringPart[]>(() => {
     if (io === 'out') {
       // Naively finds first URL in output
@@ -25,7 +25,10 @@ export default function TerminalRow({ io, command }: TerminalRowProps) {
         const indexOfUrl = command.indexOf(url);
 
         const elementPreUrl = command.substring(0, indexOfUrl);
-        const elementUrl = command.substring(indexOfUrl, indexOfUrl + url.length);
+        const elementUrl = command.substring(
+          indexOfUrl,
+          indexOfUrl + url.length
+        );
         const elementPostUrl = command.substring(
           indexOfUrl + url.length,
           command.length
@@ -34,7 +37,7 @@ export default function TerminalRow({ io, command }: TerminalRowProps) {
         return [
           { isUrl: false, string: elementPreUrl },
           { isUrl: true, string: elementUrl },
-          { isUrl: false, string: elementPostUrl },
+          { isUrl: false, string: elementPostUrl }
         ];
       }
     }
@@ -63,4 +66,6 @@ export default function TerminalRow({ io, command }: TerminalRowProps) {
       </span>
     </div>
   );
-}
+};
+
+export default TerminalRow;

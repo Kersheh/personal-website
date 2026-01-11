@@ -1,4 +1,4 @@
-const linkedin = (): string => {
+const linkedin = () => {
   return 'https://linkedin.com/in/matthewbreckon';
 };
 

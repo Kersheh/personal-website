@@ -3,30 +3,32 @@
 import { useState } from 'react';
 
 interface WindowButtonProps {
-  color: string;
-  onButtonClick: () => void;
+  color: 'red' | 'yellow' | 'green';
+  onButtonClick?: () => void;
 }
 
-export default function WindowButton({ color, onButtonClick }: WindowButtonProps) {
+const WindowButton = ({ color, onButtonClick }: WindowButtonProps) => {
   const [hover, setHover] = useState(false);
 
-  const colorClasses = {
-    red: 'bg-carnation',
-    yellow: 'bg-pastel-orange',
-    green: 'bg-dull-lime',
-  }[color] || 'bg-gray-500';
-
-  const handleClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    onButtonClick();
-  };
+  const colorClasses =
+    {
+      red: 'bg-carnation',
+      yellow: 'bg-pastel-orange',
+      green: 'bg-dull-lime'
+    }[color] || 'bg-gray-500';
 
   return (
     <span
       className={`border border-black/20 h-3.5 w-3.5 rounded-full inline-block m-2 cursor-pointer relative ${colorClasses}`}
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
-      onClick={handleClick}
+      onClick={(e) => {
+        e.stopPropagation();
+
+        if (onButtonClick) {
+          onButtonClick();
+        }
+      }}
     >
       {hover && color === 'red' && (
         <>
@@ -36,4 +38,6 @@ export default function WindowButton({ color, onButtonClick }: WindowButtonProps
       )}
     </span>
   );
-}
+};
+
+export default WindowButton;

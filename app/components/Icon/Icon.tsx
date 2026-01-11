@@ -7,7 +7,7 @@ interface IconProps {
   onDoubleClickHandler: () => void;
 }
 
-export default function Icon({ iconName, onDoubleClickHandler }: IconProps) {
+const Icon = ({ iconName, onDoubleClickHandler }: IconProps) => {
   const [isSelected, setIsSelected] = useState(false);
   const nodeRef = useRef<HTMLDivElement>(null);
 
@@ -19,30 +19,23 @@ export default function Icon({ iconName, onDoubleClickHandler }: IconProps) {
     };
 
     document.addEventListener('mousedown', handleOutsideClick);
+
     return () => {
       document.removeEventListener('mousedown', handleOutsideClick);
     };
   }, []);
 
-  const onClick = () => {
-    setIsSelected(true);
-  };
-
-  const onDoubleClick = () => {
-    onDoubleClickHandler();
-  };
-
   return (
     <div
-      className={`w-16 h-16 p-0.5 bg-no-repeat bg-cover cursor-pointer border-2 rounded-[5%] ${
+      className={`w-20 h-20 p-0.5 bg-no-repeat bg-cover cursor-pointer border-2 rounded-[5%] ${
         isSelected ? 'border-[#3f3f3f]' : 'border-transparent'
       }`}
       style={{ backgroundImage: `url(/images/icons/icon-${iconName}.png)` }}
       ref={nodeRef}
-      onClick={onClick}
-      onDoubleClick={onDoubleClick}
-    >
-      <div />
-    </div>
+      onClick={() => setIsSelected(true)}
+      onDoubleClick={onDoubleClickHandler}
+    />
   );
-}
+};
+
+export default Icon;

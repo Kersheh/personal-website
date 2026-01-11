@@ -18,22 +18,10 @@ interface DesktopProps {
   powerOff: () => void;
 }
 
-export default function Desktop({ powerOff }: DesktopProps) {
+const Desktop = ({ powerOff }: DesktopProps) => {
   const [windows, setWindows] = useState<(WindowItem | null)[]>([]);
   const [powerOn, setPowerOn] = useState(true);
   const nodeRef = useRef<HTMLDivElement>(null);
-
-  const updateWindows = (i: number) => {
-    const updatedWindows = windows.map((window) =>
-      window !== null ? { ...window, isFocused: false } : null
-    );
-
-    if (updatedWindows[i]) {
-      updatedWindows[i]!.isFocused = true;
-    }
-
-    setWindows(updatedWindows);
-  };
 
   const openNewWindow = (name: string) => {
     const updatedWindows = windows.map((window) =>
@@ -43,23 +31,10 @@ export default function Desktop({ powerOff }: DesktopProps) {
     updatedWindows.push({
       name: name,
       isFocused: true,
-      id: `window-${++windowIdCounter}`,
+      id: `window-${++windowIdCounter}`
     });
 
     setWindows(updatedWindows);
-  };
-
-  const closeWindow = (id: string) => {
-    const updatedWindows = windows.map((window) =>
-      id === get(window, 'id') ? null : window
-    );
-
-    setWindows(updatedWindows);
-  };
-
-  const timedPowerOff = () => {
-    setPowerOn(false);
-    setTimeout(powerOff, 550);
   };
 
   return (
@@ -67,25 +42,32 @@ export default function Desktop({ powerOff }: DesktopProps) {
       className={`h-full relative overflow-hidden bg-cover bg-no-repeat ${
         powerOn ? 'animate-turn-on' : 'animate-turn-off'
       }`}
-      style={{ 
+      style={{
         backgroundImage: 'url(/images/background.jpg)',
         backgroundColor: '#282936'
       }}
       ref={nodeRef}
     >
       {/* Scanlines */}
-      <div 
+      <div
         className="absolute inset-0 pointer-events-none"
         style={{
-          background: 'linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06))',
+          background:
+            'linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06))',
           backgroundSize: '100% 2px, 3px 100%'
         }}
       />
       {/* Flicker */}
       <div className="absolute inset-0 bg-onyx/10 opacity-0 pointer-events-none animate-flicker" />
-      
+
       <div className="h-full p-5 overflow-hidden">
-        <ButtonPower on={false} onClickHandler={timedPowerOff} />
+        <ButtonPower
+          on={false}
+          onClickHandler={() => {
+            setPowerOn(false);
+            setTimeout(powerOff, 550);
+          }}
+        />
         <Icon
           iconName="iterm"
           onDoubleClickHandler={() => openNewWindow('iterm')}
@@ -98,14 +80,32 @@ export default function Desktop({ powerOff }: DesktopProps) {
               index={i}
               id={item.id}
               isFocused={item.isFocused}
-              updateWindows={updateWindows}
+              updateWindows={(i: number) => {
+                const updatedWindows = windows.map((window) =>
+                  window !== null ? { ...window, isFocused: false } : null
+                );
+
+                if (updatedWindows[i]) {
+                  updatedWindows[i]!.isFocused = true;
+                }
+
+                setWindows(updatedWindows);
+              }}
               parentNode={nodeRef.current}
               windowsCount={windows.length}
-              closeWindow={closeWindow}
+              closeWindow={(id: string) => {
+                const updatedWindows = windows.map((window) =>
+                  id === get(window, 'id') ? null : window
+                );
+
+                setWindows(updatedWindows);
+              }}
             />
           );
         })}
       </div>
     </div>
   );
-}
+};
+
+export default Desktop;

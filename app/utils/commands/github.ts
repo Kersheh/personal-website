@@ -1,4 +1,4 @@
-const github = (): string => {
+const github = () => {
   return 'https://github.com/kersheh';
 };
 
