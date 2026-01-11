@@ -13,7 +13,7 @@ jest.mock('@/app/store/desktopApplicationStore', () => {
     selector: (state: typeof store) => unknown
   ) => selector(store);
 
-  (useDesktopApplicationStore as any).getState = () => store;
+  useDesktopApplicationStore.getState = () => store;
 
   return { useDesktopApplicationStore };
 });

@@ -2,7 +2,7 @@
 
 import { forwardRef, useState } from 'react';
 
-const TerminalInfo = forwardRef<HTMLSpanElement, {}>((_props, ref) => {
+const TerminalInfo = forwardRef<HTMLSpanElement>((_props, ref) => {
   const [host] = useState(() =>
     typeof window !== 'undefined' ? window.location.host : 'matthewbreckon.com'
   );

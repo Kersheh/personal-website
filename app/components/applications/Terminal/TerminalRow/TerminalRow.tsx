@@ -58,11 +58,17 @@ const TerminalRow = ({ io, command }: TerminalRowProps) => {
         <span ref={promptRef} className="absolute left-0 top-0">
           <TerminalInfo />
         </span>
-        <div
-          className="relative whitespace-pre-wrap break-words"
-          style={{ paddingLeft: promptWidth + 8 }}
-        >
-          <span className="tracking-[1.5px]">
+        <div className="relative whitespace-pre-wrap break-words min-w-0 w-full">
+          <span
+            className="invisible block tracking-[1.5px]"
+            style={{ textIndent: promptWidth + 8 }}
+          >
+            {command}
+          </span>
+          <span
+            className="absolute top-0 left-0 tracking-[1.5px]"
+            style={{ textIndent: promptWidth + 8 }}
+          >
             {commandParts.map((substring, i) =>
               substring.isUrl ? (
                 <a
