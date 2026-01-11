@@ -8,8 +8,8 @@ const TerminalInfo = forwardRef<HTMLSpanElement, {}>((_props, ref) => {
   );
 
   return (
-    <span ref={ref} className="font-semibold">
-      guest@{host} $ 
+    <span ref={ref} className="font-semibold pointer-events-none no-underline">
+      guest@{host} $
     </span>
   );
 });

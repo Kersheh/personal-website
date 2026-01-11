@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useRef, useEffect, useState } from 'react';
 import TerminalInfo from '../TerminalInfo/TerminalInfo';
 
 interface StringPart {
@@ -14,6 +14,15 @@ interface TerminalRowProps {
 }
 
 const TerminalRow = ({ io, command }: TerminalRowProps) => {
+  const promptRef = useRef<HTMLSpanElement>(null);
+  const [promptWidth, setPromptWidth] = useState(0);
+
+  useEffect(() => {
+    if (io === 'in' && promptRef.current) {
+      setPromptWidth(promptRef.current.offsetWidth);
+    }
+  }, [io]);
+
   const commandParts = useMemo<StringPart[]>(() => {
     if (io === 'out') {
       const urlRegex = /(https?:\/\/[^\s]+|mailto:[^\s]+)/g;
@@ -43,10 +52,41 @@ const TerminalRow = ({ io, command }: TerminalRowProps) => {
     return [{ isUrl: false, string: command }];
   }, [io, command]);
 
+  if (io === 'in') {
+    return (
+      <div className="text-sm tracking-wider text-white/80 font-['Courier_new',_'Courier',_monospace] relative">
+        <span ref={promptRef} className="absolute left-0 top-0">
+          <TerminalInfo />
+        </span>
+        <div
+          className="relative whitespace-pre-wrap break-words"
+          style={{ paddingLeft: promptWidth + 8 }}
+        >
+          <span className="tracking-[1.5px]">
+            {commandParts.map((substring, i) =>
+              substring.isUrl ? (
+                <a
+                  target="_blank"
+                  rel="noreferrer noopener"
+                  key={i}
+                  href={substring.string}
+                >
+                  {substring.string.startsWith('mailto:')
+                    ? substring.string.substring(7)
+                    : substring.string}
+                </a>
+              ) : (
+                substring.string
+              )
+            )}
+          </span>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="text-sm tracking-wider text-white/80 font-['Courier_new',_'Courier',_monospace] whitespace-pre-wrap break-words">
-      {io === 'in' && <TerminalInfo />}
-
       <span className="tracking-[1.5px]">
         {commandParts.map((substring, i) =>
           substring.isUrl ? (
