@@ -11,7 +11,7 @@ import {
 import { isArray } from 'lodash';
 import TerminalRow from './TerminalRow/TerminalRow';
 import TerminalInfo from './TerminalInfo/TerminalInfo';
-import commands from '../../utils/commands';
+import commands from '../../../utils/commands';
 
 interface HistoryItem {
   std: 'in' | 'out';
@@ -22,11 +22,12 @@ interface TerminalProps {
   autoFocus: boolean;
   closeWindow: (id: string) => void;
   windowId: string;
+  height?: number;
 }
 
 const CHAR_WIDTH = 10;
 
-const Terminal = ({ autoFocus, closeWindow, windowId }: TerminalProps) => {
+const Terminal = ({ autoFocus, closeWindow, windowId, height }: TerminalProps) => {
   const [value, setValue] = useState('');
   const [bufferValue, setBufferValue] = useState('');
   const [isFocused, setIsFocused] = useState(true);
@@ -57,11 +58,14 @@ const Terminal = ({ autoFocus, closeWindow, windowId }: TerminalProps) => {
     }
   }, [history]);
 
+  const contentHeight = Math.max(120, height ?? 360);
+
   return (
     <div className="[&_a]:text-white/70 [&_a:hover]:text-[#009fef]">
       <div
         ref={scrollContainerRef}
-        className="p-2.5 h-[360px] overflow-x-hidden overflow-y-scroll"
+        className="p-2.5 overflow-x-hidden overflow-y-scroll"
+        style={{ height: contentHeight }}
         onClick={() => inputRef.current?.focus()}
       >
         {history.map((item, i) => (

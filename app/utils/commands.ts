@@ -53,7 +53,7 @@ const submit = async (
   try {
     return await COMMANDS[command].run({ closeWindow, windowId });
   } catch {
-    throw new Error(`${command}: command not found`);
+    throw new Error(`${command}: command not found (try help)`);
   }
 };
 

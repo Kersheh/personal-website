@@ -3,7 +3,7 @@
 import { useState, useRef } from 'react';
 import { get } from 'lodash';
 import Window from '../Window/Window';
-import Icon from '../Icon/Icon';
+import Icon from './Icon/Icon';
 import ButtonPower from '../ButtonPower/ButtonPower';
 
 let windowIdCounter = 0;

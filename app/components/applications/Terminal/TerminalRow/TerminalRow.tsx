@@ -44,7 +44,7 @@ const TerminalRow = ({ io, command }: TerminalRowProps) => {
   }, [io, command]);
 
   return (
-    <div className="h-[18px] text-sm tracking-wider text-white/80 font-['Courier_new',_'Courier',_monospace] whitespace-pre">
+    <div className="text-sm tracking-wider text-white/80 font-['Courier_new',_'Courier',_monospace] whitespace-pre-wrap break-words">
       {io === 'in' && <TerminalInfo />}
 
       <span className="tracking-[1.5px]">
