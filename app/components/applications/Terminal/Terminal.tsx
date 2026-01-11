@@ -69,7 +69,7 @@ const Terminal = ({
     <div className="[&_a]:text-white/70 [&_a:hover]:text-[#009fef]">
       <div
         ref={scrollContainerRef}
-        className="p-2.5 overflow-x-hidden overflow-y-scroll"
+        className="p-2.5 overflow-x-auto overflow-y-scroll"
         style={{ height: contentHeight, willChange: 'height' }}
         onClick={() => inputRef.current?.focus()}
       >
@@ -77,10 +77,10 @@ const Terminal = ({
           <TerminalRow io={item.std} key={i} command={item.msg} />
         ))}
 
-        <div className="h-[18px] text-base tracking-wider text-white/80 font-['Courier_new',_'Courier',_monospace]">
+        <div className="h-[18px] text-base tracking-wider text-white/80 font-['Courier_new',_'Courier',_monospace] whitespace-nowrap">
           <TerminalInfo />
           <input
-            className="font-['Courier_new',_'Courier',_monospace] text-base tracking-[1.5px] p-0 border-none bg-transparent inline-block text-transparent [text-shadow:0_0_0_white] relative left-[0.1px] focus:outline-none"
+            className="font-['Courier_new',_'Courier',_monospace] text-base tracking-[1.5px] p-0 border-none bg-transparent inline-block text-transparent [text-shadow:0_0_0_white] relative md:left-[0.1px] focus:outline-none"
             value={value}
             ref={inputRef}
             style={{ width: value.length * CHAR_WIDTH }}
@@ -89,6 +89,17 @@ const Terminal = ({
               setBufferValue(e.target.value);
               setInputHistoryIndex(inputHistory.length);
               setTimeout(updateCursorPosition, 0);
+              setTimeout(() => {
+                if (inputRef.current && scrollContainerRef.current) {
+                  const inputRight = inputRef.current.offsetLeft + inputRef.current.offsetWidth;
+                  const containerWidth = scrollContainerRef.current.clientWidth;
+                  const currentScroll = scrollContainerRef.current.scrollLeft;
+                  
+                  if (inputRight > currentScroll + containerWidth) {
+                    scrollContainerRef.current.scrollLeft = inputRight - containerWidth + 20;
+                  }
+                }
+              }, 0);
             }}
             type="text"
             spellCheck={false}
