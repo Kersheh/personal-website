@@ -16,7 +16,7 @@
     "url": "git@github.com:Kersheh/personal-website.git"
   },
   "engines": {
-    "node": ">=18"
+    "node": "20"
   },
   "dependencies": {
     "lodash": "^4.17.21",
