@@ -1,0 +1,115 @@
+@import '../../styles/colors';
+
+.desktop {
+  height: 100%;
+  position: relative;
+  background-color: $color-ebony;
+  overflow: hidden;
+  background-image: url('/images/background.jpg');
+  background-repeat: no-repeat;
+  background-size: cover;
+  animation: turn-on 4s linear;
+  animation-fill-mode: forwards;
+
+  &.turn-off {
+    animation: turn-off .55s cubic-bezier(.230, 1, .320, 1);
+    animation-fill-mode: forwards;
+  }
+
+  // flicker
+  &::after {
+    content: '';
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    background: transparentize($color-onyx, .9);
+    opacity: 0;
+    pointer-events: none;
+    animation: flicker .15s infinite;
+  }
+
+  // scanlines
+  &::before {
+    content: '';
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    background: linear-gradient(transparentize($color-onyx, 1) 50%, transparentize(darken($color-onyx, 10), .75) 50%), linear-gradient(90deg, transparentize($color-red, .94), transparentize($color-green, .98), transparentize($color-blue, .94));
+    background-size: 100% 2px, 3px 100%;
+    pointer-events: none;
+  }
+
+  .content {
+    height: 100%;
+    padding: 20px;
+    overflow: hidden;
+  }
+
+  @keyframes flicker {
+    $steps: 20;
+    @for $i from 0 through $steps {
+      #{percentage($i * (1 / $steps))} {
+        opacity: random();
+      }
+    }
+  }
+
+  @keyframes turn-on {
+    0% {
+      transform: scale(1, .8) translate3d(0, 0, 0);
+      filter: brightness(30);
+      opacity: 1;
+    }
+    3.5% {
+      transform: scale(1, .8) translate3d(0, 100%, 0);
+    }
+    3.6% {
+      transform: scale(1, .8) translate3d(0, -100%, 0);
+      opacity: 1;
+    }
+    9% {
+      transform: scale(1.3, .6) translate3d(0, 100%, 0);
+      -webkit-filter: brightness(30);
+      filter: brightness(30);
+      opacity: 0;
+    }
+    11% {
+      transform: scale(1, 1) translate3d(0, 0, 0);
+      -webkit-filter: contrast(0) brightness(0);
+      filter: contrast(0) brightness(0);
+      opacity: 0;
+    }
+    100% {
+      transform: scale(1, 1) translate3d(0, 0, 0);
+      -webkit-filter: contrast(1) brightness(1.2) saturate(1.3);
+      filter: contrast(1) brightness(1.2) saturate(1.3);
+      opacity: 1;
+    }
+  }
+
+  @keyframes turn-off {
+    0% {
+      transform: scale(1, 1.3) translate3d(0, 0, 0);
+      -webkit-filter: brightness(1);
+      filter: brightness(1);
+      opacity: 1;
+    }
+    60% {
+      transform: scale(1.3, .001) translate3d(0, 0, 0);
+      -webkit-filter: brightness(10);
+      filter: brightness(10);
+    }
+    100% {
+      animation-timing-function: cubic-bezier(.755, .050, .855, .060);
+      transform: scale(0, .0001) translate3d(0, 0, 0);
+      -webkit-filter: brightness(50);
+      filter: brightness(50);
+    }
+  }
+}

@@ -1,0 +1,20 @@
+@import '../../styles/colors';
+
+.icon {
+  width: 64px;
+  height: 64px;
+  padding: 2px;
+  background-repeat: no-repeat;
+  background-size: cover;
+  cursor: pointer;
+  border: 2px solid transparent;
+  border-radius: 5%;
+
+  &.icon-iterm {
+    background-image: url('/images/icons/icon-iterm.png');
+  }
+
+  &.active {
+    border-color: $color-dark-gray;
+  }
+}

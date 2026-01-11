@@ -1,0 +1,80 @@
+@import '../../styles/colors';
+
+.terminal {
+  a {
+    color: rgba($color-white, .7);
+
+    &:hover {
+      color: $color-medium-electric-blue;
+    }
+  }
+
+  &-body {
+    padding: 10px;
+    height: 360px;
+    overflow-x: hidden;
+    overflow-y: scroll;
+  }
+
+  &-row {
+    height: 18px;
+    font-size: 14px;
+    letter-spacing: 1px;
+    color: rgba($color-white, .8);
+    font-family: 'Courier new', 'Courier', monospace;
+
+    &__info {
+      font-weight: 600;
+      padding-right: 10px;
+    }
+
+    &__history {
+      letter-spacing: 1.5px;
+    }
+
+    &__input {
+      font-family: 'Courier new', 'Courier', monospace;
+      font-size: 14px;
+      letter-spacing: 1.5px;
+      width: 0;
+      padding: 0;
+      border: none;
+      background-color: transparent;
+      display: inline-block;
+      color: transparent;
+      text-shadow: 0 0 0 $color-white;
+      position: relative;
+      left: .1px;
+
+      &:focus {
+        outline: none;
+      }
+    }
+
+    &__cursor {
+      display: inline-block;
+      position: relative;
+      background-color: $color-white;
+      vertical-align: top;
+      width: 10px;
+      height: 18px;
+      animation: blink 1s step-end infinite;
+
+      &[disabled] {
+        display: none;
+      }
+    }
+
+    @-webkit-keyframes blink {
+      0% { opacity: 1; }
+      50% { opacity: 0; }
+      100% { opacity: 1; }
+    }
+
+    @keyframes blink {
+      0% { opacity: 1; }
+      50% { opacity: 0; }
+      100% { opacity: 1; }
+    }
+  }
+}
