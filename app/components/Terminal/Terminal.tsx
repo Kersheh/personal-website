@@ -20,18 +20,22 @@ interface HistoryItem {
 
 interface TerminalProps {
   autoFocus: boolean;
+  closeWindow: (id: string) => void;
+  windowId: string;
 }
 
 const CHAR_WIDTH = 10;
 
-const Terminal = ({ autoFocus }: TerminalProps) => {
+const Terminal = ({ autoFocus, closeWindow, windowId }: TerminalProps) => {
   const [value, setValue] = useState('');
   const [bufferValue, setBufferValue] = useState('');
   const [isFocused, setIsFocused] = useState(true);
   const [history, setHistory] = useState<HistoryItem[]>([]);
-  const [historyIndex, setHistoryIndex] = useState(0);
+  const [inputHistory, setInputHistory] = useState<string[]>([]);
+  const [inputHistoryIndex, setInputHistoryIndex] = useState(0);
   const [cursorOffset, setCursorOffset] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   const updateCursorPosition = useCallback(() => {
     if (inputRef.current) {
@@ -46,9 +50,17 @@ const Terminal = ({ autoFocus }: TerminalProps) => {
     updateCursorPosition();
   }, [updateCursorPosition]);
 
+  useEffect(() => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollTop =
+        scrollContainerRef.current.scrollHeight;
+    }
+  }, [history]);
+
   return (
     <div className="[&_a]:text-white/70 [&_a:hover]:text-[#009fef]">
       <div
+        ref={scrollContainerRef}
         className="p-2.5 h-[360px] overflow-x-hidden overflow-y-scroll"
         onClick={() => inputRef.current?.focus()}
       >
@@ -66,7 +78,7 @@ const Terminal = ({ autoFocus }: TerminalProps) => {
             onChange={(e: ChangeEvent<HTMLInputElement>) => {
               setValue(e.target.value);
               setBufferValue(e.target.value);
-              setHistoryIndex(history.length);
+              setInputHistoryIndex(inputHistory.length);
               setTimeout(updateCursorPosition, 0);
             }}
             type="text"
@@ -97,7 +109,8 @@ const Terminal = ({ autoFocus }: TerminalProps) => {
                 setValue('');
                 setBufferValue('');
                 setHistory([...history, { std: 'in', msg: inputValue }]);
-                setHistoryIndex(historyIndex + 1);
+                setInputHistory([...inputHistory, inputValue]);
+                setInputHistoryIndex(inputHistory.length + 1);
                 setCursorOffset(0);
 
                 if (!inputValue.trim()) {
@@ -105,7 +118,11 @@ const Terminal = ({ autoFocus }: TerminalProps) => {
                 }
 
                 try {
-                  const response = await commands.submit(inputValue);
+                  const response = await commands.submit(
+                    inputValue,
+                    closeWindow,
+                    windowId
+                  );
                   const messages = isArray(response)
                     ? response
                     : response.split('\n');
@@ -128,10 +145,10 @@ const Terminal = ({ autoFocus }: TerminalProps) => {
               switch (e.key) {
                 case 'ArrowUp':
                   e.preventDefault();
-                  if (historyIndex > 0) {
-                    const prevValue = history[historyIndex - 1].msg;
+                  if (inputHistoryIndex > 0) {
+                    const prevValue = inputHistory[inputHistoryIndex - 1];
                     setValue(prevValue);
-                    setHistoryIndex(historyIndex - 1);
+                    setInputHistoryIndex(inputHistoryIndex - 1);
                     setTimeout(() => {
                       if (inputRef.current) {
                         inputRef.current.selectionStart = prevValue.length;
@@ -144,9 +161,9 @@ const Terminal = ({ autoFocus }: TerminalProps) => {
 
                 case 'ArrowDown':
                   e.preventDefault();
-                  if (historyIndex === history.length - 1) {
+                  if (inputHistoryIndex === inputHistory.length - 1) {
                     setValue(bufferValue);
-                    setHistoryIndex(historyIndex + 1);
+                    setInputHistoryIndex(inputHistory.length);
                     setTimeout(() => {
                       if (inputRef.current) {
                         inputRef.current.selectionStart = bufferValue.length;
@@ -154,10 +171,10 @@ const Terminal = ({ autoFocus }: TerminalProps) => {
                         updateCursorPosition();
                       }
                     }, 0);
-                  } else if (historyIndex < history.length - 1) {
-                    const nextValue = history[historyIndex + 1].msg;
+                  } else if (inputHistoryIndex < inputHistory.length - 1) {
+                    const nextValue = inputHistory[inputHistoryIndex + 1];
                     setValue(nextValue);
-                    setHistoryIndex(historyIndex + 1);
+                    setInputHistoryIndex(inputHistoryIndex + 1);
                     setTimeout(() => {
                       if (inputRef.current) {
                         inputRef.current.selectionStart = nextValue.length;

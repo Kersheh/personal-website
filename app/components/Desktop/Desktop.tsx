@@ -70,6 +70,7 @@ const Desktop = ({ powerOff }: DesktopProps) => {
         />
         <Icon
           iconName="iterm"
+          label="Terminal"
           onDoubleClickHandler={() => openNewWindow('iterm')}
         />
 

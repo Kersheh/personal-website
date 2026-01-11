@@ -49,7 +49,9 @@ const Window = ({
   return (
     <Draggable handle=".window-bar" nodeRef={nodeRef}>
       <div
-        className="bg-daintree border border-black/10 rounded-lg min-w-[900px] max-w-[900px] w-full absolute top-0 opacity-100 disabled:opacity-80"
+        className={`bg-daintree border border-black/10 rounded-lg min-w-[900px] max-w-[900px] w-full absolute top-0 transition-opacity duration-200 ${
+          isFocused ? 'opacity-100' : 'opacity-60'
+        }`}
         ref={nodeRef}
         onClick={() => {
           setIsFocused(true);
@@ -67,7 +69,7 @@ const Window = ({
           <WindowButton color="green" />
         </div>
 
-        <Terminal autoFocus={isFocused} />
+        <Terminal autoFocus={isFocused} closeWindow={closeWindow} windowId={id} />
       </div>
     </Draggable>
   );

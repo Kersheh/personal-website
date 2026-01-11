@@ -4,10 +4,11 @@ import { useState, useEffect, useRef } from 'react';
 
 interface IconProps {
   iconName: string;
+  label: string;
   onDoubleClickHandler: () => void;
 }
 
-const Icon = ({ iconName, onDoubleClickHandler }: IconProps) => {
+const Icon = ({ iconName, label, onDoubleClickHandler }: IconProps) => {
   const [isSelected, setIsSelected] = useState(false);
   const nodeRef = useRef<HTMLDivElement>(null);
 
@@ -27,14 +28,21 @@ const Icon = ({ iconName, onDoubleClickHandler }: IconProps) => {
 
   return (
     <div
-      className={`w-20 h-20 p-0.5 bg-no-repeat bg-cover cursor-pointer border-2 rounded-[5%] ${
+      className={`w-fit flex flex-col items-center p-0.5 border-2 rounded-[5%] cursor-pointer ${
         isSelected ? 'border-[#3f3f3f]' : 'border-transparent'
       }`}
-      style={{ backgroundImage: `url(/images/icons/icon-${iconName}.png)` }}
       ref={nodeRef}
       onClick={() => setIsSelected(true)}
       onDoubleClick={onDoubleClickHandler}
-    />
+    >
+      <div
+        className="w-20 h-20 bg-no-repeat bg-cover rounded-[5%]"
+        style={{ backgroundImage: `url(/images/icons/icon-${iconName}.png)` }}
+      />
+      <span className="text-white/80 text-xs text-center max-w-18 break-words font-['Courier_new',_'Courier',_monospace] drop-shadow-lg mt-1 select-none">
+        {label}
+      </span>
+    </div>
   );
 };
 
