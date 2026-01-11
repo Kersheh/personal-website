@@ -39,15 +39,22 @@ const Window = ({
     (state) => state.setFocusedApp
   );
   const [isFocused, setIsFocused] = useState(initialFocused);
+  
+  const initialWidth = Math.min(900, parentNode?.offsetWidth ?? 900);
+  const initialHeight = 540;
+  
+  const maxX = Math.max(0, (parentNode?.offsetWidth ?? 800) - initialWidth);
+  const maxY = Math.max(0, (parentNode?.offsetHeight ?? 600) - initialHeight);
+  
   const [initX] = useState(() =>
-    Math.floor(Math.random() * (parentNode?.offsetHeight ?? 600) * 0.5)
+    Math.floor(Math.random() * maxY * 0.8)
   );
   const [initY] = useState(() =>
-    Math.floor(Math.random() * (parentNode?.offsetWidth ?? 800) * 0.5)
+    Math.floor(Math.random() * maxX * 0.8)
   );
   const [size, setSize] = useState({
-    width: Math.min(900, parentNode?.offsetWidth ?? 900),
-    height: 540
+    width: initialWidth,
+    height: initialHeight
   });
   const [position, setPosition] = useState({ x: initY, y: initX });
   const [resizing, setResizing] = useState<{
@@ -58,6 +65,13 @@ const Window = ({
     startHeight: number;
     startPosX: number;
     startPosY: number;
+  } | null>(null);
+  const [isMaximized, setIsMaximized] = useState(false);
+  const [previousState, setPreviousState] = useState<{
+    width: number;
+    height: number;
+    x: number;
+    y: number;
   } | null>(null);
   const nodeRef = useRef<HTMLDivElement>(null);
 
@@ -96,11 +110,28 @@ const Window = ({
     if (parentNode) {
       const desktopPadding = 20;
 
-      const maxWidth = parentNode.offsetWidth;
-      const maxHeight = parentNode.offsetHeight;
+      if (isMaximized && previousState) {
+        // Restore to previous size
+        setSize({ width: previousState.width, height: previousState.height });
+        setPosition({ x: previousState.x, y: previousState.y });
+        setIsMaximized(false);
+        setPreviousState(null);
+      } else {
+        // Save current state and maximize
+        setPreviousState({
+          width: size.width,
+          height: size.height,
+          x: position.x,
+          y: position.y
+        });
 
-      setSize({ width: maxWidth, height: maxHeight });
-      setPosition({ x: -desktopPadding, y: 0 });
+        const maxWidth = parentNode.offsetWidth;
+        const maxHeight = parentNode.offsetHeight;
+
+        setSize({ width: maxWidth, height: maxHeight });
+        setPosition({ x: -desktopPadding, y: 0 });
+        setIsMaximized(true);
+      }
     }
   };
 
@@ -110,6 +141,8 @@ const Window = ({
       e.stopPropagation();
       setIsFocused(true);
       updateWindows(index);
+      setIsMaximized(false);
+      setPreviousState(null);
       setResizing({
         dir,
         startX: e.clientX,
@@ -207,7 +240,15 @@ const Window = ({
           height: size.height
         }}
       >
-        <div className="bg-mystic h-[30px] rounded-t-lg pl-2.5 text-left window-bar">
+        <div
+          className="bg-mystic h-[30px] rounded-t-lg pl-2.5 text-left window-bar"
+          onDoubleClick={(e) => {
+            const target = e.target as HTMLElement;
+            if (!target.closest('span')) {
+              maximize();
+            }
+          }}
+        >
           <WindowButton color="red" onButtonClick={() => closeWindow(id)} />
           <WindowButton color="yellow" />
           <WindowButton color="green" onButtonClick={maximize} />

@@ -130,7 +130,8 @@ const Terminal = ({
                   const response = await commands.submit(
                     inputValue,
                     closeWindow,
-                    windowId
+                    windowId,
+                    () => setHistory([])
                   );
                   const messages = isArray(response)
                     ? response

@@ -1,6 +1,7 @@
 export interface CommandOptions {
   closeWindow?: (id: string) => void;
   windowId?: string;
+  clearHistory?: () => void;
 }
 
 export interface Command {

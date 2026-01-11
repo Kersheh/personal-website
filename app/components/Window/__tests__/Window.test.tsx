@@ -89,6 +89,98 @@ describe('Window - Resize and Maximize', () => {
         expect(transform).toBe('translate(-20px,0px)');
       });
     });
+
+    it('should restore to previous size when clicking maximize again', async () => {
+      const parentNode = createMockParentNode(1070, 835);
+      render(<Window {...defaultProps} parentNode={parentNode} />);
+
+      const windowElement = document.querySelector('.react-draggable');
+      const greenButton = document.querySelector('.bg-dull-lime');
+
+      const initialWidth = (windowElement as HTMLElement).style.width;
+      const initialHeight = (windowElement as HTMLElement).style.height;
+      const initialTransform = (windowElement as HTMLElement).style.transform;
+
+      fireEvent.click(greenButton!);
+
+      await waitFor(() => {
+        expect((windowElement as HTMLElement).style.width).toBe('1070px');
+      });
+
+      fireEvent.click(greenButton!);
+
+      await waitFor(() => {
+        expect((windowElement as HTMLElement).style.width).toBe(initialWidth);
+        expect((windowElement as HTMLElement).style.height).toBe(
+          initialHeight
+        );
+        expect((windowElement as HTMLElement).style.transform).toBe(
+          initialTransform
+        );
+      });
+    });
+
+    it('should maximize when double-clicking window header', async () => {
+      const parentNode = createMockParentNode(1070, 835);
+      render(<Window {...defaultProps} parentNode={parentNode} />);
+
+      const windowElement = document.querySelector('.react-draggable');
+      const windowBar = document.querySelector('.window-bar');
+
+      expect(windowBar).toBeTruthy();
+
+      fireEvent.doubleClick(windowBar!);
+
+      await waitFor(() => {
+        const width = (windowElement as HTMLElement).style.width;
+        const height = (windowElement as HTMLElement).style.height;
+        expect(width).toBe('1070px');
+        expect(height).toBe('835px');
+      });
+    });
+
+    it('should restore when double-clicking window header while maximized', async () => {
+      const parentNode = createMockParentNode(1070, 835);
+      render(<Window {...defaultProps} parentNode={parentNode} />);
+
+      const windowElement = document.querySelector('.react-draggable');
+      const windowBar = document.querySelector('.window-bar');
+
+      const initialWidth = (windowElement as HTMLElement).style.width;
+
+      fireEvent.doubleClick(windowBar!);
+
+      await waitFor(() => {
+        expect((windowElement as HTMLElement).style.width).toBe('1070px');
+      });
+
+      fireEvent.doubleClick(windowBar!);
+
+      await waitFor(() => {
+        expect((windowElement as HTMLElement).style.width).toBe(initialWidth);
+      });
+    });
+
+    it('should not maximize when double-clicking window buttons', async () => {
+      const parentNode = createMockParentNode(1070, 835);
+      render(<Window {...defaultProps} parentNode={parentNode} />);
+
+      const windowElement = document.querySelector('.react-draggable');
+      const greenButton = document.querySelector('.bg-dull-lime');
+
+      const initialWidth = (windowElement as HTMLElement).style.width;
+
+      fireEvent.doubleClick(greenButton!);
+
+      await waitFor(
+        () => {
+          expect((windowElement as HTMLElement).style.width).toBe(
+            initialWidth
+          );
+        },
+        { timeout: 500 }
+      );
+    });
   });
 
   describe('Resize East (Right Edge)', () => {
@@ -130,6 +222,39 @@ describe('Window - Resize and Maximize', () => {
       await waitFor(() => {
         const width = parseInt((windowElement as HTMLElement).style.width);
         expect(width).toBeGreaterThanOrEqual(700);
+      });
+    });
+
+    it('should reset maximize state when resizing manually', async () => {
+      const parentNode = createMockParentNode(1070, 835);
+      render(<Window {...defaultProps} parentNode={parentNode} />);
+
+      const windowElement = document.querySelector('.react-draggable');
+      const windowBar = document.querySelector('.window-bar');
+
+      fireEvent.doubleClick(windowBar!);
+
+      await waitFor(() => {
+        expect((windowElement as HTMLElement).style.width).toBe('1070px');
+      });
+
+      const eastHandle = document.querySelector(
+        '.cursor-ew-resize.right-0'
+      ) as HTMLElement;
+
+      fireEvent.mouseDown(eastHandle, { clientX: 100, clientY: 100 });
+      fireEvent.mouseMove(document, { clientX: 200, clientY: 100 });
+      fireEvent.mouseUp(document);
+
+      await waitFor(() => {
+        const width = parseInt((windowElement as HTMLElement).style.width);
+        expect(width).toBeGreaterThan(1070);
+      });
+
+      fireEvent.doubleClick(windowBar!);
+
+      await waitFor(() => {
+        expect((windowElement as HTMLElement).style.width).toBe('1070px');
       });
     });
   });

@@ -2,6 +2,7 @@ import github from './commands/github';
 import linkedin from './commands/linkedin';
 import email from './commands/email';
 import exit from './commands/exit';
+import clear from './commands/clear';
 import { CommandRegistry } from './types';
 
 export const COMMANDS: CommandRegistry = {
@@ -24,6 +25,11 @@ export const COMMANDS: CommandRegistry = {
     cmd: 'exit',
     description: 'Close this terminal',
     run: exit
+  },
+  clear: {
+    cmd: 'clear',
+    description: 'Clear the terminal screen',
+    run: clear
   },
   help: {
     cmd: 'help',
@@ -48,10 +54,11 @@ export const COMMANDS: CommandRegistry = {
 const submit = async (
   command: string,
   closeWindow?: (id: string) => void,
-  windowId?: string
+  windowId?: string,
+  clearHistory?: () => void
 ): Promise<string> => {
   try {
-    return await COMMANDS[command].run({ closeWindow, windowId });
+    return await COMMANDS[command].run({ closeWindow, windowId, clearHistory });
   } catch {
     throw new Error(`${command}: command not found (try help)`);
   }
