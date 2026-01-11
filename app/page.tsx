@@ -1,11 +1,15 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Desktop from './components/Desktop/Desktop';
 import ButtonPower from './components/ButtonPower/ButtonPower';
 
 const Home = () => {
   const [poweredOn, setPoweredOn] = useState(false);
+
+  useEffect(() => {
+    console.log(`v${process.env.APP_VERSION}`);
+  }, []);
 
   return (
     <div className="h-full overflow-hidden">
