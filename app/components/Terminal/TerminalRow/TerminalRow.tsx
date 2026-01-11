@@ -16,8 +16,7 @@ interface TerminalRowProps {
 const TerminalRow = ({ io, command }: TerminalRowProps) => {
   const commandParts = useMemo<StringPart[]>(() => {
     if (io === 'out') {
-      // Naively finds first URL in output
-      const urlRegex = /(https?:\/\/[^\s]+)/g;
+      const urlRegex = /(https?:\/\/[^\s]+|mailto:[^\s]+)/g;
       const match = command.match(urlRegex);
 
       if (match) {
@@ -45,7 +44,7 @@ const TerminalRow = ({ io, command }: TerminalRowProps) => {
   }, [io, command]);
 
   return (
-    <div className="h-[18px] text-sm tracking-wider text-white/80 font-['Courier_new',_'Courier',_monospace]">
+    <div className="h-[18px] text-sm tracking-wider text-white/80 font-['Courier_new',_'Courier',_monospace] whitespace-pre">
       {io === 'in' && <TerminalInfo />}
 
       <span className="tracking-[1.5px]">
@@ -57,7 +56,9 @@ const TerminalRow = ({ io, command }: TerminalRowProps) => {
               key={i}
               href={substring.string}
             >
-              {substring.string}
+              {substring.string.startsWith('mailto:')
+                ? substring.string.substring(7)
+                : substring.string}
             </a>
           ) : (
             substring.string

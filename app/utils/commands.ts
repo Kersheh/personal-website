@@ -1,6 +1,7 @@
 import github from './commands/github';
 import linkedin from './commands/linkedin';
 import email from './commands/email';
+import help from './commands/help';
 
 interface Command {
   cmd: string;
@@ -19,6 +20,10 @@ const COMMANDS: Record<string, Command> = {
   email: {
     cmd: 'email',
     run: email
+  },
+  help: {
+    cmd: 'help',
+    run: help
   }
 };
 
@@ -26,7 +31,7 @@ const submit = async (command: string): Promise<string> => {
   try {
     return await COMMANDS[command].run();
   } catch {
-    throw new Error(`command '${command}' not found`);
+    throw new Error(`${command}: command not found`);
   }
 };
 

@@ -5,7 +5,9 @@ import Desktop from './components/Desktop/Desktop';
 import ButtonPower from './components/ButtonPower/ButtonPower';
 
 const Home = () => {
-  const [poweredOn, setPoweredOn] = useState(false);
+  const [poweredOn, setPoweredOn] = useState(
+    process.env.NODE_ENV === 'development'
+  );
 
   useEffect(() => {
     console.log(`v${process.env.APP_VERSION}`);

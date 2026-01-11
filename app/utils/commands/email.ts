@@ -8,6 +8,9 @@ const decodeEmail = () => {
   return Buffer.from(obfuscatedEmail, 'base64').toString('utf-8');
 };
 
-const email = () => decodeEmail();
+const email = () => {
+  const decodedEmail = decodeEmail();
+  return `mailto:${decodedEmail}`;
+};
 
 export default email;
