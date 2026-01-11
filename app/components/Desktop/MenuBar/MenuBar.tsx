@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { useDesktopApplicationStore } from '../../../store/desktopApplicationStore';
+import { useDesktopApplicationStore } from '@/app/store/desktopApplicationStore';
 
 interface MenuBarProps {
   onPowerOff: () => void;
@@ -15,6 +15,14 @@ const MenuBar = ({ onPowerOff, onCloseWindow }: MenuBarProps) => {
   );
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const prevFocusedWindowIdRef = useRef(focusedWindowId);
+
+  useEffect(() => {
+    if (prevFocusedWindowIdRef.current !== focusedWindowId && dropdownOpen) {
+      setDropdownOpen(false);
+    }
+    prevFocusedWindowIdRef.current = focusedWindowId;
+  }, [focusedWindowId, dropdownOpen]);
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -52,7 +60,7 @@ const MenuBar = ({ onPowerOff, onCloseWindow }: MenuBarProps) => {
               {focusedApp}
             </button>
             {dropdownOpen && (
-              <div className="absolute top-full left-0 mt-1 bg-black/90 backdrop-blur-md border border-white/20 rounded shadow-lg min-w-[160px] py-1">
+              <div className="absolute top-full left-0 mt-1 bg-black/90 backdrop-blur-md border border-white/20 rounded shadow-lg min-w-[160px]">
                 <button
                   onClick={() => {
                     if (focusedWindowId) {

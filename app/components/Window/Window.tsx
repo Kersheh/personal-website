@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import Draggable from 'react-draggable';
 import Terminal from '../applications/Terminal/Terminal';
 import WindowButton from './WindowButton/WindowButton';
-import { useDesktopApplicationStore } from '../../store/desktopApplicationStore';
+import { useDesktopApplicationStore } from '@/app/store/desktopApplicationStore';
 
 const APP_NAME_MAP: Record<string, string> = {
   iterm: 'Terminal'
@@ -91,6 +91,35 @@ const Window = ({
       document.removeEventListener('mousedown', handleOutsideClick);
     };
   }, [updateWindows]);
+
+  const maximize = () => {
+    if (parentNode) {
+      const desktopPadding = 20;
+
+      const maxWidth = parentNode.offsetWidth;
+      const maxHeight = parentNode.offsetHeight;
+
+      setSize({ width: maxWidth, height: maxHeight });
+      setPosition({ x: -desktopPadding, y: 0 });
+    }
+  };
+
+  const createResizeHandler =
+    (dir: 'n' | 's' | 'e' | 'w' | 'ne' | 'nw' | 'se' | 'sw') =>
+    (e: React.MouseEvent) => {
+      e.stopPropagation();
+      setIsFocused(true);
+      updateWindows(index);
+      setResizing({
+        dir,
+        startX: e.clientX,
+        startY: e.clientY,
+        startWidth: size.width,
+        startHeight: size.height,
+        startPosX: position.x,
+        startPosY: position.y
+      });
+    };
 
   useEffect(() => {
     if (!resizing) return;
@@ -181,7 +210,7 @@ const Window = ({
         <div className="bg-mystic h-[30px] rounded-t-lg pl-2.5 text-left window-bar">
           <WindowButton color="red" onButtonClick={() => closeWindow(id)} />
           <WindowButton color="yellow" />
-          <WindowButton color="green" />
+          <WindowButton color="green" onButtonClick={maximize} />
         </div>
 
         <Terminal
@@ -194,139 +223,35 @@ const Window = ({
         {/* Resize handles */}
         <div
           className="absolute right-0 top-0 h-full w-2 cursor-ew-resize"
-          onMouseDown={(e) => {
-            e.stopPropagation();
-            setIsFocused(true);
-            updateWindows(index);
-            setResizing({
-              dir: 'e',
-              startX: e.clientX,
-              startY: e.clientY,
-              startWidth: size.width,
-              startHeight: size.height,
-              startPosX: position.x,
-              startPosY: position.y
-            });
-          }}
+          onMouseDown={createResizeHandler('e')}
         />
         <div
           className="absolute bottom-0 left-0 w-full h-2 cursor-ns-resize"
-          onMouseDown={(e) => {
-            e.stopPropagation();
-            setIsFocused(true);
-            updateWindows(index);
-            setResizing({
-              dir: 's',
-              startX: e.clientX,
-              startY: e.clientY,
-              startWidth: size.width,
-              startHeight: size.height,
-              startPosX: position.x,
-              startPosY: position.y
-            });
-          }}
+          onMouseDown={createResizeHandler('s')}
         />
         <div
           className="absolute bottom-0 right-0 w-3 h-3 cursor-nwse-resize"
-          onMouseDown={(e) => {
-            e.stopPropagation();
-            setIsFocused(true);
-            updateWindows(index);
-            setResizing({
-              dir: 'se',
-              startX: e.clientX,
-              startY: e.clientY,
-              startWidth: size.width,
-              startHeight: size.height,
-              startPosX: position.x,
-              startPosY: position.y
-            });
-          }}
+          onMouseDown={createResizeHandler('se')}
         />
         <div
           className="absolute left-0 top-0 h-full w-2 cursor-ew-resize"
-          onMouseDown={(e) => {
-            e.stopPropagation();
-            setIsFocused(true);
-            updateWindows(index);
-            setResizing({
-              dir: 'w',
-              startX: e.clientX,
-              startY: e.clientY,
-              startWidth: size.width,
-              startHeight: size.height,
-              startPosX: position.x,
-              startPosY: position.y
-            });
-          }}
+          onMouseDown={createResizeHandler('w')}
         />
         <div
           className="absolute top-0 left-0 w-full h-2 cursor-ns-resize"
-          onMouseDown={(e) => {
-            e.stopPropagation();
-            setIsFocused(true);
-            updateWindows(index);
-            setResizing({
-              dir: 'n',
-              startX: e.clientX,
-              startY: e.clientY,
-              startWidth: size.width,
-              startHeight: size.height,
-              startPosX: position.x,
-              startPosY: position.y
-            });
-          }}
+          onMouseDown={createResizeHandler('n')}
         />
         <div
           className="absolute top-0 left-0 w-3 h-3 cursor-nwse-resize"
-          onMouseDown={(e) => {
-            e.stopPropagation();
-            setIsFocused(true);
-            updateWindows(index);
-            setResizing({
-              dir: 'nw',
-              startX: e.clientX,
-              startY: e.clientY,
-              startWidth: size.width,
-              startHeight: size.height,
-              startPosX: position.x,
-              startPosY: position.y
-            });
-          }}
+          onMouseDown={createResizeHandler('nw')}
         />
         <div
           className="absolute top-0 right-0 w-3 h-3 cursor-nesw-resize"
-          onMouseDown={(e) => {
-            e.stopPropagation();
-            setIsFocused(true);
-            updateWindows(index);
-            setResizing({
-              dir: 'ne',
-              startX: e.clientX,
-              startY: e.clientY,
-              startWidth: size.width,
-              startHeight: size.height,
-              startPosX: position.x,
-              startPosY: position.y
-            });
-          }}
+          onMouseDown={createResizeHandler('ne')}
         />
         <div
           className="absolute bottom-0 left-0 w-3 h-3 cursor-nesw-resize"
-          onMouseDown={(e) => {
-            e.stopPropagation();
-            setIsFocused(true);
-            updateWindows(index);
-            setResizing({
-              dir: 'sw',
-              startX: e.clientX,
-              startY: e.clientY,
-              startWidth: size.width,
-              startHeight: size.height,
-              startPosX: position.x,
-              startPosY: position.y
-            });
-          }}
+          onMouseDown={createResizeHandler('sw')}
         />
       </div>
     </Draggable>

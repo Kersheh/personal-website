@@ -11,7 +11,7 @@ import {
 import { isArray } from 'lodash';
 import TerminalRow from './TerminalRow/TerminalRow';
 import TerminalInfo from './TerminalInfo/TerminalInfo';
-import commands from '../../../utils/commands';
+import commands from '@/app/utils/commands';
 
 interface HistoryItem {
   std: 'in' | 'out';

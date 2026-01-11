@@ -1,11 +1,11 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { get } from 'lodash';
 import Window from '../Window/Window';
 import Icon from './Icon/Icon';
 import MenuBar from './MenuBar/MenuBar';
-import { useDesktopApplicationStore } from '../../store/desktopApplicationStore';
+import { useDesktopApplicationStore } from '@/app/store/desktopApplicationStore';
 
 let windowIdCounter = 0;
 
@@ -23,6 +23,7 @@ const Desktop = ({ powerOff }: DesktopProps) => {
   const [windows, setWindows] = useState<(WindowItem | null)[]>([]);
   const [powerOn, setPowerOn] = useState(true);
   const nodeRef = useRef<HTMLDivElement>(null);
+  const desktopRef = useRef<HTMLDivElement>(null);
   const setFocusedApp = useDesktopApplicationStore(
     (state) => state.setFocusedApp
   );
@@ -50,6 +51,21 @@ const Desktop = ({ powerOff }: DesktopProps) => {
       setFocusedApp(null);
     }
   }, [windows, setFocusedApp]);
+
+  const updateWindows = useCallback((i: number) => {
+    setWindows((currentWindows) => {
+      const updatedWindows = currentWindows.map((window) =>
+        window !== null ? { ...window, isFocused: false } : null
+      );
+
+      // if i is -1, this is an unfocus-all signal (clicking outside windows)
+      if (i >= 0 && updatedWindows[i]) {
+        updatedWindows[i]!.isFocused = true;
+      }
+
+      return updatedWindows;
+    });
+  }, []);
 
   return (
     <div
@@ -89,6 +105,7 @@ const Desktop = ({ powerOff }: DesktopProps) => {
       />
 
       <div
+        ref={desktopRef}
         className="flex-1 p-5 overflow-hidden relative"
         onClick={(e) => {
           if (e.target === e.currentTarget) {
@@ -110,19 +127,8 @@ const Desktop = ({ powerOff }: DesktopProps) => {
               id={item.id}
               name={item.name}
               isFocused={item.isFocused}
-              updateWindows={(i) => {
-                const updatedWindows = windows.map((window) =>
-                  window !== null ? { ...window, isFocused: false } : null
-                );
-
-                // if i is -1, this is an unfocus-all signal (clicking outside windows)
-                if (i >= 0 && updatedWindows[i]) {
-                  updatedWindows[i]!.isFocused = true;
-                }
-
-                setWindows(updatedWindows);
-              }}
-              parentNode={nodeRef.current}
+              updateWindows={updateWindows}
+              parentNode={desktopRef.current}
               windowsCount={windows.length}
               closeWindow={(id) => {
                 const updatedWindows = windows.map((window) =>

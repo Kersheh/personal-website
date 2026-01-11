@@ -1,4 +1,4 @@
-import { CommandOptions } from '../types';
+import { CommandOptions } from '@/app/utils/types';
 
 const exit = (options?: CommandOptions) => {
   if (options?.closeWindow && options?.windowId) {
