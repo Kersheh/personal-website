@@ -28,18 +28,21 @@ const Desktop = ({ powerOff }: DesktopProps) => {
     (state) => state.setFocusedApp
   );
 
-  const openNewWindow = useCallback((name: string) => {
-    const updatedWindows = windows.map((window) =>
-      window !== null ? { ...window, isFocused: false } : null
-    );
+  const openNewWindow = useCallback(
+    (name: string) => {
+      const updatedWindows = windows.map((window) =>
+        window !== null ? { ...window, isFocused: false } : null
+      );
 
-    updatedWindows.push({
-      name: name,
-      isFocused: true,
-      id: `window-${++windowIdCounter}`
-    });
-    setWindows(updatedWindows);
-  }, [windows]);
+      updatedWindows.push({
+        name: name,
+        isFocused: true,
+        id: `window-${++windowIdCounter}`
+      });
+      setWindows(updatedWindows);
+    },
+    [windows]
+  );
 
   useEffect(() => {
     const hasAnyFocusedWindow = windows.some((window) => window?.isFocused);

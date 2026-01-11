@@ -43,19 +43,15 @@ const Window = ({
   useEffect(() => {
     setIsFocused(initialFocused);
   }, [initialFocused]);
-  
+
   const initialWidth = Math.min(900, parentNode?.offsetWidth ?? 900);
   const initialHeight = 540;
-  
+
   const maxX = Math.max(0, (parentNode?.offsetWidth ?? 800) - initialWidth);
   const maxY = Math.max(0, (parentNode?.offsetHeight ?? 600) - initialHeight);
-  
-  const [initX] = useState(() =>
-    Math.floor(Math.random() * maxY * 0.8)
-  );
-  const [initY] = useState(() =>
-    Math.floor(Math.random() * maxX * 0.8)
-  );
+
+  const [initX] = useState(() => Math.floor(Math.random() * maxY * 0.8));
+  const [initY] = useState(() => Math.floor(Math.random() * maxX * 0.8));
   const [size, setSize] = useState({
     width: initialWidth,
     height: initialHeight
