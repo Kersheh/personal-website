@@ -1,6 +1,6 @@
 {
   "name": "matthewbreckon.com",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Personal website",
   "author": "Matt Breckon",
   "private": true,
@@ -23,7 +23,8 @@
     "next": "^16.1.1",
     "react": "^19.2.3",
     "react-dom": "^19.2.3",
-    "react-draggable": "^4.5.0"
+    "react-draggable": "^4.5.0",
+    "zustand": "^5.0.9"
   },
   "devDependencies": {
     "@types/lodash": "^4.17.23",

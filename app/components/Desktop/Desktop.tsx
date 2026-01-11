@@ -1,10 +1,11 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { get } from 'lodash';
 import Window from '../Window/Window';
 import Icon from './Icon/Icon';
-import ButtonPower from '../ButtonPower/ButtonPower';
+import MenuBar from './MenuBar/MenuBar';
+import { useDesktopApplicationStore } from '../../store/desktopApplicationStore';
 
 let windowIdCounter = 0;
 
@@ -22,6 +23,12 @@ const Desktop = ({ powerOff }: DesktopProps) => {
   const [windows, setWindows] = useState<(WindowItem | null)[]>([]);
   const [powerOn, setPowerOn] = useState(true);
   const nodeRef = useRef<HTMLDivElement>(null);
+  const setFocusedApp = useDesktopApplicationStore(
+    (state) => state.setFocusedApp
+  );
+  const focusedWindowId = useDesktopApplicationStore(
+    (state) => state.focusedWindowId
+  );
 
   const openNewWindow = (name: string) => {
     const updatedWindows = windows.map((window) =>
@@ -37,9 +44,16 @@ const Desktop = ({ powerOff }: DesktopProps) => {
     setWindows(updatedWindows);
   };
 
+  useEffect(() => {
+    const hasAnyFocusedWindow = windows.some((window) => window?.isFocused);
+    if (!hasAnyFocusedWindow) {
+      setFocusedApp(null);
+    }
+  }, [windows, setFocusedApp]);
+
   return (
     <div
-      className={`h-full relative overflow-hidden bg-cover bg-no-repeat ${
+      className={`h-full relative overflow-hidden bg-cover bg-no-repeat flex flex-col ${
         powerOn ? 'animate-turn-on' : 'animate-turn-off'
       }`}
       style={{
@@ -48,7 +62,7 @@ const Desktop = ({ powerOff }: DesktopProps) => {
       }}
       ref={nodeRef}
     >
-      {/* Scanlines */}
+      {/* CRT Scanlines */}
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
@@ -57,17 +71,31 @@ const Desktop = ({ powerOff }: DesktopProps) => {
           backgroundSize: '100% 2px, 3px 100%'
         }}
       />
-      {/* Flicker */}
+      {/* CRT Flicker */}
       <div className="absolute inset-0 bg-onyx/10 opacity-0 pointer-events-none animate-flicker" />
 
-      <div className="h-full p-5 overflow-hidden">
-        <ButtonPower
-          on={false}
-          onClickHandler={() => {
-            setPowerOn(false);
-            setTimeout(powerOff, 550);
-          }}
-        />
+      <MenuBar
+        onPowerOff={() => {
+          setPowerOn(false);
+          setTimeout(powerOff, 550);
+        }}
+        onCloseWindow={(id) => {
+          const updatedWindows = windows.map((window) =>
+            id === get(window, 'id') ? null : window
+          );
+          setWindows(updatedWindows);
+          setFocusedApp(null);
+        }}
+      />
+
+      <div
+        className="flex-1 p-5 overflow-hidden relative"
+        onClick={(e) => {
+          if (e.target === e.currentTarget) {
+            setFocusedApp(null);
+          }
+        }}
+      >
         <Icon
           iconName="iterm"
           label="Terminal"
@@ -80,13 +108,15 @@ const Desktop = ({ powerOff }: DesktopProps) => {
               key={i}
               index={i}
               id={item.id}
+              name={item.name}
               isFocused={item.isFocused}
-              updateWindows={(i: number) => {
+              updateWindows={(i) => {
                 const updatedWindows = windows.map((window) =>
                   window !== null ? { ...window, isFocused: false } : null
                 );
 
-                if (updatedWindows[i]) {
+                // if i is -1, this is an unfocus-all signal (clicking outside windows)
+                if (i >= 0 && updatedWindows[i]) {
                   updatedWindows[i]!.isFocused = true;
                 }
 
@@ -94,12 +124,17 @@ const Desktop = ({ powerOff }: DesktopProps) => {
               }}
               parentNode={nodeRef.current}
               windowsCount={windows.length}
-              closeWindow={(id: string) => {
+              closeWindow={(id) => {
                 const updatedWindows = windows.map((window) =>
                   id === get(window, 'id') ? null : window
                 );
 
                 setWindows(updatedWindows);
+
+                // clear focused app if the closed window was the focused one
+                if (id === focusedWindowId) {
+                  setFocusedApp(null);
+                }
               }}
             />
           );

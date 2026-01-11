@@ -4,10 +4,20 @@ import { useState, useEffect, useRef } from 'react';
 import Draggable from 'react-draggable';
 import Terminal from '../applications/Terminal/Terminal';
 import WindowButton from './WindowButton/WindowButton';
+import { useDesktopApplicationStore } from '../../store/desktopApplicationStore';
+
+const APP_NAME_MAP: Record<string, string> = {
+  iterm: 'Terminal'
+};
+
+const getAppDisplayName = (appName: string): string => {
+  return APP_NAME_MAP[appName] || appName;
+};
 
 interface WindowProps {
   index: number;
   id: string;
+  name: string;
   isFocused: boolean;
   parentNode: HTMLDivElement | null;
   windowsCount: number;
@@ -18,12 +28,16 @@ interface WindowProps {
 const Window = ({
   index,
   id,
+  name,
   isFocused: initialFocused,
   parentNode,
   windowsCount,
   updateWindows,
   closeWindow
 }: WindowProps) => {
+  const setFocusedApp = useDesktopApplicationStore(
+    (state) => state.setFocusedApp
+  );
   const [isFocused, setIsFocused] = useState(initialFocused);
   const [initX] = useState(() =>
     Math.floor(Math.random() * (parentNode?.offsetHeight ?? 600) * 0.5)
@@ -47,13 +61,28 @@ const Window = ({
   } | null>(null);
   const nodeRef = useRef<HTMLDivElement>(null);
 
+  useEffect(() => {
+    if (initialFocused) {
+      setFocusedApp(getAppDisplayName(name), id);
+    }
+  }, [initialFocused, name, id, setFocusedApp]);
+
   const MIN_WIDTH = Math.min(700, parentNode?.offsetWidth ?? 700);
   const MIN_HEIGHT = 400;
 
   useEffect(() => {
     const handleOutsideClick = (e: MouseEvent) => {
-      if (nodeRef.current && !nodeRef.current.contains(e.target as Node)) {
+      const target = e.target as Node;
+      const isMenuBarClick = (target as Element).closest?.('[data-menu-bar]');
+
+      if (
+        nodeRef.current &&
+        !nodeRef.current.contains(target) &&
+        !isMenuBarClick
+      ) {
         setIsFocused(false);
+        // unfocus all windows in Desktop state
+        updateWindows(-1);
       }
     };
 
@@ -61,7 +90,7 @@ const Window = ({
     return () => {
       document.removeEventListener('mousedown', handleOutsideClick);
     };
-  }, []);
+  }, [updateWindows]);
 
   useEffect(() => {
     if (!resizing) return;
@@ -141,6 +170,7 @@ const Window = ({
         onClick={() => {
           setIsFocused(true);
           updateWindows(index);
+          setFocusedApp(getAppDisplayName(name), id);
         }}
         style={{
           zIndex: isFocused ? windowsCount + 1 : index,
@@ -161,7 +191,6 @@ const Window = ({
           height={size.height - 30}
         />
 
-        {/* Resize handles */}
         {/* Resize handles */}
         <div
           className="absolute right-0 top-0 h-full w-2 cursor-ew-resize"

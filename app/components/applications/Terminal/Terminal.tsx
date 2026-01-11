@@ -27,7 +27,12 @@ interface TerminalProps {
 
 const CHAR_WIDTH = 10;
 
-const Terminal = ({ autoFocus, closeWindow, windowId, height }: TerminalProps) => {
+const Terminal = ({
+  autoFocus,
+  closeWindow,
+  windowId,
+  height
+}: TerminalProps) => {
   const [value, setValue] = useState('');
   const [bufferValue, setBufferValue] = useState('');
   const [isFocused, setIsFocused] = useState(true);
