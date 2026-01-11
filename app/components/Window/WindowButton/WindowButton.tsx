@@ -19,7 +19,7 @@ const WindowButton = ({ color, onButtonClick }: WindowButtonProps) => {
 
   return (
     <span
-      className={`border border-black/20 h-3.5 w-3.5 rounded-full inline-block m-2 cursor-pointer relative ${colorClasses} min-h-[44px] min-w-[44px] md:min-h-0 md:min-w-0 flex items-center justify-center`}
+      className={`border border-black/20 h-4 w-4 rounded-full inline-block mx-1.5 my-2 cursor-pointer relative ${colorClasses}`}
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
       onClick={(e: React.MouseEvent | React.TouchEvent) => {
