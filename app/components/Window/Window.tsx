@@ -3,11 +3,13 @@
 import { useState, useEffect, useRef } from 'react';
 import Draggable from 'react-draggable';
 import Terminal from '../applications/Terminal/Terminal';
+import PDFViewer from '../applications/PDFViewer/PDFViewer';
 import WindowButton from './WindowButton/WindowButton';
 import { useDesktopApplicationStore } from '@/app/store/desktopApplicationStore';
 
-const APP_NAME_MAP: Record<string, string> = {
-  iterm: 'Terminal'
+export const APP_NAME_MAP: Record<string, string> = {
+  iterm: 'Terminal',
+  pdfViwer: 'PDF Viewer'
 };
 
 const getAppDisplayName = (appName: string): string => {
@@ -286,12 +288,16 @@ const Window = ({
           <WindowButton color="green" onButtonClick={maximize} />
         </div>
 
-        <Terminal
-          autoFocus={isFocused}
-          closeWindow={closeWindow}
-          windowId={id}
-          height={size.height - 30}
-        />
+        {name === 'iterm' && (
+          <Terminal
+            autoFocus={isFocused}
+            closeWindow={closeWindow}
+            windowId={id}
+            height={size.height - 30}
+          />
+        )}
+
+        {name === 'pdf' && <PDFViewer />}
 
         {/* Resize handles */}
         <div

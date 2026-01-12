@@ -2,10 +2,11 @@
 
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { get } from 'lodash';
-import Window from '../Window/Window';
+import Window, { APP_NAME_MAP } from '../Window/Window';
 import Icon from './Icon/Icon';
 import MenuBar from './MenuBar/MenuBar';
 import { useDesktopApplicationStore } from '@/app/store/desktopApplicationStore';
+import { isFeatureEnabled, FeatureFlag } from '@/app/utils/featureFlags';
 
 let windowIdCounter = 0;
 
@@ -29,7 +30,7 @@ const Desktop = ({ powerOff }: DesktopProps) => {
   );
 
   const openNewWindow = useCallback(
-    (name: string) => {
+    (name: keyof typeof APP_NAME_MAP) => {
       const updatedWindows = windows.map((window) =>
         window !== null ? { ...window, isFocused: false } : null
       );
@@ -128,6 +129,14 @@ const Desktop = ({ powerOff }: DesktopProps) => {
           label="Terminal"
           onDoubleClickHandler={() => openNewWindow('iterm')}
         />
+
+        {isFeatureEnabled(FeatureFlag.DESKTOP_APP_PDF_VIEWER) && (
+          <Icon
+            iconName="pdf"
+            label="PDF Viewer"
+            onDoubleClickHandler={() => openNewWindow('pdfViewer')}
+          />
+        )}
 
         {windows.map((item, i) => {
           return item === null ? null : (
