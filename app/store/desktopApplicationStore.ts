@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { AppId } from '@/app/components/applications/appRegistry';
 
-interface DesktopApplicationState {
+export interface DesktopApplicationState {
   focusedApp: string | null;
   focusedWindowId: string | null;
   windowsByApp: Record<AppId, Set<string>>;

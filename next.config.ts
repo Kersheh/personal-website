@@ -9,7 +9,8 @@ const packageJson = JSON.parse(
 const nextConfig = {
   env: {
     APP_VERSION: packageJson.version
-  }
+  },
+  reactCompiler: true
 };
 
 export default nextConfig;

@@ -1,6 +1,6 @@
 'use client';
 
-import { memo, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useDesktopApplicationStore } from '@/app/store/desktopApplicationStore';
 import { resolveAppId } from '@/app/components/applications/appRegistry';
 import github from '@/app/utils/commands/github';
@@ -14,15 +14,29 @@ interface MenuBarProps {
 
 const MenuBar = ({ onPowerOff, onCloseWindow }: MenuBarProps) => {
   const focusedApp = useDesktopApplicationStore((state) => state.focusedApp);
+  const focusedWindowId = useDesktopApplicationStore(
+    (state) => state.focusedWindowId
+  );
   const getWindowsForApp = useDesktopApplicationStore(
     (state) => state.getWindowsForApp
   );
-  const [dropdowns, setDropdowns] = useState({ app: false, social: false });
+  const [dropdowns, setDropdowns] = useState({
+    file: false,
+    app: false,
+    social: false
+  });
+  const fileDropdownRef = useRef<HTMLDivElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const socialDropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
+      if (
+        fileDropdownRef.current &&
+        !fileDropdownRef.current.contains(e.target as Node)
+      ) {
+        setDropdowns((prev) => ({ ...prev, file: false }));
+      }
       if (
         dropdownRef.current &&
         !dropdownRef.current.contains(e.target as Node)
@@ -37,7 +51,7 @@ const MenuBar = ({ onPowerOff, onCloseWindow }: MenuBarProps) => {
       }
     };
 
-    if (dropdowns.app || dropdowns.social) {
+    if (dropdowns.file || dropdowns.app || dropdowns.social) {
       document.addEventListener('mousedown', handleClickOutside);
       return () => {
         document.removeEventListener('mousedown', handleClickOutside);
@@ -47,7 +61,7 @@ const MenuBar = ({ onPowerOff, onCloseWindow }: MenuBarProps) => {
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    setDropdowns({ app: false, social: false });
+    setDropdowns({ file: false, app: false, social: false });
   }, [focusedApp]);
 
   return (
@@ -146,27 +160,43 @@ const MenuBar = ({ onPowerOff, onCloseWindow }: MenuBarProps) => {
               <div className="absolute top-full left-0 mt-1 bg-black/90 backdrop-blur-md border border-white/20 rounded shadow-lg min-w-[160px]">
                 <button
                   onClick={() => {
-                    const currentId =
-                      useDesktopApplicationStore.getState().focusedWindowId;
-                    if (currentId) {
-                      onCloseWindow(currentId);
-                      setDropdowns((prev) => ({ ...prev, app: false }));
-                    }
-                  }}
-                  className="w-full text-left px-4 py-2 text-sm text-white/80 hover:bg-white/10 hover:text-white font-['Courier_new',_'Courier',_monospace] transition-colors"
-                >
-                  Close Window
-                </button>
-                <button
-                  onClick={() => {
                     const appId = resolveAppId(focusedApp || '');
                     const windowIds = getWindowsForApp(appId);
                     windowIds.forEach((id) => onCloseWindow(id));
                     setDropdowns((prev) => ({ ...prev, app: false }));
                   }}
-                  className="w-full text-left px-4 py-2 text-sm text-white/80 hover:bg-white/10 hover:text-white font-['Courier_new',_'Courier',_monospace] transition-colors border-t border-white/10"
+                  className="w-full text-left px-4 py-2 text-sm text-white/80 hover:bg-white/10 hover:text-white font-['Courier_new',_'Courier',_monospace] transition-colors whitespace-nowrap"
                 >
                   Close Application
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+        {focusedWindowId && (
+          <div ref={fileDropdownRef} className="relative">
+            <button
+              onClick={() =>
+                setDropdowns((prev) => ({ ...prev, file: !prev.file }))
+              }
+              className="inline-flex items-center h-8 text-white/80 text-sm font-['Courier_new',_'Courier',_monospace] leading-none select-none hover:text-white"
+            >
+              File
+            </button>
+            {dropdowns.file && (
+              <div className="absolute top-full left-0 mt-1 bg-black/90 backdrop-blur-md border border-white/20 rounded shadow-lg min-w-[160px]">
+                <button
+                  onClick={() => {
+                    const currentId =
+                      useDesktopApplicationStore.getState().focusedWindowId;
+                    if (currentId) {
+                      onCloseWindow(currentId);
+                      setDropdowns((prev) => ({ ...prev, file: false }));
+                    }
+                  }}
+                  className="w-full text-left px-4 py-2 text-sm text-white/80 hover:bg-white/10 hover:text-white font-['Courier_new',_'Courier',_monospace] transition-colors"
+                >
+                  Close Window
                 </button>
               </div>
             )}
@@ -199,4 +229,4 @@ const MenuBar = ({ onPowerOff, onCloseWindow }: MenuBarProps) => {
     </div>
   );
 };
-export default memo(MenuBar);
+export default MenuBar;

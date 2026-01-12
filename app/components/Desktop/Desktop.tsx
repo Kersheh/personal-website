@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { get } from 'lodash';
 import Window from '../Window/Window';
 import Icon from './Icon/Icon';
@@ -82,28 +82,25 @@ const Desktop = ({ powerOff }: DesktopProps) => {
     (state) => state.unregisterWindow
   );
 
-  const openNewWindow = useCallback(
-    (name: AppId, fileData?: WindowItem['fileData']) => {
-      const updatedWindows = windows.map((window) =>
-        window !== null ? { ...window, isFocused: false } : null
-      );
+  const openNewWindow = (name: AppId, fileData?: WindowItem['fileData']) => {
+    const updatedWindows = windows.map((window) =>
+      window !== null ? { ...window, isFocused: false } : null
+    );
 
-      const newWindowId = `window-${++windowIdCounter}`;
-      updatedWindows.push({
-        name,
-        isFocused: true,
-        id: newWindowId,
-        fileData
-      });
-      setWindows(updatedWindows);
+    const newWindowId = `window-${++windowIdCounter}`;
+    updatedWindows.push({
+      name,
+      isFocused: true,
+      id: newWindowId,
+      fileData
+    });
+    setWindows(updatedWindows);
 
-      // defer the store update to after the component finishes updating
-      queueMicrotask(() => {
-        registerWindow(name, newWindowId);
-      });
-    },
-    [windows, registerWindow]
-  );
+    // defer the store update to after the component finishes updating
+    queueMicrotask(() => {
+      registerWindow(name, newWindowId);
+    });
+  };
 
   useEffect(() => {
     const hasAnyFocusedWindow = windows.some((window) => window?.isFocused);
@@ -112,34 +109,29 @@ const Desktop = ({ powerOff }: DesktopProps) => {
     }
   }, [windows, setFocusedApp]);
 
-  const handleCloseWindow = useCallback(
-    (id: string) => {
-      const { focusedWindowId } = useDesktopApplicationStore.getState();
-      const windowToClose = windows.find(
-        (window) => window && window.id === id
-      );
+  const handleCloseWindow = (id: string) => {
+    const { focusedWindowId } = useDesktopApplicationStore.getState();
+    const windowToClose = windows.find((window) => window && window.id === id);
 
-      // defer the store update to after the component finishes updating
-      queueMicrotask(() => {
-        if (windowToClose) {
-          unregisterWindow(windowToClose.name, id);
-        }
-      });
-
-      setWindows((currentWindows) => {
-        return currentWindows.map((window) =>
-          id === get(window, 'id') ? null : window
-        );
-      });
-
-      if (focusedWindowId === id) {
-        setFocusedApp(null);
+    // defer the store update to after the component finishes updating
+    queueMicrotask(() => {
+      if (windowToClose) {
+        unregisterWindow(windowToClose.name, id);
       }
-    },
-    [windows, setFocusedApp, unregisterWindow]
-  );
+    });
 
-  const updateWindows = useCallback((i: number) => {
+    setWindows((currentWindows) => {
+      return currentWindows.map((window) =>
+        id === get(window, 'id') ? null : window
+      );
+    });
+
+    if (focusedWindowId === id) {
+      setFocusedApp(null);
+    }
+  };
+
+  const updateWindows = (i: number) => {
     setWindows((currentWindows) => {
       const updatedWindows = currentWindows.map((window) =>
         window !== null ? { ...window, isFocused: false } : null
@@ -152,7 +144,7 @@ const Desktop = ({ powerOff }: DesktopProps) => {
 
       return updatedWindows;
     });
-  }, []);
+  };
 
   return (
     <div
@@ -178,10 +170,10 @@ const Desktop = ({ powerOff }: DesktopProps) => {
       <div className="absolute inset-0 bg-onyx/10 opacity-0 pointer-events-none animate-flicker" />
 
       <MenuBar
-        onPowerOff={useCallback(() => {
+        onPowerOff={() => {
           setPowerOn(false);
           setTimeout(powerOff, 550);
-        }, [powerOff])}
+        }}
         onCloseWindow={handleCloseWindow}
       />
 

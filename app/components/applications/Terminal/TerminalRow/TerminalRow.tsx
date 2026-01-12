@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useRef, useEffect, useState } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import TerminalInfo from '../TerminalInfo/TerminalInfo';
 
 interface StringPart {
@@ -23,7 +23,7 @@ const TerminalRow = ({ io, command }: TerminalRowProps) => {
     }
   }, [io]);
 
-  const commandParts = useMemo<Array<StringPart>>(() => {
+  const commandParts: Array<StringPart> = (() => {
     if (io === 'out') {
       const urlRegex = /(https?:\/\/[^\s]+|mailto:[^\s]+)/g;
       const match = command.match(urlRegex);
@@ -50,7 +50,7 @@ const TerminalRow = ({ io, command }: TerminalRowProps) => {
       }
     }
     return [{ isUrl: false, string: command }];
-  }, [io, command]);
+  })();
 
   if (io === 'in') {
     return (
