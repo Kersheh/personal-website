@@ -26,8 +26,6 @@ const Icon = ({ iconName, label, onDoubleClickHandler }: IconProps) => {
     };
   }, []);
 
-  const iconExtension = iconName === 'pdf' ? 'svg' : 'png';
-
   return (
     <div
       className={`w-fit flex flex-col items-center p-0.5 border-2 rounded-[5%] cursor-pointer ${
@@ -39,7 +37,9 @@ const Icon = ({ iconName, label, onDoubleClickHandler }: IconProps) => {
     >
       <div
         className="w-20 h-20 bg-no-repeat bg-cover rounded-[5%]"
-        style={{ backgroundImage: `url(/images/icons/icon-${iconName}.${iconExtension})` }}
+        style={{
+          backgroundImage: `url(/images/icons/icon-${iconName})`
+        }}
       />
       <span className="text-white/80 text-xs text-center max-w-18 break-words font-['Courier_new',_'Courier',_monospace] drop-shadow-lg mt-1 select-none">
         {label}

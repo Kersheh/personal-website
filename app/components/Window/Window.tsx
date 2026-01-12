@@ -6,25 +6,25 @@ import Terminal from '../applications/Terminal/Terminal';
 import PDFViewer from '../applications/PDFViewer/PDFViewer';
 import WindowButton from './WindowButton/WindowButton';
 import { useDesktopApplicationStore } from '@/app/store/desktopApplicationStore';
-
-export const APP_NAME_MAP: Record<string, string> = {
-  iterm: 'Terminal',
-  pdfViwer: 'PDF Viewer'
-};
-
-const getAppDisplayName = (appName: string): string => {
-  return APP_NAME_MAP[appName] || appName;
-};
+import {
+  getAppConfig,
+  resolveAppId,
+  AppId
+} from '@/app/components/applications/appRegistry';
 
 interface WindowProps {
   index: number;
   id: string;
-  name: string;
+  name: AppId | string;
   isFocused: boolean;
   parentNode: HTMLDivElement | null;
   windowsCount: number;
   updateWindows: (index: number) => void;
   closeWindow: (id: string) => void;
+  fileData?: {
+    fileName: string;
+    filePath: string;
+  };
 }
 
 const Window = ({
@@ -35,11 +35,14 @@ const Window = ({
   parentNode,
   windowsCount,
   updateWindows,
-  closeWindow
+  closeWindow,
+  fileData: fileData
 }: WindowProps) => {
   const setFocusedApp = useDesktopApplicationStore(
     (state) => state.setFocusedApp
   );
+  const appId = resolveAppId(name);
+  const appConfig = getAppConfig(appId);
   const [isFocused, setIsFocused] = useState(initialFocused);
   const [isAnimating, setIsAnimating] = useState(false);
 
@@ -47,8 +50,14 @@ const Window = ({
     setIsFocused(initialFocused);
   }, [initialFocused]);
 
-  const initialWidth = Math.min(900, parentNode?.offsetWidth ?? 900);
-  const initialHeight = 540;
+  const initialWidth = Math.min(
+    appConfig.initialSize.width,
+    parentNode?.offsetWidth ?? appConfig.initialSize.width
+  );
+  const initialHeight = Math.min(
+    appConfig.initialSize.height,
+    parentNode?.offsetHeight ?? appConfig.initialSize.height
+  );
 
   const maxX = Math.max(0, (parentNode?.offsetWidth ?? 800) - initialWidth);
   const maxY = Math.max(0, (parentNode?.offsetHeight ?? 600) - initialHeight);
@@ -80,12 +89,18 @@ const Window = ({
 
   useEffect(() => {
     if (initialFocused) {
-      setFocusedApp(getAppDisplayName(name), id);
+      setFocusedApp(appConfig.displayName, id);
     }
-  }, [initialFocused, name, id, setFocusedApp]);
+  }, [initialFocused, appConfig.displayName, id, setFocusedApp]);
 
-  const MIN_WIDTH = Math.min(700, parentNode?.offsetWidth ?? 700);
-  const MIN_HEIGHT = 400;
+  const minWidth = Math.min(
+    appConfig.minSize.width,
+    parentNode?.offsetWidth ?? appConfig.minSize.width
+  );
+  const minHeight = Math.min(
+    appConfig.minSize.height,
+    parentNode?.offsetHeight ?? appConfig.minSize.height
+  );
 
   useEffect(() => {
     const handleOutsideClick = (e: MouseEvent) => {
@@ -93,7 +108,7 @@ const Window = ({
       const isMenuBarClick = (target as Element).closest?.('[data-menu-bar]');
       const isAnyWindowClick = (target as Element).closest?.('[data-window]');
 
-      // Only unfocus when clicking outside all windows (desktop background)
+      // only unfocus when clicking outside all windows (desktop background)
       if (
         nodeRef.current &&
         !nodeRef.current.contains(target) &&
@@ -111,63 +126,6 @@ const Window = ({
       document.removeEventListener('mousedown', handleOutsideClick);
     };
   }, [updateWindows]);
-
-  const maximize = () => {
-    if (parentNode) {
-      const desktopPadding = 20;
-
-      setIsAnimating(true);
-
-      setPreviousState({
-        width: size.width,
-        height: size.height,
-        x: position.x,
-        y: position.y
-      });
-
-      const maxWidth = parentNode.offsetWidth;
-      const maxHeight = parentNode.offsetHeight;
-
-      setSize({ width: maxWidth, height: maxHeight });
-      setPosition({ x: -desktopPadding, y: 0 });
-      setIsMaximized(true);
-
-      setTimeout(() => setIsAnimating(false), 300);
-    }
-  };
-
-  const toggleMaximize = () => {
-    if (parentNode) {
-      const desktopPadding = 20;
-
-      setIsAnimating(true);
-
-      if (isMaximized && previousState) {
-        // Restore to previous size
-        setSize({ width: previousState.width, height: previousState.height });
-        setPosition({ x: previousState.x, y: previousState.y });
-        setIsMaximized(false);
-        setPreviousState(null);
-      } else {
-        // Save current state and maximize
-        setPreviousState({
-          width: size.width,
-          height: size.height,
-          x: position.x,
-          y: position.y
-        });
-
-        const maxWidth = parentNode.offsetWidth;
-        const maxHeight = parentNode.offsetHeight;
-
-        setSize({ width: maxWidth, height: maxHeight });
-        setPosition({ x: -desktopPadding, y: 0 });
-        setIsMaximized(true);
-      }
-
-      setTimeout(() => setIsAnimating(false), 300);
-    }
-  };
 
   const createResizeHandler =
     (dir: 'n' | 's' | 'e' | 'w' | 'ne' | 'nw' | 'se' | 'sw') =>
@@ -196,8 +154,8 @@ const Window = ({
       const deltaY = e.clientY - resizing.startY;
 
       setSize(() => {
-        const clampWidth = (w: number) => Math.max(MIN_WIDTH, w);
-        const clampHeight = (h: number) => Math.max(MIN_HEIGHT, h);
+        const clampWidth = (w: number) => Math.max(minWidth, w);
+        const clampHeight = (h: number) => Math.max(minHeight, h);
 
         let nextWidth = resizing.startWidth;
         let nextHeight = resizing.startHeight;
@@ -247,7 +205,7 @@ const Window = ({
       document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseup', handleMouseUp);
     };
-  }, [resizing, MIN_WIDTH, MIN_HEIGHT]);
+  }, [resizing, minWidth, minHeight]);
 
   return (
     <Draggable
@@ -265,7 +223,7 @@ const Window = ({
         onClick={() => {
           setIsFocused(true);
           updateWindows(index);
-          setFocusedApp(getAppDisplayName(name), id);
+          setFocusedApp(appConfig.displayName, id);
         }}
         style={{
           zIndex: isFocused ? windowsCount + 1 : index,
@@ -279,16 +237,73 @@ const Window = ({
           onDoubleClick={(e) => {
             const target = e.target as HTMLElement;
             if (!target.closest('span')) {
-              toggleMaximize();
+              if (parentNode) {
+                const desktopPadding = 20;
+
+                setIsAnimating(true);
+
+                if (isMaximized && previousState) {
+                  // restore to previous size
+                  setSize({
+                    width: previousState.width,
+                    height: previousState.height
+                  });
+                  setPosition({ x: previousState.x, y: previousState.y });
+                  setIsMaximized(false);
+                  setPreviousState(null);
+                } else {
+                  // save current state and maximize
+                  setPreviousState({
+                    width: size.width,
+                    height: size.height,
+                    x: position.x,
+                    y: position.y
+                  });
+
+                  const maxWidth = parentNode.offsetWidth;
+                  const maxHeight = parentNode.offsetHeight;
+
+                  setSize({ width: maxWidth, height: maxHeight });
+                  setPosition({ x: -desktopPadding, y: 0 });
+                  setIsMaximized(true);
+                }
+
+                setTimeout(() => setIsAnimating(false), 300);
+              }
             }
           }}
         >
           <WindowButton color="red" onButtonClick={() => closeWindow(id)} />
           {/* <WindowButton color="yellow" /> */}
-          <WindowButton color="green" onButtonClick={maximize} />
+          <WindowButton
+            color="green"
+            onButtonClick={() => {
+              if (parentNode) {
+                const desktopPadding = 20;
+
+                setIsAnimating(true);
+
+                setPreviousState({
+                  width: size.width,
+                  height: size.height,
+                  x: position.x,
+                  y: position.y
+                });
+
+                const maxWidth = parentNode.offsetWidth;
+                const maxHeight = parentNode.offsetHeight;
+
+                setSize({ width: maxWidth, height: maxHeight });
+                setPosition({ x: -desktopPadding, y: 0 });
+                setIsMaximized(true);
+
+                setTimeout(() => setIsAnimating(false), 300);
+              }
+            }}
+          />
         </div>
 
-        {name === 'iterm' && (
+        {appId === 'TERMINAL' && (
           <Terminal
             autoFocus={isFocused}
             closeWindow={closeWindow}
@@ -297,7 +312,9 @@ const Window = ({
           />
         )}
 
-        {name === 'pdf' && <PDFViewer />}
+        {appId === 'PDF_VIEWER' && (
+          <PDFViewer height={size.height - 30} fileData={fileData} />
+        )}
 
         {/* Resize handles */}
         <div

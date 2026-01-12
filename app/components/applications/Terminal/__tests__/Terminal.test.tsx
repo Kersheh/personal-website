@@ -8,7 +8,7 @@ jest.mock('@/app/utils/commands', () => ({
   submit: jest.fn()
 }));
 
-describe('Terminal', () => {
+describe('<Terminal />', () => {
   const mockCloseWindow = jest.fn();
   const windowId = 'test-window';
 

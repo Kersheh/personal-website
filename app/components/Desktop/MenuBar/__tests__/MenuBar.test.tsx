@@ -21,7 +21,7 @@ jest.mock('@/app/store/desktopApplicationStore', () => ({
   })
 }));
 
-describe('MenuBar', () => {
+describe('<MenuBar />', () => {
   const mockPowerOff = jest.fn();
   const mockCloseWindow = jest.fn();
 

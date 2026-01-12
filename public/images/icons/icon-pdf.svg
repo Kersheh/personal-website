@@ -1,22 +1,6 @@
 <svg viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg">
-  <!-- Document body with rounded corners and folded corner -->
-  <defs>
-    <style>
-      .pdf-document { fill: #f5f5f4; stroke: black; stroke-width: 8; stroke-linejoin: round; }
-      .pdf-fold { fill: black; }
-      .pdf-text { fill: white; font-family: Arial, sans-serif; font-size: 48px; font-weight: bold; }
-    </style>
-  </defs>
-  
-  <!-- Main document shape -->
-  <path class="pdf-document" d="M 40 20 L 160 20 L 200 60 L 200 220 Q 200 230 190 230 L 50 230 Q 40 230 40 220 L 40 30 Q 40 20 50 20 Z"/>
-  
-  <!-- Folded corner -->
-  <path class="pdf-fold" d="M 160 20 L 200 60 L 160 60 Q 160 20 160 20 Z"/>
-  
-  <!-- Black section for PDF text -->
-  <rect x="40" y="150" width="160" height="80" fill="black" rx="8"/>
-  
-  <!-- PDF text -->
-  <text class="pdf-text" x="120" y="200" text-anchor="middle">PDF</text>
+  <path fill="#f5f5f4c0" stroke="black" stroke-width="8" stroke-linejoin="round" d="M 60 20 L 160 20 L 200 60 L 200 220 Q 200 230 190 230 L 70 230 Q 60 230 60 220 L 60 30 Q 60 20 70 20 Z"/>
+  <path fill="black" d="M 160 20 L 200 60 L 160 60 Q 160 20 160 20 Z"/>
+  <rect x="20" y="120" width="150" height="70" fill="black" rx="10"/>
+  <text fill="#f5f5f4c0" font-family="Arial, sans-serif" font-size="52" font-weight="bold" x="95" y="170" text-anchor="middle">PDF</text>
 </svg>

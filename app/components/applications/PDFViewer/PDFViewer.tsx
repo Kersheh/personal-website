@@ -1,10 +1,25 @@
 'use client';
 
-const PDFViewer = () => {
+interface PDFViewerProps {
+  height?: number;
+  fileData?: {
+    fileName: string;
+    filePath: string;
+  };
+}
+
+const PDFViewer = ({ height, fileData }: PDFViewerProps) => {
+  const contentHeight = Math.max(120, height ?? 360);
+
   return (
-    <div className="w-full h-full flex items-center justify-center bg-onyx text-white">
+    <div
+      className="w-full flex items-center justify-center bg-onyx text-white overflow-hidden"
+      style={{ height: contentHeight }}
+    >
       <div className="text-center">
-        <h2 className="text-2xl mb-2">PDF Viewer</h2>
+        <h2 className="text-2xl mb-2">
+          {fileData ? fileData.fileName : 'PDF Viewer'}
+        </h2>
         <p className="text-sm opacity-60">Coming soon...</p>
       </div>
     </div>

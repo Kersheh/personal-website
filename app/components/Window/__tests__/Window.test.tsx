@@ -32,7 +32,7 @@ const createMockParentNode = (width = 1070, height = 835) => {
   return div;
 };
 
-describe('Window - Resize and Maximize', () => {
+describe('<Window />', () => {
   const mockUpdateWindows = jest.fn();
   const mockCloseWindow = jest.fn();
 

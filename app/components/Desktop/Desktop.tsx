@@ -2,23 +2,70 @@
 
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { get } from 'lodash';
-import Window, { APP_NAME_MAP } from '../Window/Window';
+import Window from '../Window/Window';
 import Icon from './Icon/Icon';
 import MenuBar from './MenuBar/MenuBar';
 import { useDesktopApplicationStore } from '@/app/store/desktopApplicationStore';
 import { isFeatureEnabled, FeatureFlag } from '@/app/utils/featureFlags';
+import { AppId, APP_CONFIGS } from '@/app/components/applications/appRegistry';
 
 let windowIdCounter = 0;
 
 interface WindowItem {
-  name: string;
+  name: AppId;
   isFocused: boolean;
   id: string;
+  fileData?: {
+    fileName: string;
+    filePath: string;
+  };
 }
+
+interface DesktopApplicationItem {
+  type: 'application';
+  id: string;
+  iconName: string;
+  label: string;
+  appName: AppId;
+  featureFlag?: FeatureFlag;
+}
+
+interface DesktopFileItem {
+  type: 'file';
+  id: string;
+  iconName: string;
+  label: string;
+  fileName: string;
+  filePath: string;
+  opensWith: AppId;
+  featureFlag?: FeatureFlag;
+}
+
+type DesktopItem = DesktopApplicationItem | DesktopFileItem;
 
 interface DesktopProps {
   powerOff: () => void;
 }
+
+const DESKTOP_ITEMS: Array<DesktopItem> = [
+  {
+    type: 'application',
+    id: 'app-terminal',
+    iconName: APP_CONFIGS.TERMINAL.iconName,
+    label: APP_CONFIGS.TERMINAL.displayName,
+    appName: 'TERMINAL'
+  },
+  {
+    type: 'file',
+    id: 'file-resume',
+    iconName: APP_CONFIGS.PDF_VIEWER.iconName,
+    label: 'resume.pdf',
+    fileName: 'resume.pdf',
+    filePath: '/documents/resume.pdf',
+    opensWith: 'PDF_VIEWER',
+    featureFlag: FeatureFlag.DESKTOP_APP_PDF_VIEWER
+  }
+];
 
 const Desktop = ({ powerOff }: DesktopProps) => {
   const [windows, setWindows] = useState<Array<WindowItem | null>>([]);
@@ -30,15 +77,16 @@ const Desktop = ({ powerOff }: DesktopProps) => {
   );
 
   const openNewWindow = useCallback(
-    (name: keyof typeof APP_NAME_MAP) => {
+    (name: AppId, fileData?: WindowItem['fileData']) => {
       const updatedWindows = windows.map((window) =>
         window !== null ? { ...window, isFocused: false } : null
       );
 
       updatedWindows.push({
-        name: name,
+        name,
         isFocused: true,
-        id: `window-${++windowIdCounter}`
+        id: `window-${++windowIdCounter}`,
+        fileData
       });
       setWindows(updatedWindows);
     },
@@ -124,19 +172,33 @@ const Desktop = ({ powerOff }: DesktopProps) => {
           }
         }}
       >
-        <Icon
-          iconName="iterm"
-          label="Terminal"
-          onDoubleClickHandler={() => openNewWindow('iterm')}
-        />
+        <div className="flex gap-6 flex-wrap">
+          {DESKTOP_ITEMS.map((item) => {
+            if (item.featureFlag && !isFeatureEnabled(item.featureFlag)) {
+              return null;
+            }
 
-        {isFeatureEnabled(FeatureFlag.DESKTOP_APP_PDF_VIEWER) && (
-          <Icon
-            iconName="pdf"
-            label="PDF Viewer"
-            onDoubleClickHandler={() => openNewWindow('pdfViewer')}
-          />
-        )}
+            const handleDoubleClick = () => {
+              if (item.type === 'application') {
+                openNewWindow(item.appName);
+              } else {
+                openNewWindow(item.opensWith, {
+                  fileName: item.fileName,
+                  filePath: item.filePath
+                });
+              }
+            };
+
+            return (
+              <Icon
+                key={item.id}
+                iconName={item.iconName}
+                label={item.label}
+                onDoubleClickHandler={handleDoubleClick}
+              />
+            );
+          })}
+        </div>
 
         {windows.map((item, i) => {
           return item === null ? null : (
@@ -150,6 +212,7 @@ const Desktop = ({ powerOff }: DesktopProps) => {
               parentNode={desktopRef.current}
               windowsCount={windows.length}
               closeWindow={handleCloseWindow}
+              fileData={item.fileData}
             />
           );
         })}

@@ -24,7 +24,7 @@ const isWindowFocused = (window: Element) =>
 const isWindowUnfocused = (window: Element) =>
   window.classList.contains('opacity-60');
 
-describe('Desktop - Multi-Window Focus Integration', () => {
+describe('<Desktop />', () => {
   const mockPowerOff = jest.fn();
 
   beforeEach(() => {
