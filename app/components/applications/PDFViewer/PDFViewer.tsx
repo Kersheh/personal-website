@@ -33,7 +33,9 @@ const DOCUMENT_RENDERERS: Record<string, () => React.JSX.Element> = {
 };
 
 const normalizeKey = (fileData?: PDFViewerProps['fileData']) => {
-  if (!fileData) return DEFAULT_DOC_KEY;
+  if (!fileData) {
+    return DEFAULT_DOC_KEY;
+  }
 
   const stripExt = (value?: string) =>
     value ? value.replace(/\.[^/.]+$/, '') : '';
@@ -72,7 +74,9 @@ const PDFViewer = ({ height, fileData }: PDFViewerProps) => {
 
   useEffect(() => {
     const node = viewportRef.current;
-    if (!node || typeof ResizeObserver === 'undefined') return;
+    if (!node || typeof ResizeObserver === 'undefined') {
+      return;
+    }
 
     const observer = new ResizeObserver((entries) => {
       const width = entries[0]?.contentRect.width ?? PAGE_WIDTH;
@@ -164,7 +168,9 @@ const PDFViewer = ({ height, fileData }: PDFViewerProps) => {
         }}
         onMouseDown={(e: React.MouseEvent) => {
           const container = scrollContainerRef.current;
-          if (!container) return;
+          if (!container) {
+            return;
+          }
 
           setIsDragging(true);
           setDragStart({
@@ -173,10 +179,14 @@ const PDFViewer = ({ height, fileData }: PDFViewerProps) => {
           });
         }}
         onMouseMove={(e: React.MouseEvent) => {
-          if (!isDragging) return;
+          if (!isDragging) {
+            return;
+          }
 
           const container = scrollContainerRef.current;
-          if (!container) return;
+          if (!container) {
+            return;
+          }
 
           container.scrollLeft = dragStart.x - e.clientX;
           container.scrollTop = dragStart.y - e.clientY;

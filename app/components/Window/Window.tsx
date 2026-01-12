@@ -148,7 +148,9 @@ const Window = ({
     };
 
   useEffect(() => {
-    if (!resizing) return;
+    if (!resizing) {
+      return;
+    }
 
     const handleMouseMove = (e: MouseEvent) => {
       const deltaX = e.clientX - resizing.startX;
@@ -279,7 +281,9 @@ const Window = ({
           }}
           onTouchEnd={(e: React.TouchEvent) => {
             const target = e.target as HTMLElement;
-            if (target.closest('span')) return;
+            if (target.closest('span')) {
+              return;
+            }
 
             const now = Date.now();
             const timeSinceLastTap = now - lastTap;

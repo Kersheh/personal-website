@@ -17,6 +17,11 @@ const eslintConfig = defineConfig([
     }
   },
   prettierConfig,
+  {
+    rules: {
+      curly: 'error'
+    }
+  },
   globalIgnores(['.next/**', 'out/**', 'build/**', 'next-env.d.ts'])
 ]);
 
