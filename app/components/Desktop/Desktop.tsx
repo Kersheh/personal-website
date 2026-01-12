@@ -75,6 +75,12 @@ const Desktop = ({ powerOff }: DesktopProps) => {
   const setFocusedApp = useDesktopApplicationStore(
     (state) => state.setFocusedApp
   );
+  const registerWindow = useDesktopApplicationStore(
+    (state) => state.registerWindow
+  );
+  const unregisterWindow = useDesktopApplicationStore(
+    (state) => state.unregisterWindow
+  );
 
   const openNewWindow = useCallback(
     (name: AppId, fileData?: WindowItem['fileData']) => {
@@ -82,15 +88,21 @@ const Desktop = ({ powerOff }: DesktopProps) => {
         window !== null ? { ...window, isFocused: false } : null
       );
 
+      const newWindowId = `window-${++windowIdCounter}`;
       updatedWindows.push({
         name,
         isFocused: true,
-        id: `window-${++windowIdCounter}`,
+        id: newWindowId,
         fileData
       });
       setWindows(updatedWindows);
+
+      // defer the store update to after the component finishes updating
+      queueMicrotask(() => {
+        registerWindow(name, newWindowId);
+      });
     },
-    [windows]
+    [windows, registerWindow]
   );
 
   useEffect(() => {
@@ -103,18 +115,28 @@ const Desktop = ({ powerOff }: DesktopProps) => {
   const handleCloseWindow = useCallback(
     (id: string) => {
       const { focusedWindowId } = useDesktopApplicationStore.getState();
-
-      setWindows((currentWindows) =>
-        currentWindows.map((window) =>
-          id === get(window, 'id') ? null : window
-        )
+      const windowToClose = windows.find(
+        (window) => window && window.id === id
       );
+
+      // defer the store update to after the component finishes updating
+      queueMicrotask(() => {
+        if (windowToClose) {
+          unregisterWindow(windowToClose.name, id);
+        }
+      });
+
+      setWindows((currentWindows) => {
+        return currentWindows.map((window) =>
+          id === get(window, 'id') ? null : window
+        );
+      });
 
       if (focusedWindowId === id) {
         setFocusedApp(null);
       }
     },
-    [setFocusedApp]
+    [windows, setFocusedApp, unregisterWindow]
   );
 
   const updateWindows = useCallback((i: number) => {

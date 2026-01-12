@@ -2,6 +2,7 @@
 
 import { memo, useEffect, useRef, useState } from 'react';
 import { useDesktopApplicationStore } from '@/app/store/desktopApplicationStore';
+import { resolveAppId } from '@/app/components/applications/appRegistry';
 import github from '@/app/utils/commands/github';
 import linkedin from '@/app/utils/commands/linkedin';
 import email from '@/app/utils/commands/email';
@@ -13,8 +14,10 @@ interface MenuBarProps {
 
 const MenuBar = ({ onPowerOff, onCloseWindow }: MenuBarProps) => {
   const focusedApp = useDesktopApplicationStore((state) => state.focusedApp);
-  const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [socialDropdownOpen, setSocialDropdownOpen] = useState(false);
+  const getWindowsForApp = useDesktopApplicationStore(
+    (state) => state.getWindowsForApp
+  );
+  const [dropdowns, setDropdowns] = useState({ app: false, social: false });
   const dropdownRef = useRef<HTMLDivElement>(null);
   const socialDropdownRef = useRef<HTMLDivElement>(null);
 
@@ -24,27 +27,27 @@ const MenuBar = ({ onPowerOff, onCloseWindow }: MenuBarProps) => {
         dropdownRef.current &&
         !dropdownRef.current.contains(e.target as Node)
       ) {
-        setDropdownOpen(false);
+        setDropdowns((prev) => ({ ...prev, app: false }));
       }
       if (
         socialDropdownRef.current &&
         !socialDropdownRef.current.contains(e.target as Node)
       ) {
-        setSocialDropdownOpen(false);
+        setDropdowns((prev) => ({ ...prev, social: false }));
       }
     };
 
-    if (dropdownOpen || socialDropdownOpen) {
+    if (dropdowns.app || dropdowns.social) {
       document.addEventListener('mousedown', handleClickOutside);
       return () => {
         document.removeEventListener('mousedown', handleClickOutside);
       };
     }
-  }, [dropdownOpen, socialDropdownOpen]);
+  }, [dropdowns]);
 
   useEffect(() => {
-    setDropdownOpen(false);
-    setSocialDropdownOpen(false);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setDropdowns({ app: false, social: false });
   }, [focusedApp]);
 
   return (
@@ -57,20 +60,24 @@ const MenuBar = ({ onPowerOff, onCloseWindow }: MenuBarProps) => {
         {/* Social links dropdown */}
         <div ref={socialDropdownRef} className="relative">
           <button
-            onClick={() => setSocialDropdownOpen(!socialDropdownOpen)}
+            onClick={() =>
+              setDropdowns((prev) => ({ ...prev, social: !prev.social }))
+            }
             className="flex items-center justify-center h-8 w-8 hover:opacity-80 transition-opacity select-none p-1"
             aria-label="Social links"
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/favicon.ico" alt="Logo" className="w-5 h-5" />
           </button>
-          {socialDropdownOpen && (
+          {dropdowns.social && (
             <div className="absolute top-full left-0 mt-1 bg-black/90 backdrop-blur-md border border-white/20 rounded shadow-lg min-w-[160px]">
               <a
                 href={github()}
                 target="_blank"
                 rel="noopener noreferrer"
-                onClick={() => setSocialDropdownOpen(false)}
+                onClick={() =>
+                  setDropdowns((prev) => ({ ...prev, social: false }))
+                }
                 className="flex items-center gap-3 w-full text-left px-4 py-2 text-sm text-white/80 hover:bg-white/10 hover:text-white font-['Courier_new',_'Courier',_monospace] transition-colors"
               >
                 <svg
@@ -86,7 +93,9 @@ const MenuBar = ({ onPowerOff, onCloseWindow }: MenuBarProps) => {
                 href={linkedin()}
                 target="_blank"
                 rel="noopener noreferrer"
-                onClick={() => setSocialDropdownOpen(false)}
+                onClick={() =>
+                  setDropdowns((prev) => ({ ...prev, social: false }))
+                }
                 className="flex items-center gap-3 w-full text-left px-4 py-2 text-sm text-white/80 hover:bg-white/10 hover:text-white font-['Courier_new',_'Courier',_monospace] transition-colors"
               >
                 <svg
@@ -101,7 +110,7 @@ const MenuBar = ({ onPowerOff, onCloseWindow }: MenuBarProps) => {
               <button
                 onClick={() => {
                   window.location.href = email();
-                  setSocialDropdownOpen(false);
+                  setDropdowns((prev) => ({ ...prev, social: false }));
                 }}
                 className="flex items-center gap-3 w-full text-left px-4 py-2 text-sm text-white/80 hover:bg-white/10 hover:text-white font-['Courier_new',_'Courier',_monospace] transition-colors"
               >
@@ -126,12 +135,14 @@ const MenuBar = ({ onPowerOff, onCloseWindow }: MenuBarProps) => {
         {focusedApp && (
           <div ref={dropdownRef} className="relative">
             <button
-              onClick={() => setDropdownOpen(!dropdownOpen)}
+              onClick={() =>
+                setDropdowns((prev) => ({ ...prev, app: !prev.app }))
+              }
               className="inline-flex items-center h-8 text-white/80 text-sm font-semibold font-['Courier_new',_'Courier',_monospace] leading-none select-none hover:text-white"
             >
               {focusedApp}
             </button>
-            {dropdownOpen && (
+            {dropdowns.app && (
               <div className="absolute top-full left-0 mt-1 bg-black/90 backdrop-blur-md border border-white/20 rounded shadow-lg min-w-[160px]">
                 <button
                   onClick={() => {
@@ -139,12 +150,23 @@ const MenuBar = ({ onPowerOff, onCloseWindow }: MenuBarProps) => {
                       useDesktopApplicationStore.getState().focusedWindowId;
                     if (currentId) {
                       onCloseWindow(currentId);
-                      setDropdownOpen(false);
+                      setDropdowns((prev) => ({ ...prev, app: false }));
                     }
                   }}
                   className="w-full text-left px-4 py-2 text-sm text-white/80 hover:bg-white/10 hover:text-white font-['Courier_new',_'Courier',_monospace] transition-colors"
                 >
                   Close Window
+                </button>
+                <button
+                  onClick={() => {
+                    const appId = resolveAppId(focusedApp || '');
+                    const windowIds = getWindowsForApp(appId);
+                    windowIds.forEach((id) => onCloseWindow(id));
+                    setDropdowns((prev) => ({ ...prev, app: false }));
+                  }}
+                  className="w-full text-left px-4 py-2 text-sm text-white/80 hover:bg-white/10 hover:text-white font-['Courier_new',_'Courier',_monospace] transition-colors border-t border-white/10"
+                >
+                  Close Application
                 </button>
               </div>
             )}
