@@ -85,6 +85,7 @@ const Window = ({
     x: number;
     y: number;
   } | null>(null);
+  const [lastTap, setLastTap] = useState(0);
   const nodeRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -207,6 +208,42 @@ const Window = ({
     };
   }, [resizing, minWidth, minHeight]);
 
+  const handleMaximizeToggle = () => {
+    if (parentNode) {
+      const desktopPadding = 20;
+
+      setIsAnimating(true);
+
+      if (isMaximized && previousState) {
+        // restore to previous size
+        setSize({
+          width: previousState.width,
+          height: previousState.height
+        });
+        setPosition({ x: previousState.x, y: previousState.y });
+        setIsMaximized(false);
+        setPreviousState(null);
+      } else {
+        // save current state and maximize
+        setPreviousState({
+          width: size.width,
+          height: size.height,
+          x: position.x,
+          y: position.y
+        });
+
+        const maxWidth = parentNode.offsetWidth;
+        const maxHeight = parentNode.offsetHeight;
+
+        setSize({ width: maxWidth, height: maxHeight });
+        setPosition({ x: -desktopPadding, y: 0 });
+        setIsMaximized(true);
+      }
+
+      setTimeout(() => setIsAnimating(false), 300);
+    }
+  };
+
   return (
     <Draggable
       handle=".window-bar"
@@ -237,40 +274,22 @@ const Window = ({
           onDoubleClick={(e) => {
             const target = e.target as HTMLElement;
             if (!target.closest('span')) {
-              if (parentNode) {
-                const desktopPadding = 20;
-
-                setIsAnimating(true);
-
-                if (isMaximized && previousState) {
-                  // restore to previous size
-                  setSize({
-                    width: previousState.width,
-                    height: previousState.height
-                  });
-                  setPosition({ x: previousState.x, y: previousState.y });
-                  setIsMaximized(false);
-                  setPreviousState(null);
-                } else {
-                  // save current state and maximize
-                  setPreviousState({
-                    width: size.width,
-                    height: size.height,
-                    x: position.x,
-                    y: position.y
-                  });
-
-                  const maxWidth = parentNode.offsetWidth;
-                  const maxHeight = parentNode.offsetHeight;
-
-                  setSize({ width: maxWidth, height: maxHeight });
-                  setPosition({ x: -desktopPadding, y: 0 });
-                  setIsMaximized(true);
-                }
-
-                setTimeout(() => setIsAnimating(false), 300);
-              }
+              handleMaximizeToggle();
             }
+          }}
+          onTouchEnd={(e: React.TouchEvent) => {
+            const target = e.target as HTMLElement;
+            if (target.closest('span')) return;
+
+            const now = Date.now();
+            const timeSinceLastTap = now - lastTap;
+
+            if (timeSinceLastTap < 300 && timeSinceLastTap > 0) {
+              e.preventDefault();
+              handleMaximizeToggle();
+            }
+
+            setLastTap(now);
           }}
         >
           <WindowButton color="red" onButtonClick={() => closeWindow(id)} />
@@ -303,18 +322,25 @@ const Window = ({
           />
         </div>
 
-        {appId === 'TERMINAL' && (
-          <Terminal
-            autoFocus={isFocused}
-            closeWindow={closeWindow}
-            windowId={id}
-            height={size.height - 30}
-          />
-        )}
+        <div
+          style={{
+            height: size.height - 30,
+            transition: isAnimating ? 'height 300ms ease-in-out' : 'none'
+          }}
+        >
+          {appId === 'TERMINAL' && (
+            <Terminal
+              autoFocus={isFocused}
+              closeWindow={closeWindow}
+              windowId={id}
+              height={size.height - 30}
+            />
+          )}
 
-        {appId === 'PDF_VIEWER' && (
-          <PDFViewer height={size.height - 30} fileData={fileData} />
-        )}
+          {appId === 'PDF_VIEWER' && (
+            <PDFViewer height={size.height - 30} fileData={fileData} />
+          )}
+        </div>
 
         {/* Resize handles */}
         <div

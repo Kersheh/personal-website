@@ -42,11 +42,28 @@ const normalizeKey = (fileData?: PDFViewerProps['fileData']) => {
 
 const PDFViewer = ({ height, fileData }: PDFViewerProps) => {
   const [scale, setScale] = useState(1);
+  const [zoomInput, setZoomInput] = useState('100');
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const viewportRef = useRef<HTMLDivElement>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   const contentHeight = Math.max(160, height ?? 420);
   const docKey = normalizeKey(fileData);
   const DocumentBody = DOCUMENT_RENDERERS[docKey];
+
+  const applyZoomInput = () => {
+    const value = parseInt(zoomInput, 10);
+    if (isNaN(value) || value < 50 || value > 300) {
+      setZoomInput(Math.round(scale * 100).toString());
+      return;
+    }
+    const newScale = value / 100;
+    setScale(newScale);
+    setZoomInput(Math.round(newScale * 100).toString());
+  };
+
+  const handleMouseUp = () => setIsDragging(false);
 
   useEffect(() => {
     const node = viewportRef.current;
@@ -58,6 +75,7 @@ const PDFViewer = ({ height, fileData }: PDFViewerProps) => {
       setScale((prevScale) => {
         // only update if scale changes significantly to prevent infinite loops
         if (Math.abs(nextScale - prevScale) > 0.001) {
+          setZoomInput(Math.round(nextScale * 100).toString());
           return nextScale;
         }
         return prevScale;
@@ -72,39 +90,143 @@ const PDFViewer = ({ height, fileData }: PDFViewerProps) => {
   const scaledHeight = PAGE_HEIGHT * scale;
 
   return (
-    <div
-      className="w-full overflow-y-scroll pt-6 px-6 flex justify-center bg-onyx text-white"
-      style={{ height: contentHeight }}
-    >
-      <div className="w-full max-w-5xl" ref={viewportRef}>
-        <div
-          className="relative mx-auto"
-          style={{ width: scaledWidth, height: scaledHeight }}
+    <div className="w-full h-full flex flex-col bg-onyx text-white">
+      <div className="flex items-center gap-2 px-4 py-2 bg-onyx/50 border-b border-white/10">
+        <button
+          onClick={() => {
+            setScale((prev) => {
+              const newScale = Math.max(prev - 0.1, 0.5);
+              setZoomInput(Math.round(newScale * 100).toString());
+              return newScale;
+            });
+          }}
+          className="flex items-center justify-center w-8 h-8 rounded hover:bg-white/10 transition-colors"
+          aria-label="Zoom out"
         >
+          <svg
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <circle cx="11" cy="11" r="8" />
+            <path d="M21 21l-4.35-4.35" />
+            <line x1="8" y1="11" x2="14" y2="11" />
+          </svg>
+        </button>
+        <button
+          onClick={() => {
+            setScale((prev) => {
+              const newScale = Math.min(prev + 0.1, 3);
+              setZoomInput(Math.round(newScale * 100).toString());
+              return newScale;
+            });
+          }}
+          className="flex items-center justify-center w-8 h-8 rounded hover:bg-white/10 transition-colors"
+          aria-label="Zoom in"
+        >
+          <svg
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <circle cx="11" cy="11" r="8" />
+            <path d="M21 21l-4.35-4.35" />
+            <line x1="11" y1="8" x2="11" y2="14" />
+            <line x1="8" y1="11" x2="14" y2="11" />
+          </svg>
+        </button>
+        <input
+          type="text"
+          value={zoomInput}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+            const value = e.target.value.replace(/[^0-9]/g, '');
+            setZoomInput(value);
+          }}
+          onBlur={applyZoomInput}
+          onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
+            if (e.key === 'Enter') {
+              applyZoomInput();
+              (e.target as HTMLInputElement).blur();
+            }
+          }}
+          className="w-12 text-xs text-white/90 bg-white/10 border border-white/20 rounded px-1.5 py-0.5 text-center ml-2 focus:outline-none focus:border-white/40"
+          aria-label="Zoom percentage"
+        />
+        <span className="text-xs text-white/60">%</span>
+      </div>
+      <div
+        ref={scrollContainerRef}
+        className="flex-1 overflow-scroll pt-6 pl-6 flex justify-center select-none"
+        style={{
+          height: contentHeight - 44,
+          cursor: isDragging ? 'move' : 'default'
+        }}
+        onMouseDown={(e: React.MouseEvent) => {
+          const container = scrollContainerRef.current;
+          if (!container) return;
+
+          setIsDragging(true);
+          setDragStart({
+            x: e.clientX + container.scrollLeft,
+            y: e.clientY + container.scrollTop
+          });
+        }}
+        onMouseMove={(e: React.MouseEvent) => {
+          if (!isDragging) return;
+
+          const container = scrollContainerRef.current;
+          if (!container) return;
+
+          container.scrollLeft = dragStart.x - e.clientX;
+          container.scrollTop = dragStart.y - e.clientY;
+        }}
+        onMouseUp={handleMouseUp}
+        onMouseLeave={handleMouseUp}
+      >
+        <div className="w-full max-w-5xl flex justify-center" ref={viewportRef}>
           <div
-            className="absolute top-0 left-0 bg-[#fdfaf5] text-slate-900 shadow-2xl shadow-black/30 rounded-md border border-black/5 overflow-hidden"
+            className="relative"
             style={{
-              width: PAGE_WIDTH,
-              height: PAGE_HEIGHT,
-              transform: `scale(${scale})`,
-              transformOrigin: 'top left'
+              width: scaledWidth,
+              height: scaledHeight,
+              marginRight: 30,
+              marginBottom: 30
             }}
           >
-            <div className="border-b border-black/10 px-6 py-4 flex items-center justify-between bg-white/70">
-              <div className="text-sm font-medium text-slate-700">
-                {fileData?.fileName ?? 'Document'}
+            <div
+              className="absolute top-0 left-0 bg-[#fdfaf5] text-slate-900 shadow-2xl shadow-black/30 rounded-md border border-black/5 overflow-hidden"
+              style={{
+                width: PAGE_WIDTH,
+                height: PAGE_HEIGHT,
+                transform: `scale(${scale})`,
+                transformOrigin: 'top left'
+              }}
+            >
+              <div className="border-b border-black/10 px-6 py-4 flex items-center justify-between bg-white/70">
+                <div className="text-sm font-medium text-slate-700">
+                  {fileData?.fileName ?? 'Document'}
+                </div>
+                <div className="text-xs text-slate-500 font-mono">
+                  HTML preview (PDF stub)
+                </div>
               </div>
-              <div className="text-xs text-slate-500 font-mono">
-                HTML preview (PDF stub)
-              </div>
-            </div>
 
-            <div className="px-6 py-6 space-y-4 leading-relaxed">
-              <DocumentBody />
+              <div className="px-6 py-6 space-y-4 leading-relaxed">
+                <DocumentBody />
+              </div>
             </div>
           </div>
         </div>
-        <div style={{ height: 24 }} />
       </div>
     </div>
   );

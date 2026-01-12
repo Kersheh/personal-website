@@ -10,6 +10,7 @@ interface IconProps {
 
 const Icon = ({ iconName, label, onDoubleClickHandler }: IconProps) => {
   const [isSelected, setIsSelected] = useState(false);
+  const [lastTap, setLastTap] = useState(0);
   const nodeRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -34,6 +35,19 @@ const Icon = ({ iconName, label, onDoubleClickHandler }: IconProps) => {
       ref={nodeRef}
       onClick={() => setIsSelected(true)}
       onDoubleClick={onDoubleClickHandler}
+      onTouchEnd={(e: React.TouchEvent) => {
+        const now = Date.now();
+        const timeSinceLastTap = now - lastTap;
+
+        if (timeSinceLastTap < 300 && timeSinceLastTap > 0) {
+          e.preventDefault();
+          onDoubleClickHandler();
+        } else {
+          setIsSelected(true);
+        }
+
+        setLastTap(now);
+      }}
     >
       <div
         className="w-20 h-20 bg-no-repeat bg-cover rounded-[5%]"
