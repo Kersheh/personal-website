@@ -70,14 +70,11 @@ body {
     color: #000 !important;
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
-    width: 8.5in !important;
-    min-height: 11in !important;
     margin: 0 auto !important;
     padding: 0 !important;
   }
 
   @page {
-    size: 8.5in 11in;
     margin: 0;
   }
 }
