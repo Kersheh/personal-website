@@ -1,7 +1,8 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import ResumeDocument from './documents/resume';
+import { createPortal } from 'react-dom';
+import ResumeDocument from './documents/ResumeDocument';
 import {
   PrintIcon,
   ZoomOutIcon,
@@ -12,6 +13,7 @@ import {
 
 interface PDFViewerProps {
   height?: number;
+  isFocused?: boolean;
   fileData?: {
     fileName: string;
     filePath: string;
@@ -47,7 +49,7 @@ const normalizeKey = (fileData?: PDFViewerProps['fileData']) => {
   return match && DOCUMENT_RENDERERS[match] ? match : DEFAULT_DOC_KEY;
 };
 
-const PDFViewer = ({ height, fileData }: PDFViewerProps) => {
+const PDFViewer = ({ height, isFocused, fileData }: PDFViewerProps) => {
   const [scale, setScale] = useState(1);
   const [zoomInput, setZoomInput] = useState('100');
   const [isDragging, setIsDragging] = useState(false);
@@ -100,13 +102,15 @@ const PDFViewer = ({ height, fileData }: PDFViewerProps) => {
 
   return (
     <div className="w-full h-full flex flex-col bg-onyx text-white">
-      <div className="flex items-center gap-2 px-4 py-2 bg-onyx/50 border-b border-white/10 select-none">
+      <div className="flex items-center gap-2 px-4 py-2 bg-onyx/50 border-b border-white/10 select-none no-print">
         <span className="text-sm font-medium text-white/90 mr-auto">
           {fileData?.fileName ?? 'Document'}
         </span>
         <button
           onClick={() => {
-            // TODO: Implement print functionality
+            if (typeof window !== 'undefined') {
+              window.print();
+            }
           }}
           className="flex items-center justify-center w-8 h-8 rounded hover:bg-white/10 transition-colors"
           aria-label="Print document"
@@ -161,7 +165,7 @@ const PDFViewer = ({ height, fileData }: PDFViewerProps) => {
       </div>
       <div
         ref={scrollContainerRef}
-        className="flex-1 overflow-scroll pt-6 pl-6 flex justify-center select-none"
+        className="flex-1 overflow-scroll pt-6 pl-6 flex justify-center select-none no-print"
         style={{
           height: contentHeight - 44,
           cursor: isDragging ? 'move' : 'default'
@@ -220,6 +224,26 @@ const PDFViewer = ({ height, fileData }: PDFViewerProps) => {
           </div>
         </div>
       </div>
+      {/* Print-only page (unscaled, isolated) - only render for focused window */}
+      {isFocused &&
+        typeof window !== 'undefined' &&
+        createPortal(
+          <div className="print-only">
+            <div
+              className="pdf-print-page bg-white text-slate-900"
+              style={{
+                width: '8.5in',
+                minHeight: '11in',
+                margin: '0 auto'
+              }}
+            >
+              <div className="px-6 py-6 space-y-4 leading-relaxed">
+                <DocumentBody />
+              </div>
+            </div>
+          </div>,
+          document.body
+        )}
     </div>
   );
 };

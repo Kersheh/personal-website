@@ -21,10 +21,76 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Print helpers */
+.print-only {
+  display: none;
+}
+
+@media print {
+
+  html,
+  body {
+    height: auto !important;
+    overflow: visible !important;
+    background: #fff !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* Hide ALL app content - use visibility+position to avoid animation restart */
+  body>*:not(.print-only) {
+    visibility: hidden !important;
+    position: absolute !important;
+    top: -9999px !important;
+    left: -9999px !important;
+  }
+
+  /* Hide elements marked as no-print */
+  .no-print {
+    display: none !important;
+  }
+
+  /* The print-only portal content */
+  .print-only {
+    display: block !important;
+    position: static !important;
+    visibility: visible !important;
+    width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    background: #fff !important;
+  }
+
+  /* Ensure the printed page is clean */
+  .pdf-print-page {
+    display: block !important;
+    box-shadow: none !important;
+    border: none !important;
+    background: #fff !important;
+    color: #000 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    width: 8.5in !important;
+    min-height: 11in !important;
+    margin: 0 auto !important;
+    padding: 0 !important;
+  }
+
+  @page {
+    size: 8.5in 11in;
+    margin: 0;
+  }
+}
+
 @layer utilities {
   @keyframes fadein {
-    from { opacity: 0; }
-    to { opacity: 1; }
+    from {
+      opacity: 0;
+    }
+
+    to {
+      opacity: 1;
+    }
   }
 
   @keyframes turn-on {
@@ -33,23 +99,28 @@ body {
       filter: brightness(30);
       opacity: 1;
     }
+
     3.5% {
       transform: scale(1, .8) translate3d(0, 100%, 0);
     }
+
     3.6% {
       transform: scale(1, .8) translate3d(0, -100%, 0);
       opacity: 1;
     }
+
     9% {
       transform: scale(1.3, .6) translate3d(0, 100%, 0);
       filter: brightness(30);
       opacity: 0;
     }
+
     11% {
       transform: scale(1, 1) translate3d(0, 0, 0);
       filter: contrast(0) brightness(0);
       opacity: 0;
     }
+
     100% {
       transform: scale(1, 1) translate3d(0, 0, 0);
       filter: contrast(1) brightness(1.2) saturate(1.3);
@@ -63,10 +134,12 @@ body {
       filter: brightness(1);
       opacity: 1;
     }
+
     60% {
       transform: scale(1.3, .001) translate3d(0, 0, 0);
       filter: brightness(10);
     }
+
     100% {
       animation-timing-function: cubic-bezier(.755, .050, .855, .060);
       transform: scale(0, .0001) translate3d(0, 0, 0);
@@ -75,45 +148,117 @@ body {
   }
 
   @keyframes flicker {
-    0% { opacity: 0.27861; }
-    5% { opacity: 0.34769; }
-    10% { opacity: 0.23604; }
-    15% { opacity: 0.90626; }
-    20% { opacity: 0.18128; }
-    25% { opacity: 0.83891; }
-    30% { opacity: 0.65583; }
-    35% { opacity: 0.67807; }
-    40% { opacity: 0.26559; }
-    45% { opacity: 0.84693; }
-    50% { opacity: 0.96019; }
-    55% { opacity: 0.08594; }
-    60% { opacity: 0.20313; }
-    65% { opacity: 0.71988; }
-    70% { opacity: 0.53455; }
-    75% { opacity: 0.37288; }
-    80% { opacity: 0.71428; }
-    85% { opacity: 0.70419; }
-    90% { opacity: 0.7003; }
-    95% { opacity: 0.36108; }
-    100% { opacity: 0.24387; }
+    0% {
+      opacity: 0.27861;
+    }
+
+    5% {
+      opacity: 0.34769;
+    }
+
+    10% {
+      opacity: 0.23604;
+    }
+
+    15% {
+      opacity: 0.90626;
+    }
+
+    20% {
+      opacity: 0.18128;
+    }
+
+    25% {
+      opacity: 0.83891;
+    }
+
+    30% {
+      opacity: 0.65583;
+    }
+
+    35% {
+      opacity: 0.67807;
+    }
+
+    40% {
+      opacity: 0.26559;
+    }
+
+    45% {
+      opacity: 0.84693;
+    }
+
+    50% {
+      opacity: 0.96019;
+    }
+
+    55% {
+      opacity: 0.08594;
+    }
+
+    60% {
+      opacity: 0.20313;
+    }
+
+    65% {
+      opacity: 0.71988;
+    }
+
+    70% {
+      opacity: 0.53455;
+    }
+
+    75% {
+      opacity: 0.37288;
+    }
+
+    80% {
+      opacity: 0.71428;
+    }
+
+    85% {
+      opacity: 0.70419;
+    }
+
+    90% {
+      opacity: 0.7003;
+    }
+
+    95% {
+      opacity: 0.36108;
+    }
+
+    100% {
+      opacity: 0.24387;
+    }
   }
 
   @keyframes pulse {
     0% {
       box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.28);
     }
+
     70% {
       box-shadow: 0 0 0 30px rgba(0, 0, 0, 0);
     }
+
     100% {
       box-shadow: 0 0 0 0 rgba(0, 0, 0, 0);
     }
   }
 
   @keyframes blink {
-    0% { opacity: 1; }
-    50% { opacity: 0; }
-    100% { opacity: 1; }
+    0% {
+      opacity: 1;
+    }
+
+    50% {
+      opacity: 0;
+    }
+
+    100% {
+      opacity: 1;
+    }
   }
 
   .animate-fadein {
@@ -130,12 +275,20 @@ body {
     animation-fill-mode: forwards;
   }
 
-  .animate-flicker {
-    animation: flicker .15s infinite;
+  /* State after turn-on animation completes - holds the final values */
+  .animation-done {
+    transform: scale(1, 1) translate3d(0, 0, 0);
+    filter: contrast(1) brightness(1.2) saturate(1.3);
+    opacity: 1;
+  }
+
+  @media screen {
+    .animate-flicker {
+      animation: flicker .15s infinite;
+    }
   }
 
   .animate-pulse-button {
     animation: pulse 2s infinite;
   }
 }
-

@@ -342,7 +342,11 @@ const Window = ({
           )}
 
           {appId === 'PDF_VIEWER' && (
-            <PDFViewer height={size.height - 30} fileData={fileData} />
+            <PDFViewer
+              height={size.height - 30}
+              isFocused={isFocused}
+              fileData={fileData}
+            />
           )}
         </div>
 

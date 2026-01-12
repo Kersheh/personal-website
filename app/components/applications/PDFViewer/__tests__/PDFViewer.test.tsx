@@ -138,4 +138,30 @@ describe('<PDFViewer />', () => {
 
     expect(zoomInput).toHaveValue('210');
   });
+
+  it('should call window.print when print button is clicked', async () => {
+    const mockPrint = jest.fn();
+    window.print = mockPrint;
+
+    render(<PDFViewer height={600} isFocused={true} />);
+
+    const printButton = screen.getByLabelText('Print document');
+    await userEvent.click(printButton);
+
+    expect(mockPrint).toHaveBeenCalledTimes(1);
+  });
+
+  it('should render print-only content when focused', () => {
+    render(<PDFViewer height={600} isFocused={true} />);
+
+    const printOnly = document.querySelector('.print-only');
+    expect(printOnly).toBeInTheDocument();
+  });
+
+  it('should not render print-only content when not focused', () => {
+    render(<PDFViewer height={600} isFocused={false} />);
+
+    const printOnly = document.querySelector('.print-only');
+    expect(printOnly).not.toBeInTheDocument();
+  });
 });
