@@ -93,9 +93,11 @@ const MenuBar = ({ onPowerOff, onCloseWindow }: MenuBarProps) => {
                 </svg>
                 LinkedIn
               </a>
-              <a
-                href={email()}
-                onClick={() => setSocialDropdownOpen(false)}
+              <button
+                onClick={() => {
+                  window.location.href = email();
+                  setSocialDropdownOpen(false);
+                }}
                 className="flex items-center gap-3 w-full text-left px-4 py-2 text-sm text-white/80 hover:bg-white/10 hover:text-white font-['Courier_new',_'Courier',_monospace] transition-colors"
               >
                 <svg
@@ -112,7 +114,7 @@ const MenuBar = ({ onPowerOff, onCloseWindow }: MenuBarProps) => {
                   />
                 </svg>
                 Email
-              </a>
+              </button>
             </div>
           )}
         </div>

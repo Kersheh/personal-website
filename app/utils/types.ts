@@ -2,6 +2,7 @@ export interface CommandOptions {
   closeWindow?: (id: string) => void;
   windowId?: string;
   clearHistory?: () => void;
+  args?: Array<string>;
 }
 
 export interface Command {

@@ -65,11 +65,15 @@ interface SubmitOptions {
 }
 
 const submit = async (
-  command: string,
+  input: string,
   options: SubmitOptions = {}
 ): Promise<string> => {
+  const parts = input.trim().split(/\s+/);
+  const command = parts[0];
+  const args = parts.slice(1);
+
   try {
-    return await COMMANDS[command].run(options);
+    return await COMMANDS[command].run({ ...options, args });
   } catch {
     throw new Error(`${command}: command not found (try \`help\`)`);
   }

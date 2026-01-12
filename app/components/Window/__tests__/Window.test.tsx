@@ -1,4 +1,5 @@
 import { render, waitFor, fireEvent } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import Window from '../Window';
 
 jest.mock('@/app/store/desktopApplicationStore', () => ({
@@ -65,7 +66,7 @@ describe('Window - Resize and Maximize', () => {
       const greenButton = document.querySelector('.bg-dull-lime');
       expect(greenButton).toBeTruthy();
 
-      fireEvent.click(greenButton!);
+      await userEvent.click(greenButton!);
 
       await waitFor(() => {
         const width = (windowElement as HTMLElement).style.width;
@@ -82,7 +83,7 @@ describe('Window - Resize and Maximize', () => {
       const windowElement = document.querySelector('.react-draggable');
       const greenButton = document.querySelector('.bg-dull-lime');
 
-      fireEvent.click(greenButton!);
+      await userEvent.click(greenButton!);
 
       await waitFor(() => {
         const transform = (windowElement as HTMLElement).style.transform;
@@ -97,14 +98,13 @@ describe('Window - Resize and Maximize', () => {
       const windowElement = document.querySelector('.react-draggable');
       const greenButton = document.querySelector('.bg-dull-lime');
 
-      fireEvent.click(greenButton!);
+      await userEvent.click(greenButton!);
 
       await waitFor(() => {
         expect((windowElement as HTMLElement).style.width).toBe('1070px');
       });
 
-      // Click again - should stay maximized
-      fireEvent.click(greenButton!);
+      await userEvent.click(greenButton!);
 
       await waitFor(() => {
         expect((windowElement as HTMLElement).style.width).toBe('1070px');
@@ -121,7 +121,7 @@ describe('Window - Resize and Maximize', () => {
 
       expect(windowBar).toBeTruthy();
 
-      fireEvent.doubleClick(windowBar!);
+      await userEvent.dblClick(windowBar!);
 
       await waitFor(() => {
         const width = (windowElement as HTMLElement).style.width;
@@ -140,13 +140,13 @@ describe('Window - Resize and Maximize', () => {
 
       const initialWidth = (windowElement as HTMLElement).style.width;
 
-      fireEvent.doubleClick(windowBar!);
+      await userEvent.dblClick(windowBar!);
 
       await waitFor(() => {
         expect((windowElement as HTMLElement).style.width).toBe('1070px');
       });
 
-      fireEvent.doubleClick(windowBar!);
+      await userEvent.dblClick(windowBar!);
 
       await waitFor(() => {
         expect((windowElement as HTMLElement).style.width).toBe(initialWidth);

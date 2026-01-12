@@ -23,7 +23,7 @@ const TerminalRow = ({ io, command }: TerminalRowProps) => {
     }
   }, [io]);
 
-  const commandParts = useMemo<StringPart[]>(() => {
+  const commandParts = useMemo<Array<StringPart>>(() => {
     if (io === 'out') {
       const urlRegex = /(https?:\/\/[^\s]+|mailto:[^\s]+)/g;
       const match = command.match(urlRegex);
@@ -71,16 +71,24 @@ const TerminalRow = ({ io, command }: TerminalRowProps) => {
           >
             {commandParts.map((substring, i) =>
               substring.isUrl ? (
-                <a
-                  target="_blank"
-                  rel="noreferrer noopener"
-                  key={i}
-                  href={substring.string}
-                >
-                  {substring.string.startsWith('mailto:')
-                    ? substring.string.substring(7)
-                    : substring.string}
-                </a>
+                substring.string.startsWith('mailto:') ? (
+                  <button
+                    key={i}
+                    onClick={() => (window.location.href = substring.string)}
+                    className="underline cursor-pointer bg-transparent border-none text-inherit font-inherit p-0 hover:opacity-80"
+                  >
+                    {substring.string.substring(7)}
+                  </button>
+                ) : (
+                  <a
+                    target="_blank"
+                    rel="noreferrer noopener"
+                    key={i}
+                    href={substring.string}
+                  >
+                    {substring.string}
+                  </a>
+                )
               ) : (
                 substring.string
               )
@@ -96,16 +104,24 @@ const TerminalRow = ({ io, command }: TerminalRowProps) => {
       <span className="tracking-[1.5px]">
         {commandParts.map((substring, i) =>
           substring.isUrl ? (
-            <a
-              target="_blank"
-              rel="noreferrer noopener"
-              key={i}
-              href={substring.string}
-            >
-              {substring.string.startsWith('mailto:')
-                ? substring.string.substring(7)
-                : substring.string}
-            </a>
+            substring.string.startsWith('mailto:') ? (
+              <button
+                key={i}
+                onClick={() => (window.location.href = substring.string)}
+                className="underline cursor-pointer bg-transparent border-none text-inherit font-inherit p-0 hover:opacity-80"
+              >
+                {substring.string.substring(7)}
+              </button>
+            ) : (
+              <a
+                target="_blank"
+                rel="noreferrer noopener"
+                key={i}
+                href={substring.string}
+              >
+                {substring.string}
+              </a>
+            )
           ) : (
             substring.string
           )

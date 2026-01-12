@@ -26,8 +26,8 @@ const Terminal = ({
 }: TerminalProps) => {
   const [value, setValue] = useState('');
   const [bufferValue, setBufferValue] = useState('');
-  const [history, setHistory] = useState<HistoryItem[]>([]);
-  const [inputHistory, setInputHistory] = useState<string[]>([]);
+  const [history, setHistory] = useState<Array<HistoryItem>>([]);
+  const [inputHistory, setInputHistory] = useState<Array<string>>([]);
   const [inputHistoryIndex, setInputHistoryIndex] = useState(0);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -88,46 +88,47 @@ const Terminal = ({
               autoComplete="off"
               autoCapitalize="off"
               onKeyDown={async (e: KeyboardEvent<HTMLTextAreaElement>) => {
-                if (e.key === 'Enter') {
-                  e.preventDefault();
-                  const inputValue = (e.target as HTMLTextAreaElement).value;
+                switch (e.key) {
+                  case 'Enter':
+                    e.preventDefault();
+                    const inputValue = (e.target as HTMLTextAreaElement).value;
 
-                  setValue('');
-                  setBufferValue('');
-                  setHistory([...history, { std: 'in', msg: inputValue }]);
-                  setInputHistory([...inputHistory, inputValue]);
-                  setInputHistoryIndex(inputHistory.length + 1);
+                    if (!inputValue.trim()) {
+                      setValue('');
+                      setBufferValue('');
+                      return;
+                    }
 
-                  if (!inputValue.trim()) {
-                    return;
-                  }
+                    setValue('');
+                    setBufferValue('');
+                    setHistory([...history, { std: 'in', msg: inputValue }]);
+                    setInputHistory([...inputHistory, inputValue]);
+                    setInputHistoryIndex(inputHistory.length + 1);
 
-                  try {
-                    const response = await commands.submit(inputValue, {
-                      closeWindow,
-                      windowId,
-                      clearHistory: () => setHistory([])
-                    });
-                    const messages = isArray(response)
-                      ? response
-                      : response.split('\n');
+                    try {
+                      const response = await commands.submit(inputValue, {
+                        closeWindow,
+                        windowId,
+                        clearHistory: () => setHistory([])
+                      });
+                      const messages = isArray(response)
+                        ? response
+                        : response.split('\n');
 
-                    messages.forEach((message) => {
+                      messages.forEach((message) => {
+                        setHistory((prev) => [
+                          ...prev,
+                          { std: 'out', msg: message }
+                        ]);
+                      });
+                    } catch (err) {
                       setHistory((prev) => [
                         ...prev,
-                        { std: 'out', msg: message }
+                        { std: 'out', msg: (err as Error).message }
                       ]);
-                    });
-                  } catch (err) {
-                    setHistory((prev) => [
-                      ...prev,
-                      { std: 'out', msg: (err as Error).message }
-                    ]);
-                  }
-                  return;
-                }
+                    }
+                    break;
 
-                switch (e.key) {
                   case 'ArrowUp':
                     e.preventDefault();
                     if (inputHistoryIndex > 0) {

@@ -12,7 +12,8 @@ const eslintConfig = defineConfig([
       prettier: prettierPlugin
     },
     rules: {
-      'prettier/prettier': 'error'
+      'prettier/prettier': 'error',
+      '@typescript-eslint/array-type': ['error', { default: 'generic' }]
     }
   },
   prettierConfig,

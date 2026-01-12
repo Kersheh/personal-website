@@ -1,3 +1,4 @@
+// not encrypted - just obfuscated to avoid simple bot scraping
 const obfuscatedEmail = 'bWF0dGJyZWNrb25AZ21haWwuY29t';
 
 const decodeEmail = () => {

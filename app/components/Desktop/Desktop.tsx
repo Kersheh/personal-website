@@ -20,7 +20,7 @@ interface DesktopProps {
 }
 
 const Desktop = ({ powerOff }: DesktopProps) => {
-  const [windows, setWindows] = useState<(WindowItem | null)[]>([]);
+  const [windows, setWindows] = useState<Array<WindowItem | null>>([]);
   const [powerOn, setPowerOn] = useState(true);
   const nodeRef = useRef<HTMLDivElement>(null);
   const desktopRef = useRef<HTMLDivElement>(null);
