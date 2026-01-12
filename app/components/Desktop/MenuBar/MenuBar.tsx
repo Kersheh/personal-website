@@ -42,6 +42,11 @@ const MenuBar = ({ onPowerOff, onCloseWindow }: MenuBarProps) => {
     }
   }, [dropdownOpen, socialDropdownOpen]);
 
+  useEffect(() => {
+    setDropdownOpen(false);
+    setSocialDropdownOpen(false);
+  }, [focusedApp]);
+
   return (
     <div
       data-menu-bar
