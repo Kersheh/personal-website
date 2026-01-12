@@ -211,7 +211,7 @@ describe('<Window />', () => {
 
       await waitFor(() => {
         const width = parseInt((windowElement as HTMLElement).style.width);
-        expect(width).toBeGreaterThanOrEqual(700);
+        expect(width).toBeGreaterThanOrEqual(375);
       });
     });
 

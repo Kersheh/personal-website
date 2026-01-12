@@ -22,14 +22,14 @@ export const APP_CONFIGS: Record<AppId, AppConfig> = {
     displayName: 'Terminal',
     iconName: 'iterm.png',
     initialSize: { width: 900, height: 540 },
-    minSize: { width: 700, height: 400 }
+    minSize: { width: 375, height: 400 }
   },
   PDF_VIEWER: {
     id: 'PDF_VIEWER',
     displayName: 'PDF Viewer',
     iconName: 'pdf.svg',
     initialSize: { width: 600, height: 780 },
-    minSize: { width: 700, height: 400 },
+    minSize: { width: 375, height: 400 },
     featureFlag: FeatureFlag.DESKTOP_APP_PDF_VIEWER
   }
 };
