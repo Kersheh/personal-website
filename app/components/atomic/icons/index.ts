@@ -1,0 +1,9 @@
+export { default as GitHubIcon } from './GitHubIcon';
+export { default as LinkedInIcon } from './LinkedInIcon';
+export { default as EmailIcon } from './EmailIcon';
+export { default as PowerIcon } from './PowerIcon';
+export { default as PrintIcon } from './PrintIcon';
+export { default as ZoomOutIcon } from './ZoomOutIcon';
+export { default as ZoomInIcon } from './ZoomInIcon';
+export { default as CloseIcon } from './CloseIcon';
+export { default as MaximizeIcon } from './MaximizeIcon';

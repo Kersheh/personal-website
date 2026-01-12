@@ -2,6 +2,11 @@
 
 import { useEffect, useRef, useState } from 'react';
 import ResumeDocument from './documents/resume';
+import {
+  PrintIcon,
+  ZoomOutIcon,
+  ZoomInIcon
+} from '@/app/components/atomic/icons';
 
 // Fake PDF viewer: renders HTML documents per file instead of real PDFs
 
@@ -91,7 +96,20 @@ const PDFViewer = ({ height, fileData }: PDFViewerProps) => {
 
   return (
     <div className="w-full h-full flex flex-col bg-onyx text-white">
-      <div className="flex items-center gap-2 px-4 py-2 bg-onyx/50 border-b border-white/10">
+      <div className="flex items-center gap-2 px-4 py-2 bg-onyx/50 border-b border-white/10 select-none">
+        <span className="text-sm font-medium text-white/90 mr-auto">
+          {fileData?.fileName ?? 'Document'}
+        </span>
+        <button
+          onClick={() => {
+            // TODO: Implement print functionality
+          }}
+          className="flex items-center justify-center w-8 h-8 rounded hover:bg-white/10 transition-colors"
+          aria-label="Print document"
+        >
+          <PrintIcon />
+        </button>
+        <div className="w-px h-5 bg-white/20" />
         <button
           onClick={() => {
             setScale((prev) => {
@@ -103,20 +121,7 @@ const PDFViewer = ({ height, fileData }: PDFViewerProps) => {
           className="flex items-center justify-center w-8 h-8 rounded hover:bg-white/10 transition-colors"
           aria-label="Zoom out"
         >
-          <svg
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <circle cx="11" cy="11" r="8" />
-            <path d="M21 21l-4.35-4.35" />
-            <line x1="8" y1="11" x2="14" y2="11" />
-          </svg>
+          <ZoomOutIcon />
         </button>
         <button
           onClick={() => {
@@ -129,21 +134,7 @@ const PDFViewer = ({ height, fileData }: PDFViewerProps) => {
           className="flex items-center justify-center w-8 h-8 rounded hover:bg-white/10 transition-colors"
           aria-label="Zoom in"
         >
-          <svg
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <circle cx="11" cy="11" r="8" />
-            <path d="M21 21l-4.35-4.35" />
-            <line x1="11" y1="8" x2="11" y2="14" />
-            <line x1="8" y1="11" x2="14" y2="11" />
-          </svg>
+          <ZoomInIcon />
         </button>
         <input
           type="text"
@@ -212,15 +203,6 @@ const PDFViewer = ({ height, fileData }: PDFViewerProps) => {
                 transformOrigin: 'top left'
               }}
             >
-              <div className="border-b border-black/10 px-6 py-4 flex items-center justify-between bg-white/70">
-                <div className="text-sm font-medium text-slate-700">
-                  {fileData?.fileName ?? 'Document'}
-                </div>
-                <div className="text-xs text-slate-500 font-mono">
-                  HTML preview (PDF stub)
-                </div>
-              </div>
-
               <div className="px-6 py-6 space-y-4 leading-relaxed">
                 <DocumentBody />
               </div>
