@@ -10,7 +10,11 @@ import * as emailModule from '@/app/utils/commands/email';
 jest.mock('@/app/utils/commands/github');
 jest.mock('@/app/utils/commands/linkedin');
 jest.mock('@/app/utils/commands/email');
-jest.mock('@/app/components/applications/appRegistry');
+
+jest.mock('@/app/components/applications/appRegistry', () => ({
+  resolveAppId: jest.fn((name: string) => name),
+  AppId: {}
+}));
 
 const mockSetFocusedApp = jest.fn();
 const mockGetWindowsForApp = jest.fn();
@@ -286,7 +290,6 @@ describe('<MenuBar />', () => {
 
       const closeWindowButton = await screen.findByText('Close Window');
       expect(closeWindowButton).toBeInTheDocument();
-      // The button is clickable and renders correctly
     });
 
     it('should close File dropdown after closing a window', async () => {
@@ -309,7 +312,6 @@ describe('<MenuBar />', () => {
       await userEvent.click(fileButton);
 
       const closeWindowButton = await screen.findByText('Close Window');
-      // Verify the Close Window button renders in the dropdown
       expect(closeWindowButton).toBeInTheDocument();
     });
   });
@@ -405,7 +407,6 @@ describe('<MenuBar />', () => {
       const closeAppButton = await screen.findByText('Close Application');
       await userEvent.click(closeAppButton);
 
-      // Should be called 3 times (once for each window)
       expect(mockCloseWindow).toHaveBeenCalledTimes(3);
       expect(mockCloseWindow).toHaveBeenCalledWith('window-1');
       expect(mockCloseWindow).toHaveBeenCalledWith('window-2');
@@ -437,7 +438,6 @@ describe('<MenuBar />', () => {
       await userEvent.click(terminalButton);
 
       const closeAppButton = await screen.findByText('Close Application');
-      // Verify the Close Application button renders in the dropdown
       expect(closeAppButton).toBeInTheDocument();
     });
   });

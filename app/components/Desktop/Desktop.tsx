@@ -135,7 +135,6 @@ const Desktop = ({ powerOff }: DesktopProps) => {
   const handleOpenApp = (appId: AppId) => {
     const appConfig = APP_CONFIGS[appId];
 
-    // Check feature flag first
     if (appConfig.featureFlag && !isFeatureEnabled(appConfig.featureFlag)) {
       return;
     }
@@ -147,7 +146,7 @@ const Desktop = ({ powerOff }: DesktopProps) => {
       );
 
       if (existingWindowIndex !== -1) {
-        // Focus existing window
+        // focus existing window
         updateWindows(existingWindowIndex);
         return;
       }
