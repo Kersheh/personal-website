@@ -13,6 +13,9 @@ import {
   AppId
 } from '@/app/components/applications/appRegistry';
 
+const WINDOW_Z_BASE = 2000;
+const WINDOW_FOCUS_BUMP = 100;
+
 interface WindowProps {
   index: number;
   id: string;
@@ -293,7 +296,8 @@ const Window = ({
           setFocusedApp(appConfig.displayName, id);
         }}
         style={{
-          zIndex: isFocused ? windowsCount + 1 : index,
+          zIndex:
+            WINDOW_Z_BASE + (isFocused ? WINDOW_FOCUS_BUMP + index : index),
           width: size.width,
           height: size.height,
           willChange: isAnimating ? 'width, height' : 'auto'

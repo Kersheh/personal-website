@@ -1,6 +1,12 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import {
+  useState,
+  useEffect,
+  useRef,
+  type MouseEvent as ReactMouseEvent,
+  type TouchEvent as ReactTouchEvent
+} from 'react';
 
 interface IconProps {
   iconName: string;
@@ -56,6 +62,7 @@ const Icon = ({
   } | null>(null);
   const [parentRect, setParentRect] = useState<DOMRect | null>(null);
   const nodeRef = useRef<HTMLDivElement>(null);
+  const lastTouchTimeRef = useRef(0);
 
   useEffect(() => {
     const handleOutsideClick = (e: MouseEvent) => {
@@ -145,11 +152,12 @@ const Icon = ({
     parentRect
   ]);
 
-  const handleTouchStart = (e: React.TouchEvent) => {
+  const handleTouchStart = (e: ReactTouchEvent) => {
     if (e.touches.length === 0) {
       return;
     }
 
+    lastTouchTimeRef.current = Date.now();
     setIsSelected(true);
     if (nodeRef.current && position) {
       const rect = nodeRef.current.getBoundingClientRect();
@@ -169,7 +177,7 @@ const Icon = ({
     }
   };
 
-  const handleMouseDown = (e: React.MouseEvent) => {
+  const handleMouseDown = (e: ReactMouseEvent) => {
     if (e.detail === 1) {
       setIsSelected(true);
       if (nodeRef.current && position) {
@@ -209,8 +217,16 @@ const Icon = ({
       ref={nodeRef}
       onMouseDown={handleMouseDown}
       onTouchStart={handleTouchStart}
-      onDoubleClick={onDoubleClickHandler}
-      onTouchEnd={(e: React.TouchEvent) => {
+      onDoubleClick={() => {
+        const timeSinceLastTouch = Date.now() - lastTouchTimeRef.current;
+
+        if (timeSinceLastTouch < 500) {
+          return;
+        }
+
+        onDoubleClickHandler();
+      }}
+      onTouchEnd={(e: ReactTouchEvent) => {
         const now = Date.now();
         const timeSinceLastTap = now - lastTap;
 
@@ -221,6 +237,7 @@ const Icon = ({
           setIsSelected(true);
         }
 
+        lastTouchTimeRef.current = now;
         setLastTap(now);
       }}
     >
