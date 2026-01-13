@@ -11,8 +11,7 @@ import {
   LinkedInIcon,
   EmailIcon,
   PowerIcon,
-  WrenchIcon,
-  MIMIcon
+  WrenchIcon
 } from '@/app/components/atomic/icons';
 
 interface MenuBarProps {
@@ -142,7 +141,12 @@ const MenuBar = ({ onPowerOff, onCloseWindow, onOpenWindow }: MenuBarProps) => {
                 }}
                 className={MENU_ITEM_WITH_ICON_CLASS}
               >
-                <MIMIcon className="w-4 h-4" />
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="/images/icons/icon-mim.svg"
+                  alt="MIM"
+                  className="w-4 h-4"
+                />
                 MIM Chat
               </button>
 

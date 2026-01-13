@@ -8,4 +8,3 @@ export { default as ZoomInIcon } from './ZoomInIcon';
 export { default as CloseIcon } from './CloseIcon';
 export { default as MaximizeIcon } from './MaximizeIcon';
 export { default as WrenchIcon } from './WrenchIcon';
-export { default as MIMIcon } from './MIMIcon';

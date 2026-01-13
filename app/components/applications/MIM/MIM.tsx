@@ -70,7 +70,9 @@ const MIM = ({ height, isFocused }: MIMProps) => {
       style={containerStyles}
     >
       <div className="px-4 py-2 border-b border-white/10 flex items-center justify-between">
-        <div className="font-semibold tracking-wide select-none">MIM Chat</div>
+        <div className="font-semibold tracking-wide select-none">
+          Matt Instant Messenger
+        </div>
         <div className="text-xs text-white/60 select-none">
           {isFocused ? 'Active' : 'Inactive'}
         </div>
