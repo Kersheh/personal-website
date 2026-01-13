@@ -33,6 +33,7 @@ jest.mock('@/app/store/desktopApplicationStore', () => {
 describe('<MenuBar />', () => {
   const mockPowerOff = jest.fn();
   const mockCloseWindow = jest.fn();
+  const mockOpenWindow = jest.fn();
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -55,7 +56,11 @@ describe('<MenuBar />', () => {
   describe('External links - GitHub and LinkedIn', () => {
     it('should render GitHub link with correct href', async () => {
       render(
-        <MenuBar onPowerOff={mockPowerOff} onCloseWindow={mockCloseWindow} />
+        <MenuBar
+          onPowerOff={mockPowerOff}
+          onCloseWindow={mockCloseWindow}
+          onOpenWindow={mockOpenWindow}
+        />
       );
 
       const logoButton = screen.getByRole('button', { name: /social links/i });
@@ -76,7 +81,11 @@ describe('<MenuBar />', () => {
 
     it('should render LinkedIn link with correct href', async () => {
       render(
-        <MenuBar onPowerOff={mockPowerOff} onCloseWindow={mockCloseWindow} />
+        <MenuBar
+          onPowerOff={mockPowerOff}
+          onCloseWindow={mockCloseWindow}
+          onOpenWindow={mockOpenWindow}
+        />
       );
 
       const logoButton = screen.getByRole('button', { name: /social links/i });
@@ -97,7 +106,11 @@ describe('<MenuBar />', () => {
 
     it('should close dropdown when external link is clicked', async () => {
       render(
-        <MenuBar onPowerOff={mockPowerOff} onCloseWindow={mockCloseWindow} />
+        <MenuBar
+          onPowerOff={mockPowerOff}
+          onCloseWindow={mockCloseWindow}
+          onOpenWindow={mockOpenWindow}
+        />
       );
 
       const logoButton = screen.getByRole('button', { name: /social links/i });
@@ -116,7 +129,11 @@ describe('<MenuBar />', () => {
   describe('mailto: links - JavaScript reveal', () => {
     it('should not expose mailto: href in DOM', async () => {
       render(
-        <MenuBar onPowerOff={mockPowerOff} onCloseWindow={mockCloseWindow} />
+        <MenuBar
+          onPowerOff={mockPowerOff}
+          onCloseWindow={mockCloseWindow}
+          onOpenWindow={mockOpenWindow}
+        />
       );
 
       const logoButton = screen.getByRole('button', { name: /social links/i });
@@ -130,7 +147,11 @@ describe('<MenuBar />', () => {
 
     it('should render email button instead of link', async () => {
       render(
-        <MenuBar onPowerOff={mockPowerOff} onCloseWindow={mockCloseWindow} />
+        <MenuBar
+          onPowerOff={mockPowerOff}
+          onCloseWindow={mockCloseWindow}
+          onOpenWindow={mockOpenWindow}
+        />
       );
 
       const logoButton = screen.getByRole('button', { name: /social links/i });
@@ -144,7 +165,11 @@ describe('<MenuBar />', () => {
 
     it('should trigger mailto: on email button click', async () => {
       render(
-        <MenuBar onPowerOff={mockPowerOff} onCloseWindow={mockCloseWindow} />
+        <MenuBar
+          onPowerOff={mockPowerOff}
+          onCloseWindow={mockCloseWindow}
+          onOpenWindow={mockOpenWindow}
+        />
       );
 
       const logoButton = screen.getByRole('button', { name: /social links/i });
@@ -162,7 +187,11 @@ describe('<MenuBar />', () => {
         .mockImplementation(() => {});
 
       render(
-        <MenuBar onPowerOff={mockPowerOff} onCloseWindow={mockCloseWindow} />
+        <MenuBar
+          onPowerOff={mockPowerOff}
+          onCloseWindow={mockCloseWindow}
+          onOpenWindow={mockOpenWindow}
+        />
       );
 
       const logoButton = screen.getByRole('button', { name: /social links/i });
@@ -182,7 +211,11 @@ describe('<MenuBar />', () => {
   describe('File menu - Close Window', () => {
     it('should not show File menu when no window is focused', () => {
       render(
-        <MenuBar onPowerOff={mockPowerOff} onCloseWindow={mockCloseWindow} />
+        <MenuBar
+          onPowerOff={mockPowerOff}
+          onCloseWindow={mockCloseWindow}
+          onOpenWindow={mockOpenWindow}
+        />
       );
 
       const fileButton = screen.queryByRole('button', { name: 'File' });
@@ -198,7 +231,11 @@ describe('<MenuBar />', () => {
       };
 
       render(
-        <MenuBar onPowerOff={mockPowerOff} onCloseWindow={mockCloseWindow} />
+        <MenuBar
+          onPowerOff={mockPowerOff}
+          onCloseWindow={mockCloseWindow}
+          onOpenWindow={mockOpenWindow}
+        />
       );
 
       const fileButton = screen.getByRole('button', { name: 'File' });
@@ -214,7 +251,11 @@ describe('<MenuBar />', () => {
       };
 
       render(
-        <MenuBar onPowerOff={mockPowerOff} onCloseWindow={mockCloseWindow} />
+        <MenuBar
+          onPowerOff={mockPowerOff}
+          onCloseWindow={mockCloseWindow}
+          onOpenWindow={mockOpenWindow}
+        />
       );
 
       const fileButton = screen.getByRole('button', { name: 'File' });
@@ -233,7 +274,11 @@ describe('<MenuBar />', () => {
       };
 
       render(
-        <MenuBar onPowerOff={mockPowerOff} onCloseWindow={mockCloseWindow} />
+        <MenuBar
+          onPowerOff={mockPowerOff}
+          onCloseWindow={mockCloseWindow}
+          onOpenWindow={mockOpenWindow}
+        />
       );
 
       const fileButton = screen.getByRole('button', { name: 'File' });
@@ -253,7 +298,11 @@ describe('<MenuBar />', () => {
       };
 
       render(
-        <MenuBar onPowerOff={mockPowerOff} onCloseWindow={mockCloseWindow} />
+        <MenuBar
+          onPowerOff={mockPowerOff}
+          onCloseWindow={mockCloseWindow}
+          onOpenWindow={mockOpenWindow}
+        />
       );
 
       const fileButton = screen.getByRole('button', { name: 'File' });
@@ -275,7 +324,11 @@ describe('<MenuBar />', () => {
       };
 
       render(
-        <MenuBar onPowerOff={mockPowerOff} onCloseWindow={mockCloseWindow} />
+        <MenuBar
+          onPowerOff={mockPowerOff}
+          onCloseWindow={mockCloseWindow}
+          onOpenWindow={mockOpenWindow}
+        />
       );
 
       const terminalButton = screen.queryByRole('button', { name: 'TERMINAL' });
@@ -291,7 +344,11 @@ describe('<MenuBar />', () => {
       };
 
       render(
-        <MenuBar onPowerOff={mockPowerOff} onCloseWindow={mockCloseWindow} />
+        <MenuBar
+          onPowerOff={mockPowerOff}
+          onCloseWindow={mockCloseWindow}
+          onOpenWindow={mockOpenWindow}
+        />
       );
 
       const terminalButton = screen.getByRole('button', { name: 'TERMINAL' });
@@ -307,7 +364,11 @@ describe('<MenuBar />', () => {
       };
 
       render(
-        <MenuBar onPowerOff={mockPowerOff} onCloseWindow={mockCloseWindow} />
+        <MenuBar
+          onPowerOff={mockPowerOff}
+          onCloseWindow={mockCloseWindow}
+          onOpenWindow={mockOpenWindow}
+        />
       );
 
       const terminalButton = screen.getByRole('button', { name: 'TERMINAL' });
@@ -331,7 +392,11 @@ describe('<MenuBar />', () => {
       };
 
       render(
-        <MenuBar onPowerOff={mockPowerOff} onCloseWindow={mockCloseWindow} />
+        <MenuBar
+          onPowerOff={mockPowerOff}
+          onCloseWindow={mockCloseWindow}
+          onOpenWindow={mockOpenWindow}
+        />
       );
 
       const terminalButton = screen.getByRole('button', { name: 'TERMINAL' });
@@ -361,7 +426,11 @@ describe('<MenuBar />', () => {
       };
 
       render(
-        <MenuBar onPowerOff={mockPowerOff} onCloseWindow={mockCloseWindow} />
+        <MenuBar
+          onPowerOff={mockPowerOff}
+          onCloseWindow={mockCloseWindow}
+          onOpenWindow={mockOpenWindow}
+        />
       );
 
       const terminalButton = screen.getByRole('button', { name: 'TERMINAL' });
