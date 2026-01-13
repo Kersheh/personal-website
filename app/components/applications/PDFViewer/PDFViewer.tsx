@@ -175,6 +175,7 @@ const PDFViewer = ({ height, isFocused, fileData }: PDFViewerProps) => {
           padding: TOTAL_PADDING
         }}
         onMouseDown={(e: React.MouseEvent) => {
+          e.preventDefault();
           const container = scrollContainerRef.current;
           if (!container) {
             return;
