@@ -15,6 +15,7 @@ export interface AppConfig {
     | AppSize
     | ((parentWidth?: number, parentHeight?: number) => AppSize);
   minSize: AppSize;
+  unique?: boolean;
   featureFlag?: FeatureFlag;
 }
 
@@ -58,7 +59,8 @@ export const APP_CONFIGS: Record<AppId, AppConfig> = {
     displayName: 'Devtools',
     iconName: 'iterm.png',
     initialSize: { width: 600, height: 500 },
-    minSize: { width: 400, height: 300 }
+    minSize: { width: 400, height: 300 },
+    unique: true
   },
   MIM: {
     id: 'MIM',
@@ -66,6 +68,7 @@ export const APP_CONFIGS: Record<AppId, AppConfig> = {
     iconName: 'mim.svg',
     initialSize: { width: 620, height: 500 },
     minSize: { width: 420, height: 360 },
+    unique: true,
     featureFlag: FeatureFlag.DESKTOP_APP_MIM
   }
 };

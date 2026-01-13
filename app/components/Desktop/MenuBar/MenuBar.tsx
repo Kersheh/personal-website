@@ -80,7 +80,7 @@ const MenuBar = ({ onPowerOff, onCloseWindow, onOpenWindow }: MenuBarProps) => {
   return (
     <div
       data-menu-bar
-      className="h-8 bg-black/65 backdrop-blur-md border-b border-white/10 flex items-center justify-between px-4 relative z-50"
+      className="h-8 bg-black/65 backdrop-blur-md border-b border-white/10 flex items-center justify-between px-4 relative z-[3000]"
     >
       {/* Left side - App menu */}
       <div className="flex items-center gap-6 relative">
@@ -97,7 +97,7 @@ const MenuBar = ({ onPowerOff, onCloseWindow, onOpenWindow }: MenuBarProps) => {
             <img src="/favicon.ico" alt="Logo" className="w-5 h-5" />
           </button>
           {dropdowns.social && (
-            <div className="absolute top-full left-0 mt-1 bg-black/90 backdrop-blur-md border border-white/20 rounded-sm shadow-lg min-w-[160px]">
+            <div className="absolute top-full left-0 mt-1 bg-black/90 backdrop-blur-md border border-white/20 rounded-sm shadow-lg min-w-[160px] z-[3000]">
               <a
                 href={github()}
                 target="_blank"
@@ -163,7 +163,7 @@ const MenuBar = ({ onPowerOff, onCloseWindow, onOpenWindow }: MenuBarProps) => {
               {focusedApp}
             </button>
             {dropdowns.app && (
-              <div className="absolute top-full left-0 mt-1 bg-black/90 backdrop-blur-md border border-white/20 rounded-sm shadow-lg min-w-[160px]">
+              <div className="absolute top-full left-0 mt-1 bg-black/90 backdrop-blur-md border border-white/20 rounded-sm shadow-lg min-w-[160px] z-[3000]">
                 <button
                   onClick={() => {
                     const appId = resolveAppId(focusedApp || '');
@@ -193,7 +193,7 @@ const MenuBar = ({ onPowerOff, onCloseWindow, onOpenWindow }: MenuBarProps) => {
               File
             </button>
             {dropdowns.file && (
-              <div className="absolute top-full left-0 mt-1 bg-black/90 backdrop-blur-md border border-white/20 rounded-sm shadow-lg min-w-[160px]">
+              <div className="absolute top-full left-0 mt-1 bg-black/90 backdrop-blur-md border border-white/20 rounded-sm shadow-lg min-w-[160px] z-[3000]">
                 <button
                   onClick={() => {
                     const currentId =

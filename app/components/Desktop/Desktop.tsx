@@ -131,6 +131,25 @@ const Desktop = ({ powerOff }: DesktopProps) => {
     });
   };
 
+  const handleOpenApp = (appId: AppId) => {
+    const appConfig = APP_CONFIGS[appId];
+
+    // if app is unique, check if window already exists
+    if (appConfig.unique) {
+      const existingWindowIndex = windows.findIndex(
+        (w) => w && w.name === appId
+      );
+
+      if (existingWindowIndex !== -1) {
+        // Focus existing window
+        updateWindows(existingWindowIndex);
+        return;
+      }
+    }
+
+    openNewWindow(appId);
+  };
+
   useEffect(() => {
     const hasAnyFocusedWindow = windows.some((window) => window?.isFocused);
     if (!hasAnyFocusedWindow) {
@@ -204,7 +223,7 @@ const Desktop = ({ powerOff }: DesktopProps) => {
           setTimeout(powerOff, 550);
         }}
         onCloseWindow={handleCloseWindow}
-        onOpenWindow={openNewWindow}
+        onOpenWindow={handleOpenApp}
       />
 
       <div
@@ -224,6 +243,21 @@ const Desktop = ({ powerOff }: DesktopProps) => {
 
             const handleDoubleClick = () => {
               if (item.type === 'application') {
+                const appConfig = APP_CONFIGS[item.appName];
+
+                // if app is unique, check if window already exists
+                if (appConfig.unique) {
+                  const existingWindowIndex = windows.findIndex(
+                    (w) => w && w.name === item.appName
+                  );
+
+                  if (existingWindowIndex !== -1) {
+                    // Focus existing window
+                    updateWindows(existingWindowIndex);
+                    return;
+                  }
+                }
+
                 openNewWindow(item.appName);
               } else {
                 openNewWindow(item.opensWith, {

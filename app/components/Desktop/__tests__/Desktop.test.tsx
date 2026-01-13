@@ -203,4 +203,74 @@ describe('<Desktop />', () => {
 
     expect(isWindowUnfocused(windows[0])).toBe(true);
   });
+
+  describe('unique app feature', () => {
+    it('should allow multiple windows when unique is false', async () => {
+      const user = userEvent.setup();
+      render(<Desktop powerOff={mockPowerOff} />);
+
+      const terminalIcon = screen.getByText('Terminal');
+
+      await user.dblClick(terminalIcon);
+      await waitFor(() => {
+        expect(getWindows().length).toBe(1);
+      });
+
+      await user.dblClick(terminalIcon);
+      await waitFor(() => {
+        expect(getWindows().length).toBe(2);
+      });
+    });
+
+    it('should focus existing window when unique app is double-clicked while a window is unfocused', async () => {
+      const user = userEvent.setup();
+      render(<Desktop powerOff={mockPowerOff} />);
+
+      const devtoolsIcon = screen.queryByText('Devtools');
+
+      const uniqueAppIcon = devtoolsIcon || screen.getByText('MIM');
+
+      await user.dblClick(uniqueAppIcon);
+      await waitFor(() => {
+        expect(getWindows().length).toBe(1);
+      });
+
+      let windows = getWindows();
+      const firstWindowBar = windows[0].querySelector(
+        '.window-bar'
+      ) as HTMLElement;
+
+      await user.click(firstWindowBar);
+
+      const desktopArea = document.querySelector('.p-5') as HTMLElement;
+      await user.click(desktopArea);
+
+      await waitFor(() => {
+        expect(isWindowUnfocused(windows[0])).toBe(true);
+      });
+
+      await user.dblClick(uniqueAppIcon);
+
+      await waitFor(() => {
+        windows = getWindows();
+        expect(windows.length).toBe(1);
+        expect(isWindowFocused(windows[0])).toBe(true);
+      });
+    });
+
+    it('should open a new window when unique app is first launched', async () => {
+      const user = userEvent.setup();
+      render(<Desktop powerOff={mockPowerOff} />);
+
+      const mimIcon = screen.getByText('MIM');
+
+      await user.dblClick(mimIcon);
+
+      await waitFor(() => {
+        const windows = getWindows();
+        expect(windows.length).toBe(1);
+        expect(isWindowFocused(windows[0])).toBe(true);
+      });
+    });
+  });
 });
