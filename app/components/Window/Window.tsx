@@ -45,7 +45,7 @@ const Window = ({
     (state) => state.setFocusedApp
   );
   const appId = resolveAppId(name);
-  const appConfig = getAppConfig(appId);
+  const appConfig = appId ? getAppConfig(appId) : null;
   const [isFocused, setIsFocused] = useState(initialFocused);
   const [isAnimating, setIsAnimating] = useState(false);
 
@@ -55,10 +55,16 @@ const Window = ({
 
   // handle both static and dynamic initialSize
   const getInitialSize = () => {
+    if (!appConfig) {
+      return { width: 600, height: 400 };
+    }
+
     const configSize = appConfig.initialSize;
+
     if (typeof configSize === 'function') {
       return configSize(parentNode?.offsetWidth, parentNode?.offsetHeight);
     }
+
     return configSize;
   };
 
@@ -119,19 +125,23 @@ const Window = ({
   const nodeRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (initialFocused) {
+    if (initialFocused && appConfig) {
       setFocusedApp(appConfig.displayName, id);
     }
-  }, [initialFocused, appConfig.displayName, id, setFocusedApp]);
+  }, [initialFocused, appConfig, id, setFocusedApp]);
 
-  const minWidth = Math.min(
-    appConfig.minSize.width,
-    parentNode?.offsetWidth ?? appConfig.minSize.width
-  );
-  const minHeight = Math.min(
-    appConfig.minSize.height,
-    parentNode?.offsetHeight ?? appConfig.minSize.height
-  );
+  const minWidth = appConfig
+    ? Math.min(
+        appConfig.minSize.width,
+        parentNode?.offsetWidth ?? appConfig.minSize.width
+      )
+    : 375;
+  const minHeight = appConfig
+    ? Math.min(
+        appConfig.minSize.height,
+        parentNode?.offsetHeight ?? appConfig.minSize.height
+      )
+    : 400;
 
   useEffect(() => {
     const handleOutsideClick = (e: MouseEvent) => {
@@ -276,6 +286,10 @@ const Window = ({
     }
   };
 
+  if (!appId) {
+    return null;
+  }
+
   return (
     <Draggable
       handle=".window-bar"
@@ -292,7 +306,9 @@ const Window = ({
         onClick={() => {
           setIsFocused(true);
           updateWindows(index);
-          setFocusedApp(appConfig.displayName, id);
+          if (appConfig) {
+            setFocusedApp(appConfig.displayName, id);
+          }
         }}
         style={{
           zIndex:

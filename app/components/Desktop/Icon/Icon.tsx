@@ -242,7 +242,7 @@ const Icon = ({
       }}
     >
       <div
-        className="w-20 h-20 bg-no-repeat bg-cover rounded-[5%]"
+        className="w-20 h-20 bg-no-repeat bg-contain bg-center rounded-[5%]"
         style={{
           backgroundImage: `url(/images/icons/icon-${iconName})`,
           pointerEvents: 'none'

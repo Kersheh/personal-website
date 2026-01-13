@@ -72,7 +72,7 @@ export const APP_CONFIGS: Record<AppId, AppConfig> = {
 
 export const getAppConfig = (appId: AppId): AppConfig => APP_CONFIGS[appId];
 
-export const resolveAppId = (name: string): AppId => {
+export const resolveAppId = (name: string): AppId | null => {
   const normalized = name.toUpperCase().replace(/\s+/g, '_');
   if (normalized in APP_CONFIGS) {
     return normalized as AppId;
@@ -82,5 +82,9 @@ export const resolveAppId = (name: string): AppId => {
     (config) => config.displayName.toUpperCase() === name.toUpperCase()
   );
 
-  return (match?.id ?? 'TERMINAL') as AppId;
+  if (!match) {
+    return null;
+  }
+
+  return match.id;
 };

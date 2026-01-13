@@ -132,23 +132,6 @@ const MenuBar = ({ onPowerOff, onCloseWindow, onOpenWindow }: MenuBarProps) => {
                 <EmailIcon />
                 Email
               </button>
-              <div className="border-t border-white/10 my-1" />
-
-              <button
-                onClick={() => {
-                  onOpenWindow('MIM');
-                  setDropdowns((prev) => ({ ...prev, social: false }));
-                }}
-                className={MENU_ITEM_WITH_ICON_CLASS}
-              >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src="/images/icons/icon-mim.svg"
-                  alt="MIM"
-                  className="w-4 h-4"
-                />
-                MIM Chat
-              </button>
 
               {process.env.NODE_ENV === 'development' && (
                 <>
@@ -184,6 +167,9 @@ const MenuBar = ({ onPowerOff, onCloseWindow, onOpenWindow }: MenuBarProps) => {
                 <button
                   onClick={() => {
                     const appId = resolveAppId(focusedApp || '');
+                    if (!appId) {
+                      return;
+                    }
                     const windowIds = getWindowsForApp(appId);
                     windowIds.forEach((id) => onCloseWindow(id));
                     setDropdowns((prev) => ({ ...prev, app: false }));
