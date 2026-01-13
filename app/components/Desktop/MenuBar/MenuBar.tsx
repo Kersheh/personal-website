@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useDesktopApplicationStore } from '@/app/store/desktopApplicationStore';
-import { resolveAppId } from '@/app/components/applications/appRegistry';
+import { resolveAppId, AppId } from '@/app/components/applications/appRegistry';
 import github from '@/app/utils/commands/github';
 import linkedin from '@/app/utils/commands/linkedin';
 import email from '@/app/utils/commands/email';
@@ -17,6 +17,7 @@ import {
 interface MenuBarProps {
   onPowerOff: () => void;
   onCloseWindow: (id: string) => void;
+  onOpenWindow: (appId: AppId) => void;
 }
 
 const MENU_ITEM_CLASS =
@@ -24,7 +25,7 @@ const MENU_ITEM_CLASS =
 const MENU_ITEM_WITH_ICON_CLASS = `flex items-center gap-3 ${MENU_ITEM_CLASS}`;
 const MENU_ITEM_WITH_WHITESPACE_CLASS = `${MENU_ITEM_CLASS} whitespace-nowrap`;
 
-const MenuBar = ({ onPowerOff, onCloseWindow }: MenuBarProps) => {
+const MenuBar = ({ onPowerOff, onCloseWindow, onOpenWindow }: MenuBarProps) => {
   const focusedApp = useDesktopApplicationStore((state) => state.focusedApp);
   const focusedWindowId = useDesktopApplicationStore(
     (state) => state.focusedWindowId
@@ -136,7 +137,7 @@ const MenuBar = ({ onPowerOff, onCloseWindow }: MenuBarProps) => {
                   <div className="border-t border-white/10 my-1" />
                   <button
                     onClick={() => {
-                      // TODO: Open custom devtools window
+                      onOpenWindow('DEVTOOLS');
                       setDropdowns((prev) => ({ ...prev, social: false }));
                     }}
                     className={MENU_ITEM_WITH_ICON_CLASS}

@@ -198,6 +198,7 @@ const Desktop = ({ powerOff }: DesktopProps) => {
           setTimeout(powerOff, 550);
         }}
         onCloseWindow={handleCloseWindow}
+        onOpenWindow={openNewWindow}
       />
 
       <div

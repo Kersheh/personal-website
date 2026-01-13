@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import Draggable from 'react-draggable';
 import Terminal from '../applications/Terminal/Terminal';
 import PDFViewer from '../applications/PDFViewer/PDFViewer';
+import Devtools from '../applications/Devtools/Devtools';
 import WindowButton from './WindowButton/WindowButton';
 import { useDesktopApplicationStore } from '@/app/store/desktopApplicationStore';
 import {
@@ -375,6 +376,8 @@ const Window = ({
               fileData={fileData}
             />
           )}
+
+          {appId === 'DEVTOOLS' && <Devtools height={size.height - 30} />}
         </div>
 
         {/* Resize handles */}

@@ -18,6 +18,7 @@ export interface DesktopApplicationState {
   getWindowsForApp: (appId: AppId) => Array<string>;
   updateIconPosition: (iconId: string, position: IconPosition) => void;
   getIconPosition: (iconId: string) => IconPosition | undefined;
+  resetIconPositions: () => void;
 }
 
 export const useDesktopApplicationStore = create<DesktopApplicationState>()(
@@ -27,7 +28,8 @@ export const useDesktopApplicationStore = create<DesktopApplicationState>()(
       focusedWindowId: null,
       windowsByApp: {
         TERMINAL: new Set(),
-        PDF_VIEWER: new Set()
+        PDF_VIEWER: new Set(),
+        DEVTOOLS: new Set()
       },
       iconPositions: {},
       setFocusedApp: (appName, windowId = null) =>
@@ -67,7 +69,8 @@ export const useDesktopApplicationStore = create<DesktopApplicationState>()(
         })),
       getIconPosition: (iconId: string) => {
         return get().iconPositions[iconId];
-      }
+      },
+      resetIconPositions: () => set({ iconPositions: {} })
     }),
     {
       name: 'desktop-storage',

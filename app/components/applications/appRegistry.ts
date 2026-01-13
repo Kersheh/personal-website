@@ -1,6 +1,6 @@
 import { FeatureFlag } from '../../utils/featureFlags';
 
-export type AppId = 'TERMINAL' | 'PDF_VIEWER';
+export type AppId = 'TERMINAL' | 'PDF_VIEWER' | 'DEVTOOLS';
 
 interface AppSize {
   width: number;
@@ -53,6 +53,13 @@ export const APP_CONFIGS: Record<AppId, AppConfig> = {
     initialSize: getPDFViewerSize,
     minSize: { width: 375, height: 400 },
     featureFlag: FeatureFlag.DESKTOP_APP_PDF_VIEWER
+  },
+  DEVTOOLS: {
+    id: 'DEVTOOLS',
+    displayName: 'Devtools',
+    iconName: 'iterm.png',
+    initialSize: { width: 600, height: 500 },
+    minSize: { width: 400, height: 300 }
   }
 };
 

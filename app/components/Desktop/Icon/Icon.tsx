@@ -90,6 +90,21 @@ const Icon = ({
       setTempPosition({ x: newX, y: newY });
     };
 
+    const handleTouchMove = (e: TouchEvent) => {
+      if (!parentRect || e.touches.length === 0) {
+        return;
+      }
+
+      // convert viewport coordinates to container-relative coordinates
+      const touch = e.touches[0];
+      const containerRelativeX = touch.clientX - parentRect.left;
+      const containerRelativeY = touch.clientY - parentRect.top;
+
+      const newX = containerRelativeX - dragOffset.x;
+      const newY = containerRelativeY - dragOffset.y;
+      setTempPosition({ x: newX, y: newY });
+    };
+
     const handleMouseUp = () => {
       if (tempPosition && onPositionChange) {
         const snappedPosition = snapToGrid(tempPosition.x, tempPosition.y);
@@ -110,11 +125,15 @@ const Icon = ({
     };
 
     document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('touchmove', handleTouchMove);
     document.addEventListener('mouseup', handleMouseUp);
+    document.addEventListener('touchend', handleMouseUp);
 
     return () => {
       document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('touchmove', handleTouchMove);
       document.removeEventListener('mouseup', handleMouseUp);
+      document.removeEventListener('touchend', handleMouseUp);
     };
   }, [
     isDragging,
@@ -125,6 +144,30 @@ const Icon = ({
     position,
     parentRect
   ]);
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (e.touches.length === 0) {
+      return;
+    }
+
+    setIsSelected(true);
+    if (nodeRef.current && position) {
+      const rect = nodeRef.current.getBoundingClientRect();
+      const parentElement = nodeRef.current.parentElement;
+
+      if (parentElement) {
+        const parentRect = parentElement.getBoundingClientRect();
+        setParentRect(parentRect);
+
+        const touch = e.touches[0];
+        setDragOffset({
+          x: touch.clientX - rect.left,
+          y: touch.clientY - rect.top
+        });
+        setIsDragging(true);
+      }
+    }
+  };
 
   const handleMouseDown = (e: React.MouseEvent) => {
     if (e.detail === 1) {
@@ -165,6 +208,7 @@ const Icon = ({
       }
       ref={nodeRef}
       onMouseDown={handleMouseDown}
+      onTouchStart={handleTouchStart}
       onDoubleClick={onDoubleClickHandler}
       onTouchEnd={(e: React.TouchEvent) => {
         const now = Date.now();
