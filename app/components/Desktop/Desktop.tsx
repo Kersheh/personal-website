@@ -60,7 +60,8 @@ const DESKTOP_ITEMS: Array<DesktopItem> = [
     id: 'app-mim',
     iconName: APP_CONFIGS.MIM.iconName,
     label: APP_CONFIGS.MIM.displayName,
-    appName: 'MIM'
+    appName: 'MIM',
+    featureFlag: FeatureFlag.DESKTOP_APP_MIM
   },
   {
     type: 'file',
@@ -133,6 +134,11 @@ const Desktop = ({ powerOff }: DesktopProps) => {
 
   const handleOpenApp = (appId: AppId) => {
     const appConfig = APP_CONFIGS[appId];
+
+    // Check feature flag first
+    if (appConfig.featureFlag && !isFeatureEnabled(appConfig.featureFlag)) {
+      return;
+    }
 
     // if app is unique, check if window already exists
     if (appConfig.unique) {
