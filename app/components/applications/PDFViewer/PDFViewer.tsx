@@ -168,7 +168,7 @@ const PDFViewer = ({ height, isFocused, fileData }: PDFViewerProps) => {
       </div>
       <div
         ref={scrollContainerRef}
-        className="flex-1 overflow-scroll select-none no-print bg-onyx text-center"
+        className="flex-1 overflow-scroll select-none no-print bg-onyx"
         style={{
           height: contentHeight - 44,
           cursor: isDragging ? 'move' : 'default',
@@ -202,25 +202,27 @@ const PDFViewer = ({ height, isFocused, fileData }: PDFViewerProps) => {
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseUp}
       >
-        <div className="inline-block" ref={viewportRef}>
-          <div
-            className="relative"
-            style={{
-              width: scaledWidth,
-              height: scaledHeight
-            }}
-          >
+        <div className="min-w-full inline-flex justify-center">
+          <div className="inline-block" ref={viewportRef}>
             <div
-              className="absolute top-0 left-0 bg-[#fdfaf5] text-slate-900 shadow-2xl shadow-black/30 rounded-md border border-black/5 overflow-hidden"
+              className="relative"
               style={{
-                width: PAGE_WIDTH,
-                height: PAGE_HEIGHT,
-                transform: `scale(${scale})`,
-                transformOrigin: 'top left'
+                width: scaledWidth,
+                height: scaledHeight
               }}
             >
-              <div className="px-6 py-6 space-y-4 leading-relaxed">
-                <DocumentBody />
+              <div
+                className="absolute top-0 left-0 bg-[#fdfaf5] text-slate-900 shadow-2xl shadow-black/30 rounded-md border border-black/5 overflow-hidden"
+                style={{
+                  width: PAGE_WIDTH,
+                  height: PAGE_HEIGHT,
+                  transform: `scale(${scale})`,
+                  transformOrigin: 'top left'
+                }}
+              >
+                <div className="px-6 py-6 space-y-4 leading-relaxed">
+                  <DocumentBody />
+                </div>
               </div>
             </div>
           </div>
