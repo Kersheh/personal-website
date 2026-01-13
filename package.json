@@ -1,6 +1,6 @@
 {
   "name": "matthewbreckon.com",
-  "version": "0.8.0",
+  "version": "0.9.0",
   "description": "Personal website",
   "author": "Matt Breckon",
   "private": true,
@@ -27,9 +27,10 @@
     "react": "^19.2.3",
     "react-dom": "^19.2.3",
     "react-draggable": "^4.5.0",
-    "zustand": "^5.0.9"
+    "zustand": "^5.0.10"
   },
   "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.18",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.1",
     "@testing-library/user-event": "^14.6.1",
@@ -38,7 +39,6 @@
     "@types/node": "^25.0.6",
     "@types/react": "^19.2.8",
     "@types/react-dom": "^19.2.3",
-    "autoprefixer": "^10.4.23",
     "babel-plugin-react-compiler": "^1.0.0",
     "eslint": "^9.39.2",
     "eslint-config-next": "^16.1.1",
@@ -48,7 +48,7 @@
     "jest-environment-jsdom": "^30.2.0",
     "postcss": "^8.5.6",
     "prettier": "^3.7.4",
-    "tailwindcss": "^3.4.19",
+    "tailwindcss": "^4.1.18",
     "typescript": "^5.9.3"
   }
 }

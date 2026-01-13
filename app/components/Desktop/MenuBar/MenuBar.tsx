@@ -83,14 +83,14 @@ const MenuBar = ({ onPowerOff, onCloseWindow }: MenuBarProps) => {
             onClick={() =>
               setDropdowns((prev) => ({ ...prev, social: !prev.social }))
             }
-            className="flex items-center justify-center h-8 w-8 hover:opacity-80 transition-opacity select-none p-1"
+            className="flex items-center justify-center h-8 w-8 hover:opacity-80 transition-opacity select-none p-1 cursor-pointer"
             aria-label="Social links"
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/favicon.ico" alt="Logo" className="w-5 h-5" />
           </button>
           {dropdowns.social && (
-            <div className="absolute top-full left-0 mt-1 bg-black/90 backdrop-blur-md border border-white/20 rounded shadow-lg min-w-[160px]">
+            <div className="absolute top-full left-0 mt-1 bg-black/90 backdrop-blur-md border border-white/20 rounded-sm shadow-lg min-w-[160px]">
               <a
                 href={github()}
                 target="_blank"
@@ -98,7 +98,7 @@ const MenuBar = ({ onPowerOff, onCloseWindow }: MenuBarProps) => {
                 onClick={() =>
                   setDropdowns((prev) => ({ ...prev, social: false }))
                 }
-                className="flex items-center gap-3 w-full text-left px-4 py-2 text-sm text-white/80 hover:bg-white/10 hover:text-white font-['Courier_new',_'Courier',_monospace] transition-colors"
+                className="flex items-center gap-3 w-full text-left px-4 py-2 text-sm text-white/80 hover:bg-white/10 hover:text-white font-['Courier_new','Courier',monospace] transition-colors cursor-pointer"
               >
                 <GitHubIcon />
                 GitHub
@@ -110,7 +110,7 @@ const MenuBar = ({ onPowerOff, onCloseWindow }: MenuBarProps) => {
                 onClick={() =>
                   setDropdowns((prev) => ({ ...prev, social: false }))
                 }
-                className="flex items-center gap-3 w-full text-left px-4 py-2 text-sm text-white/80 hover:bg-white/10 hover:text-white font-['Courier_new',_'Courier',_monospace] transition-colors"
+                className="flex items-center gap-3 w-full text-left px-4 py-2 text-sm text-white/80 hover:bg-white/10 hover:text-white font-['Courier_new','Courier',monospace] transition-colors cursor-pointer"
               >
                 <LinkedInIcon />
                 LinkedIn
@@ -120,7 +120,7 @@ const MenuBar = ({ onPowerOff, onCloseWindow }: MenuBarProps) => {
                   window.location.href = email();
                   setDropdowns((prev) => ({ ...prev, social: false }));
                 }}
-                className="flex items-center gap-3 w-full text-left px-4 py-2 text-sm text-white/80 hover:bg-white/10 hover:text-white font-['Courier_new',_'Courier',_monospace] transition-colors"
+                className="flex items-center gap-3 w-full text-left px-4 py-2 text-sm text-white/80 hover:bg-white/10 hover:text-white font-['Courier_new','Courier',monospace] transition-colors cursor-pointer"
               >
                 <EmailIcon />
                 Email
@@ -134,12 +134,12 @@ const MenuBar = ({ onPowerOff, onCloseWindow }: MenuBarProps) => {
               onClick={() =>
                 setDropdowns((prev) => ({ ...prev, app: !prev.app }))
               }
-              className="inline-flex items-center h-8 text-white/80 text-sm font-semibold font-['Courier_new',_'Courier',_monospace] leading-none select-none hover:text-white"
+              className="inline-flex items-center h-8 text-white/80 text-sm font-semibold font-['Courier_new','Courier',monospace] leading-none select-none hover:text-white cursor-pointer"
             >
               {focusedApp}
             </button>
             {dropdowns.app && (
-              <div className="absolute top-full left-0 mt-1 bg-black/90 backdrop-blur-md border border-white/20 rounded shadow-lg min-w-[160px]">
+              <div className="absolute top-full left-0 mt-1 bg-black/90 backdrop-blur-md border border-white/20 rounded-sm shadow-lg min-w-[160px]">
                 <button
                   onClick={() => {
                     const appId = resolveAppId(focusedApp || '');
@@ -147,7 +147,7 @@ const MenuBar = ({ onPowerOff, onCloseWindow }: MenuBarProps) => {
                     windowIds.forEach((id) => onCloseWindow(id));
                     setDropdowns((prev) => ({ ...prev, app: false }));
                   }}
-                  className="w-full text-left px-4 py-2 text-sm text-white/80 hover:bg-white/10 hover:text-white font-['Courier_new',_'Courier',_monospace] transition-colors whitespace-nowrap"
+                  className="w-full text-left px-4 py-2 text-sm text-white/80 hover:bg-white/10 hover:text-white font-['Courier_new','Courier',monospace] transition-colors whitespace-nowrap cursor-pointer"
                 >
                   Close Application
                 </button>
@@ -161,12 +161,12 @@ const MenuBar = ({ onPowerOff, onCloseWindow }: MenuBarProps) => {
               onClick={() =>
                 setDropdowns((prev) => ({ ...prev, file: !prev.file }))
               }
-              className="inline-flex items-center h-8 text-white/80 text-sm font-['Courier_new',_'Courier',_monospace] leading-none select-none hover:text-white"
+              className="inline-flex items-center h-8 text-white/80 text-sm font-['Courier_new','Courier',monospace] leading-none select-none hover:text-white cursor-pointer"
             >
               File
             </button>
             {dropdowns.file && (
-              <div className="absolute top-full left-0 mt-1 bg-black/90 backdrop-blur-md border border-white/20 rounded shadow-lg min-w-[160px]">
+              <div className="absolute top-full left-0 mt-1 bg-black/90 backdrop-blur-md border border-white/20 rounded-sm shadow-lg min-w-[160px]">
                 <button
                   onClick={() => {
                     const currentId =
@@ -176,7 +176,7 @@ const MenuBar = ({ onPowerOff, onCloseWindow }: MenuBarProps) => {
                       setDropdowns((prev) => ({ ...prev, file: false }));
                     }
                   }}
-                  className="w-full text-left px-4 py-2 text-sm text-white/80 hover:bg-white/10 hover:text-white font-['Courier_new',_'Courier',_monospace] transition-colors"
+                  className="w-full text-left px-4 py-2 text-sm text-white/80 hover:bg-white/10 hover:text-white font-['Courier_new','Courier',monospace] transition-colors cursor-pointer"
                 >
                   Close Window
                 </button>
@@ -190,7 +190,7 @@ const MenuBar = ({ onPowerOff, onCloseWindow }: MenuBarProps) => {
       <div className="flex items-center gap-4">
         <button
           onClick={onPowerOff}
-          className="text-white/70 hover:text-white/90 transition-colors p-1"
+          className="text-white/70 hover:text-white/90 transition-colors p-1 cursor-pointer"
           aria-label="Power off"
         >
           <PowerIcon />

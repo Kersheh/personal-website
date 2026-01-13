@@ -112,7 +112,7 @@ const PDFViewer = ({ height, isFocused, fileData }: PDFViewerProps) => {
               window.print();
             }
           }}
-          className="flex items-center justify-center w-8 h-8 rounded hover:bg-white/10 transition-colors"
+          className="flex items-center justify-center w-8 h-8 rounded-sm hover:bg-white/10 transition-colors"
           aria-label="Print document"
         >
           <PrintIcon />
@@ -126,7 +126,7 @@ const PDFViewer = ({ height, isFocused, fileData }: PDFViewerProps) => {
               return newScale;
             });
           }}
-          className="flex items-center justify-center w-8 h-8 rounded hover:bg-white/10 transition-colors"
+          className="flex items-center justify-center w-8 h-8 rounded-sm hover:bg-white/10 transition-colors"
           aria-label="Zoom out"
         >
           <ZoomOutIcon />
@@ -139,7 +139,7 @@ const PDFViewer = ({ height, isFocused, fileData }: PDFViewerProps) => {
               return newScale;
             });
           }}
-          className="flex items-center justify-center w-8 h-8 rounded hover:bg-white/10 transition-colors"
+          className="flex items-center justify-center w-8 h-8 rounded-sm hover:bg-white/10 transition-colors"
           aria-label="Zoom in"
         >
           <ZoomInIcon />
@@ -158,7 +158,7 @@ const PDFViewer = ({ height, isFocused, fileData }: PDFViewerProps) => {
               (e.target as HTMLInputElement).blur();
             }
           }}
-          className="w-12 text-xs text-white/90 bg-white/10 border border-white/20 rounded px-1.5 py-0.5 text-center ml-2 focus:outline-none focus:border-white/40"
+          className="w-12 text-xs text-white/90 bg-white/10 border border-white/20 rounded-sm px-1.5 py-0.5 text-center ml-2 focus:outline-hidden focus:border-white/40"
           aria-label="Zoom percentage"
         />
         <span className="text-xs text-white/60">%</span>

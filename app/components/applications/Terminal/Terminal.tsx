@@ -61,7 +61,7 @@ const Terminal = ({
           <TerminalRow io={item.std} key={i} command={item.msg} />
         ))}
 
-        <div className="text-sm tracking-wider text-white/80 font-['Courier_new',_'Courier',_monospace] relative">
+        <div className="text-sm tracking-wider text-white/80 font-['Courier_new','Courier',monospace] relative">
           <span className="absolute left-0 top-0">
             <TerminalInfo ref={promptRef} />
           </span>
@@ -73,7 +73,7 @@ const Terminal = ({
               {value || ' '}
             </span>
             <textarea
-              className="font-['Courier_new',_'Courier',_monospace] text-sm tracking-[1.5px] p-0 border-none bg-transparent text-white/80 absolute top-0 left-0 w-full resize-none focus:outline-none caret-white whitespace-pre-wrap break-all"
+              className="font-['Courier_new','Courier',monospace] text-sm tracking-[1.5px] p-0 border-none bg-transparent text-white/80 absolute top-0 left-0 w-full resize-none focus:outline-hidden caret-white whitespace-pre-wrap break-all"
               value={value}
               ref={inputRef}
               style={{ textIndent: `${promptWidth + 8}px`, height: '100%' }}

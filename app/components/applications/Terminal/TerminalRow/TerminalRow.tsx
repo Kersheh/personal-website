@@ -54,11 +54,11 @@ const TerminalRow = ({ io, command }: TerminalRowProps) => {
 
   if (io === 'in') {
     return (
-      <div className="text-sm tracking-wider text-white/80 font-['Courier_new',_'Courier',_monospace] relative">
+      <div className="text-sm tracking-wider text-white/80 font-['Courier_new','Courier',monospace] relative">
         <span ref={promptRef} className="absolute left-0 top-0">
           <TerminalInfo />
         </span>
-        <div className="relative whitespace-pre-wrap break-words min-w-0 w-full">
+        <div className="relative whitespace-pre-wrap wrap-break-word min-w-0 w-full">
           <span
             className="invisible block tracking-[1.5px]"
             style={{ textIndent: promptWidth + 8 }}
@@ -100,7 +100,7 @@ const TerminalRow = ({ io, command }: TerminalRowProps) => {
   }
 
   return (
-    <div className="text-sm tracking-wider text-white/80 font-['Courier_new',_'Courier',_monospace] whitespace-pre-wrap break-words">
+    <div className="text-sm tracking-wider text-white/80 font-['Courier_new','Courier',monospace] whitespace-pre-wrap wrap-break-word">
       <span className="tracking-[1.5px]">
         {commandParts.map((substring, i) =>
           substring.isUrl ? (

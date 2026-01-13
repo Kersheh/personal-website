@@ -1,81 +1,157 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
 
-html,
-body,
-#__next,
-main {
-  height: 100%;
-  margin: 0;
-  padding: 0;
-  overflow: hidden;
+@theme {
+  --color-carnation: #f45f74;
+  --color-daintree: #012a36;
+  --color-dull-lime: #85c91c;
+  --color-mystic: #d9e3e8;
+  --color-pastel-orange: #f4af64;
+  --color-onyx: #121010;
 }
 
-body {
-  background-color: #000;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+@layer base {
+
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentcolor);
+  }
 }
 
-/* Print helpers */
-.print-only {
-  display: none;
+@utility animate-fadein {
+  animation: fadein 2s;
 }
 
-@media print {
+@utility animate-turn-on {
+  animation: turn-on 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+  animation-fill-mode: forwards;
+  transform-origin: center center;
+  will-change: transform, filter;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    animation: crt-glow 1.4s ease-out forwards;
+    z-index: 9999;
+  }
+}
+
+@utility crt-scanlines-animating {
+  /* Scanline animation during turn-on */
+  animation: scanline-tighten 0.8s ease-out forwards;
+}
+
+@utility crt-chromatic {
+  /* Chromatic aberration effect class */
+  animation: chromatic-shift 0.6s ease-out forwards;
+}
+
+@utility animate-turn-off {
+  animation: turn-off 0.55s cubic-bezier(0.23, 1, 0.32, 1);
+  animation-fill-mode: forwards;
+}
+
+@utility animation-done {
+  /* State after turn-on animation completes - holds the final values */
+  transform: scale(1, 1) translate3d(0, 0, 0);
+  filter: contrast(1) brightness(1.2) saturate(1.3);
+  opacity: 1;
+}
+
+@utility animate-flicker {
+  @media screen {
+    animation: flicker 0.15s infinite;
+  }
+}
+
+@layer utilities {
+  .animate-pulse-ring {
+    animation: pulse-ring 2s infinite;
+  }
+}
+
+@layer utilities {
 
   html,
-  body {
-    height: auto !important;
-    overflow: visible !important;
-    background: #fff !important;
-    margin: 0 !important;
-    padding: 0 !important;
-  }
-
-  /* Hide ALL app content - use visibility+position to avoid animation restart */
-  body>*:not(.print-only) {
-    visibility: hidden !important;
-    position: absolute !important;
-    top: -9999px !important;
-    left: -9999px !important;
-  }
-
-  /* Hide elements marked as no-print */
-  .no-print {
-    display: none !important;
-  }
-
-  /* The print-only portal content */
-  .print-only {
-    display: block !important;
-    position: static !important;
-    visibility: visible !important;
-    width: 100% !important;
-    padding: 0 !important;
-    margin: 0 !important;
-    background: #fff !important;
-  }
-
-  /* Ensure the printed page is clean */
-  .pdf-print-page {
-    display: block !important;
-    box-shadow: none !important;
-    border: none !important;
-    background: #fff !important;
-    color: #000 !important;
-    -webkit-print-color-adjust: exact;
-    print-color-adjust: exact;
-    margin: 0 auto !important;
-    padding: 0 !important;
-  }
-
-  @page {
+  body,
+  #__next,
+  main {
+    height: 100%;
     margin: 0;
+    padding: 0;
+    overflow: hidden;
+  }
+
+  body {
+    background-color: #000;
+    font-family:
+      -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+      'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+      sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Print helpers */
+  .print-only {
+    display: none;
+  }
+
+  @media print {
+
+    html,
+    body {
+      height: auto !important;
+      overflow: visible !important;
+      background: #fff !important;
+      margin: 0 !important;
+      padding: 0 !important;
+    }
+
+    /* Hide ALL app content - use visibility+position to avoid animation restart */
+    body>*:not(.print-only) {
+      visibility: hidden !important;
+      position: absolute !important;
+      top: -9999px !important;
+      left: -9999px !important;
+    }
+
+    /* Hide elements marked as no-print */
+    .no-print {
+      display: none !important;
+    }
+
+    /* The print-only portal content */
+    .print-only {
+      display: block !important;
+      position: static !important;
+      visibility: visible !important;
+      width: 100% !important;
+      padding: 0 !important;
+      margin: 0 !important;
+      background: #fff !important;
+    }
+
+    /* Ensure the printed page is clean */
+    .pdf-print-page {
+      display: block !important;
+      box-shadow: none !important;
+      border: none !important;
+      background: #fff !important;
+      color: #000 !important;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+      margin: 0 auto !important;
+      padding: 0 !important;
+    }
+
+    @page {
+      margin: 0;
+    }
   }
 }
 
@@ -90,7 +166,6 @@ body {
     }
   }
 
-  /* CRT Turn-On - Hollywood style with horizontal line expansion */
   @keyframes turn-on {
     0% {
       /* Start as bright horizontal line */
@@ -128,7 +203,6 @@ body {
     }
   }
 
-  /* Glow/bloom overlay animation for CRT turn-on */
   @keyframes crt-glow {
     0% {
       box-shadow:
@@ -166,7 +240,6 @@ body {
     }
   }
 
-  /* Scanline tightening animation */
   @keyframes scanline-tighten {
     0% {
       background-size: 100% 8px, 6px 100%;
@@ -184,7 +257,6 @@ body {
     }
   }
 
-  /* Chromatic aberration during turn-on */
   @keyframes chromatic-shift {
     0% {
       text-shadow:
@@ -213,7 +285,6 @@ body {
     }
   }
 
-  /* Gamma ramp animation */
   @keyframes gamma-ramp {
     0% {
       filter: brightness(0) contrast(0);
@@ -341,7 +412,7 @@ body {
     }
   }
 
-  @keyframes pulse {
+  @keyframes pulse-ring {
     0% {
       box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.28);
     }
@@ -367,57 +438,5 @@ body {
     100% {
       opacity: 1;
     }
-  }
-
-  .animate-fadein {
-    animation: fadein 2s;
-  }
-
-  .animate-turn-on {
-    animation: turn-on 1.2s cubic-bezier(0.16, 1, 0.3, 1);
-    animation-fill-mode: forwards;
-    transform-origin: center center;
-    will-change: transform, filter;
-  }
-
-  .animate-turn-on::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    animation: crt-glow 1.4s ease-out forwards;
-    z-index: 9999;
-  }
-
-  /* Scanline animation during turn-on */
-  .crt-scanlines-animating {
-    animation: scanline-tighten 0.8s ease-out forwards;
-  }
-
-  /* Chromatic aberration effect class */
-  .crt-chromatic {
-    animation: chromatic-shift 0.6s ease-out forwards;
-  }
-
-  .animate-turn-off {
-    animation: turn-off .55s cubic-bezier(.230, 1, .320, 1);
-    animation-fill-mode: forwards;
-  }
-
-  /* State after turn-on animation completes - holds the final values */
-  .animation-done {
-    transform: scale(1, 1) translate3d(0, 0, 0);
-    filter: contrast(1) brightness(1.2) saturate(1.3);
-    opacity: 1;
-  }
-
-  @media screen {
-    .animate-flicker {
-      animation: flicker .15s infinite;
-    }
-  }
-
-  .animate-pulse-button {
-    animation: pulse 2s infinite;
   }
 }

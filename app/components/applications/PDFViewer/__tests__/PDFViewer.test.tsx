@@ -124,7 +124,7 @@ describe('<PDFViewer />', () => {
     expect(zoomInput).toHaveValue('123');
   });
 
-  it('should apply manual zoom on blur', async () => {
+  it('should apply manual zoom on blur-sm', async () => {
     render(<PDFViewer height={600} />);
 
     const zoomInput = screen.getByLabelText(
