@@ -61,7 +61,7 @@ const Terminal = ({
           <TerminalRow io={item.std} key={i} command={item.msg} />
         ))}
 
-        <div className="text-sm tracking-wider text-white/80 font-['Courier_new','Courier',monospace] relative">
+        <div className="text-sm tracking-wider text-white/80 font-['Courier_new','Courier',monospace] relative select-text">
           <span className="absolute left-0 top-0">
             <TerminalInfo ref={promptRef} />
           </span>

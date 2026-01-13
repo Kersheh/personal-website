@@ -83,7 +83,7 @@ const MIM = ({ height, isFocused }: MIMProps) => {
         className="flex-1 overflow-y-auto px-4 py-3 space-y-3 bg-gradient-to-b from-black/30 to-black/10"
       >
         {messages.map((message) => (
-          <div key={message.id} className="space-y-1">
+          <div key={message.id} className="space-y-1 select-text">
             <div className="text-xs uppercase tracking-wide text-white/50">
               {message.sender} · {message.timestamp}
             </div>
@@ -103,7 +103,7 @@ const MIM = ({ height, isFocused }: MIMProps) => {
           value={draft}
           onChange={(e) => setDraft(e.target.value)}
           placeholder="Type a message..."
-          className="flex-1 bg-white/5 border border-white/10 rounded-sm px-3 py-2 text-sm text-white placeholder:text-white/40 focus:outline-none focus:border-carnation"
+          className="flex-1 bg-white/5 border border-white/10 rounded-sm px-3 py-2 text-sm text-white placeholder:text-white/40 placeholder:select-none focus:outline-none focus:border-carnation"
         />
         <button
           type="submit"
