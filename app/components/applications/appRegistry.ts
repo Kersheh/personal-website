@@ -11,10 +11,32 @@ export interface AppConfig {
   id: AppId;
   displayName: string;
   iconName: string;
-  initialSize: AppSize;
+  initialSize:
+    | AppSize
+    | ((parentWidth?: number, parentHeight?: number) => AppSize);
   minSize: AppSize;
   featureFlag?: FeatureFlag;
 }
+
+const getPDFViewerSize = (
+  parentWidth?: number,
+  parentHeight?: number
+): AppSize => {
+  const isMobile = (parentWidth ?? 800) < 768;
+
+  if (isMobile) {
+    return {
+      width: parentWidth ?? 375,
+      height: parentHeight ?? 667
+    };
+  }
+
+  const desktopWidth = Math.max(600, (parentWidth ?? 1200) * 0.5);
+  return {
+    width: desktopWidth,
+    height: 780
+  };
+};
 
 export const APP_CONFIGS: Record<AppId, AppConfig> = {
   TERMINAL: {
@@ -28,7 +50,7 @@ export const APP_CONFIGS: Record<AppId, AppConfig> = {
     id: 'PDF_VIEWER',
     displayName: 'PDF Viewer',
     iconName: 'pdf.svg',
-    initialSize: { width: 600, height: 780 },
+    initialSize: getPDFViewerSize,
     minSize: { width: 375, height: 400 },
     featureFlag: FeatureFlag.DESKTOP_APP_PDF_VIEWER
   }

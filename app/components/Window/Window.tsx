@@ -50,20 +50,47 @@ const Window = ({
     setIsFocused(initialFocused);
   }, [initialFocused]);
 
+  // handle both static and dynamic initialSize
+  const getInitialSize = () => {
+    const configSize = appConfig.initialSize;
+    if (typeof configSize === 'function') {
+      return configSize(parentNode?.offsetWidth, parentNode?.offsetHeight);
+    }
+    return configSize;
+  };
+
+  const initialSize = getInitialSize();
   const initialWidth = Math.min(
-    appConfig.initialSize.width,
-    parentNode?.offsetWidth ?? appConfig.initialSize.width
+    initialSize.width,
+    parentNode?.offsetWidth ?? initialSize.width
   );
   const initialHeight = Math.min(
-    appConfig.initialSize.height,
-    parentNode?.offsetHeight ?? appConfig.initialSize.height
+    initialSize.height,
+    parentNode?.offsetHeight ?? initialSize.height
   );
 
   const maxX = Math.max(0, (parentNode?.offsetWidth ?? 800) - initialWidth);
   const maxY = Math.max(0, (parentNode?.offsetHeight ?? 600) - initialHeight);
 
-  const [initX] = useState(() => Math.floor(Math.random() * maxY * 0.8));
-  const [initY] = useState(() => Math.floor(Math.random() * maxX * 0.8));
+  const isMobile = (parentNode?.offsetWidth ?? 800) < 768;
+
+  // on mobile, offset by negative padding to be flush with edges
+  const mobilePaddingOffset = (() => {
+    if (!isMobile || !parentNode) {
+      return 0;
+    }
+
+    const computedStyle = window.getComputedStyle(parentNode);
+    const paddingLeft = parseFloat(computedStyle.paddingLeft) || 0;
+    return -paddingLeft;
+  })();
+
+  const [initX] = useState(() =>
+    isMobile ? 0 : Math.floor(Math.random() * maxY * 0.8)
+  );
+  const [initY] = useState(() =>
+    isMobile ? mobilePaddingOffset : Math.floor(Math.random() * maxX * 0.8)
+  );
   const [size, setSize] = useState({
     width: initialWidth,
     height: initialHeight
