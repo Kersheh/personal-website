@@ -199,6 +199,10 @@ const Desktop = ({ powerOff }: DesktopProps) => {
     });
   };
 
+  const visibleDesktopItems = DESKTOP_ITEMS.filter(
+    (item) => !item.featureFlag || isFeatureEnabled(item.featureFlag)
+  );
+
   return (
     <div
       className={`h-full relative overflow-hidden bg-cover bg-no-repeat flex flex-col ${
@@ -241,11 +245,7 @@ const Desktop = ({ powerOff }: DesktopProps) => {
         }}
       >
         <div className="relative w-full h-full">
-          {DESKTOP_ITEMS.map((item, index) => {
-            if (item.featureFlag && !isFeatureEnabled(item.featureFlag)) {
-              return null;
-            }
-
+          {visibleDesktopItems.map((item, index) => {
             const handleDoubleClick = () => {
               if (item.type === 'application') {
                 const appConfig = APP_CONFIGS[item.appName];
@@ -276,13 +276,13 @@ const Desktop = ({ powerOff }: DesktopProps) => {
               iconPositions[item.id] || getDefaultPosition(index);
 
             // build list of all occupied positions except current icon's position
-            const occupiedPositions = DESKTOP_ITEMS.map((desktopItem) => {
+            const occupiedPositions = visibleDesktopItems.map((desktopItem) => {
               if (desktopItem.id === item.id) {
                 return null;
               }
               return (
                 iconPositions[desktopItem.id] ||
-                getDefaultPosition(DESKTOP_ITEMS.indexOf(desktopItem))
+                getDefaultPosition(visibleDesktopItems.indexOf(desktopItem))
               );
             }).filter((pos): pos is { x: number; y: number } => pos !== null);
 
