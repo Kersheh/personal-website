@@ -1,6 +1,6 @@
-import { FeatureFlag } from '../../utils/featureFlags';
+import { FeatureFlag } from '@/app/utils/featureFlags';
 
-export type AppId = 'TERMINAL' | 'PDF_VIEWER' | 'DEVTOOLS';
+export type AppId = 'TERMINAL' | 'PDF_VIEWER' | 'DEVTOOLS' | 'MIM';
 
 interface AppSize {
   width: number;
@@ -51,8 +51,7 @@ export const APP_CONFIGS: Record<AppId, AppConfig> = {
     displayName: 'PDF Viewer',
     iconName: 'pdf.svg',
     initialSize: getPDFViewerSize,
-    minSize: { width: 375, height: 400 },
-    featureFlag: FeatureFlag.DESKTOP_APP_PDF_VIEWER
+    minSize: { width: 375, height: 400 }
   },
   DEVTOOLS: {
     id: 'DEVTOOLS',
@@ -60,6 +59,14 @@ export const APP_CONFIGS: Record<AppId, AppConfig> = {
     iconName: 'iterm.png',
     initialSize: { width: 600, height: 500 },
     minSize: { width: 400, height: 300 }
+  },
+  MIM: {
+    id: 'MIM',
+    displayName: 'MIM',
+    iconName: 'mim.svg',
+    initialSize: { width: 620, height: 500 },
+    minSize: { width: 420, height: 360 },
+    featureFlag: FeatureFlag.DESKTOP_APP_MIM
   }
 };
 

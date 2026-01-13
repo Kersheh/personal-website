@@ -56,14 +56,20 @@ const DESKTOP_ITEMS: Array<DesktopItem> = [
     appName: 'TERMINAL'
   },
   {
+    type: 'application',
+    id: 'app-mim',
+    iconName: APP_CONFIGS.MIM.iconName,
+    label: APP_CONFIGS.MIM.displayName,
+    appName: 'MIM'
+  },
+  {
     type: 'file',
     id: 'file-resume',
     iconName: APP_CONFIGS.PDF_VIEWER.iconName,
     label: 'resume.pdf',
     fileName: 'resume.pdf',
     filePath: '/documents/resume.pdf',
-    opensWith: 'PDF_VIEWER',
-    featureFlag: FeatureFlag.DESKTOP_APP_PDF_VIEWER
+    opensWith: 'PDF_VIEWER'
   }
 ];
 
@@ -268,7 +274,6 @@ const Desktop = ({ powerOff }: DesktopProps) => {
               isFocused={item.isFocused}
               updateWindows={updateWindows}
               parentNode={desktopRef.current}
-              windowsCount={windows.length}
               closeWindow={handleCloseWindow}
               fileData={item.fileData}
             />

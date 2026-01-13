@@ -5,6 +5,7 @@ import Draggable from 'react-draggable';
 import Terminal from '../applications/Terminal/Terminal';
 import PDFViewer from '../applications/PDFViewer/PDFViewer';
 import Devtools from '../applications/Devtools/Devtools';
+import MIM from '../applications/MIM/MIM';
 import WindowButton from './WindowButton/WindowButton';
 import { useDesktopApplicationStore } from '@/app/store/desktopApplicationStore';
 import {
@@ -22,7 +23,6 @@ interface WindowProps {
   name: AppId | string;
   isFocused: boolean;
   parentNode: HTMLDivElement | null;
-  windowsCount: number;
   updateWindows: (index: number) => void;
   closeWindow: (id: string) => void;
   fileData?: {
@@ -37,7 +37,6 @@ const Window = ({
   name,
   isFocused: initialFocused,
   parentNode,
-  windowsCount,
   updateWindows,
   closeWindow,
   fileData: fileData
@@ -382,6 +381,10 @@ const Window = ({
           )}
 
           {appId === 'DEVTOOLS' && <Devtools height={size.height - 30} />}
+
+          {appId === 'MIM' && (
+            <MIM height={size.height - 30} isFocused={isFocused} />
+          )}
         </div>
 
         {/* Resize handles */}
