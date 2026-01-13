@@ -183,7 +183,7 @@
 
     70% {
       /* Slight overshoot */
-      transform: scaleY(1.02);
+      transform: scaleY(1.001);
       filter: brightness(1.6) saturate(0.9);
       opacity: 1;
     }
