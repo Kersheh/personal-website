@@ -112,7 +112,7 @@ const PDFViewer = ({ height, isFocused, fileData }: PDFViewerProps) => {
               window.print();
             }
           }}
-          className="flex items-center justify-center w-8 h-8 rounded-sm hover:bg-white/10 transition-colors"
+          className="flex items-center justify-center w-8 h-8 rounded-sm hover:bg-white/10 transition-colors cursor-pointer"
           aria-label="Print document"
         >
           <PrintIcon />
@@ -126,7 +126,7 @@ const PDFViewer = ({ height, isFocused, fileData }: PDFViewerProps) => {
               return newScale;
             });
           }}
-          className="flex items-center justify-center w-8 h-8 rounded-sm hover:bg-white/10 transition-colors"
+          className="flex items-center justify-center w-8 h-8 rounded-sm hover:bg-white/10 transition-colors cursor-pointer"
           aria-label="Zoom out"
         >
           <ZoomOutIcon />
@@ -139,7 +139,7 @@ const PDFViewer = ({ height, isFocused, fileData }: PDFViewerProps) => {
               return newScale;
             });
           }}
-          className="flex items-center justify-center w-8 h-8 rounded-sm hover:bg-white/10 transition-colors"
+          className="flex items-center justify-center w-8 h-8 rounded-sm hover:bg-white/10 transition-colors cursor-pointer"
           aria-label="Zoom in"
         >
           <ZoomInIcon />

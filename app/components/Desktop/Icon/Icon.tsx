@@ -55,7 +55,7 @@ const Icon = ({ iconName, label, onDoubleClickHandler }: IconProps) => {
           backgroundImage: `url(/images/icons/icon-${iconName})`
         }}
       />
-      <span className="text-white/80 text-xs text-center max-w-18 wrap-break-word font-['Courier_new','Courier',monospace] drop-shadow-lg mt-1 select-none">
+      <span className="text-white/80 text-xs text-center max-w-20 wrap-break-word font-['Courier_new','Courier',monospace] drop-shadow-lg mt-1 select-none">
         {label}
       </span>
     </div>

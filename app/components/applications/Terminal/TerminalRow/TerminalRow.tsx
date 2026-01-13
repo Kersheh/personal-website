@@ -85,6 +85,7 @@ const TerminalRow = ({ io, command }: TerminalRowProps) => {
                     rel="noreferrer noopener"
                     key={i}
                     href={substring.string}
+                    className="underline cursor-pointer hover:opacity-80"
                   >
                     {substring.string}
                   </a>
@@ -118,6 +119,7 @@ const TerminalRow = ({ io, command }: TerminalRowProps) => {
                 rel="noreferrer noopener"
                 key={i}
                 href={substring.string}
+                className="underline cursor-pointer hover:opacity-80"
               >
                 {substring.string}
               </a>
