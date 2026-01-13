@@ -23,6 +23,9 @@ interface PDFViewerProps {
 const DEFAULT_DOC_KEY = 'default';
 const PAGE_WIDTH = 816; // 8.5in @ 96dpi
 const PAGE_HEIGHT = 1056; // 11in @ 96dpi
+const CANVAS_PADDING = 30; // consistent padding around the scaled page when scrolling
+const SCROLLBAR_BUFFER = 32; // extra space to avoid flush edges next to native scrollbars
+const TOTAL_PADDING = CANVAS_PADDING + SCROLLBAR_BUFFER;
 
 const DOCUMENT_RENDERERS: Record<string, () => React.JSX.Element> = {
   resume: () => <ResumeDocument />,
@@ -165,10 +168,11 @@ const PDFViewer = ({ height, isFocused, fileData }: PDFViewerProps) => {
       </div>
       <div
         ref={scrollContainerRef}
-        className="flex-1 overflow-scroll pt-6 pl-6 flex justify-center select-none no-print"
+        className="flex-1 overflow-scroll select-none no-print bg-onyx text-center"
         style={{
           height: contentHeight - 44,
-          cursor: isDragging ? 'move' : 'default'
+          cursor: isDragging ? 'move' : 'default',
+          padding: TOTAL_PADDING
         }}
         onMouseDown={(e: React.MouseEvent) => {
           const container = scrollContainerRef.current;
@@ -198,14 +202,12 @@ const PDFViewer = ({ height, isFocused, fileData }: PDFViewerProps) => {
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseUp}
       >
-        <div className="w-full max-w-5xl flex justify-center" ref={viewportRef}>
+        <div className="inline-block" ref={viewportRef}>
           <div
             className="relative"
             style={{
               width: scaledWidth,
-              height: scaledHeight,
-              marginRight: 30,
-              marginBottom: 30
+              height: scaledHeight
             }}
           >
             <div
