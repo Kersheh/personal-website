@@ -81,6 +81,29 @@ const Desktop = ({ powerOff }: DesktopProps) => {
   const unregisterWindow = useDesktopApplicationStore(
     (state) => state.unregisterWindow
   );
+  const iconPositions = useDesktopApplicationStore(
+    (state) => state.iconPositions
+  );
+  const updateIconPosition = useDesktopApplicationStore(
+    (state) => state.updateIconPosition
+  );
+
+  // calculate default positions for icons that don't have saved positions
+  const getDefaultPosition = (index: number) => {
+    const ICON_WIDTH = 104; // 80px + padding + gap
+    const ICON_HEIGHT = 120; // 80px + text + padding + gap
+    const START_X = 20;
+    const START_Y = 20;
+    const ICONS_PER_COLUMN = 4;
+
+    const col = Math.floor(index / ICONS_PER_COLUMN);
+    const row = index % ICONS_PER_COLUMN;
+
+    return {
+      x: START_X + col * ICON_WIDTH,
+      y: START_Y + row * ICON_HEIGHT
+    };
+  };
 
   const openNewWindow = (name: AppId, fileData?: WindowItem['fileData']) => {
     const updatedWindows = windows.map((window) =>
@@ -186,8 +209,8 @@ const Desktop = ({ powerOff }: DesktopProps) => {
           }
         }}
       >
-        <div className="flex gap-6 flex-wrap">
-          {DESKTOP_ITEMS.map((item) => {
+        <div className="relative w-full h-full">
+          {DESKTOP_ITEMS.map((item, index) => {
             if (item.featureFlag && !isFeatureEnabled(item.featureFlag)) {
               return null;
             }
@@ -203,12 +226,32 @@ const Desktop = ({ powerOff }: DesktopProps) => {
               }
             };
 
+            const position =
+              iconPositions[item.id] || getDefaultPosition(index);
+
+            // build list of all occupied positions except current icon's position
+            const occupiedPositions = DESKTOP_ITEMS.map((desktopItem) => {
+              if (desktopItem.id === item.id) {
+                return null;
+              }
+              return (
+                iconPositions[desktopItem.id] ||
+                getDefaultPosition(DESKTOP_ITEMS.indexOf(desktopItem))
+              );
+            }).filter((pos): pos is { x: number; y: number } => pos !== null);
+
             return (
               <Icon
                 key={item.id}
                 iconName={item.iconName}
                 label={item.label}
                 onDoubleClickHandler={handleDoubleClick}
+                position={position}
+                onPositionChange={(newPosition) =>
+                  updateIconPosition(item.id, newPosition)
+                }
+                occupiedPositions={occupiedPositions}
+                currentIconId={item.id}
               />
             );
           })}

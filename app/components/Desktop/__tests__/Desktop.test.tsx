@@ -6,10 +6,13 @@ jest.mock('@/app/store/desktopApplicationStore', () => {
   const store = {
     focusedApp: null,
     focusedWindowId: null,
+    iconPositions: {},
     setFocusedApp: jest.fn(),
     registerWindow: jest.fn(),
     unregisterWindow: jest.fn(),
-    getWindowsForApp: jest.fn(() => [])
+    getWindowsForApp: jest.fn(() => []),
+    updateIconPosition: jest.fn(),
+    getIconPosition: jest.fn(() => undefined)
   };
 
   const useDesktopApplicationStore = (

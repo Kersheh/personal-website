@@ -10,13 +10,19 @@ import {
   GitHubIcon,
   LinkedInIcon,
   EmailIcon,
-  PowerIcon
+  PowerIcon,
+  WrenchIcon
 } from '@/app/components/atomic/icons';
 
 interface MenuBarProps {
   onPowerOff: () => void;
   onCloseWindow: (id: string) => void;
 }
+
+const MENU_ITEM_CLASS =
+  "w-full text-left px-4 py-2 text-sm text-white/80 hover:bg-white/10 hover:text-white font-['Courier_new','Courier',monospace] transition-colors cursor-pointer";
+const MENU_ITEM_WITH_ICON_CLASS = `flex items-center gap-3 ${MENU_ITEM_CLASS}`;
+const MENU_ITEM_WITH_WHITESPACE_CLASS = `${MENU_ITEM_CLASS} whitespace-nowrap`;
 
 const MenuBar = ({ onPowerOff, onCloseWindow }: MenuBarProps) => {
   const focusedApp = useDesktopApplicationStore((state) => state.focusedApp);
@@ -77,14 +83,14 @@ const MenuBar = ({ onPowerOff, onCloseWindow }: MenuBarProps) => {
     >
       {/* Left side - App menu */}
       <div className="flex items-center gap-6 relative">
-        {/* Social links dropdown */}
+        {/* System dropdown */}
         <div ref={socialDropdownRef} className="relative">
           <button
             onClick={() =>
               setDropdowns((prev) => ({ ...prev, social: !prev.social }))
             }
             className="flex items-center justify-center h-8 w-8 hover:opacity-80 transition-opacity select-none p-1 cursor-pointer"
-            aria-label="Social links"
+            aria-label="System menu and social links"
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/favicon.ico" alt="Logo" className="w-5 h-5" />
@@ -98,7 +104,7 @@ const MenuBar = ({ onPowerOff, onCloseWindow }: MenuBarProps) => {
                 onClick={() =>
                   setDropdowns((prev) => ({ ...prev, social: false }))
                 }
-                className="flex items-center gap-3 w-full text-left px-4 py-2 text-sm text-white/80 hover:bg-white/10 hover:text-white font-['Courier_new','Courier',monospace] transition-colors cursor-pointer"
+                className={MENU_ITEM_WITH_ICON_CLASS}
               >
                 <GitHubIcon />
                 GitHub
@@ -110,7 +116,7 @@ const MenuBar = ({ onPowerOff, onCloseWindow }: MenuBarProps) => {
                 onClick={() =>
                   setDropdowns((prev) => ({ ...prev, social: false }))
                 }
-                className="flex items-center gap-3 w-full text-left px-4 py-2 text-sm text-white/80 hover:bg-white/10 hover:text-white font-['Courier_new','Courier',monospace] transition-colors cursor-pointer"
+                className={MENU_ITEM_WITH_ICON_CLASS}
               >
                 <LinkedInIcon />
                 LinkedIn
@@ -120,11 +126,26 @@ const MenuBar = ({ onPowerOff, onCloseWindow }: MenuBarProps) => {
                   window.location.href = email();
                   setDropdowns((prev) => ({ ...prev, social: false }));
                 }}
-                className="flex items-center gap-3 w-full text-left px-4 py-2 text-sm text-white/80 hover:bg-white/10 hover:text-white font-['Courier_new','Courier',monospace] transition-colors cursor-pointer"
+                className={MENU_ITEM_WITH_ICON_CLASS}
               >
                 <EmailIcon />
                 Email
               </button>
+              {process.env.NODE_ENV === 'development' && (
+                <>
+                  <div className="border-t border-white/10 my-1" />
+                  <button
+                    onClick={() => {
+                      // TODO: Open custom devtools window
+                      setDropdowns((prev) => ({ ...prev, social: false }));
+                    }}
+                    className={MENU_ITEM_WITH_ICON_CLASS}
+                  >
+                    <WrenchIcon className="w-4 h-4" />
+                    Devtools
+                  </button>
+                </>
+              )}
             </div>
           )}
         </div>
@@ -147,7 +168,7 @@ const MenuBar = ({ onPowerOff, onCloseWindow }: MenuBarProps) => {
                     windowIds.forEach((id) => onCloseWindow(id));
                     setDropdowns((prev) => ({ ...prev, app: false }));
                   }}
-                  className="w-full text-left px-4 py-2 text-sm text-white/80 hover:bg-white/10 hover:text-white font-['Courier_new','Courier',monospace] transition-colors whitespace-nowrap cursor-pointer"
+                  className={MENU_ITEM_WITH_WHITESPACE_CLASS}
                 >
                   Close Application
                 </button>
@@ -176,7 +197,7 @@ const MenuBar = ({ onPowerOff, onCloseWindow }: MenuBarProps) => {
                       setDropdowns((prev) => ({ ...prev, file: false }));
                     }
                   }}
-                  className="w-full text-left px-4 py-2 text-sm text-white/80 hover:bg-white/10 hover:text-white font-['Courier_new','Courier',monospace] transition-colors cursor-pointer"
+                  className={MENU_ITEM_CLASS}
                 >
                   Close Window
                 </button>
