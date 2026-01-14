@@ -10,6 +10,7 @@ import {
 
 interface IconProps {
   iconName: string;
+  iconScale?: number;
   label: string;
   onDoubleClickHandler: () => void;
   position?: { x: number; y: number };
@@ -46,6 +47,7 @@ const isPositionOccupied = (
 
 const Icon = ({
   iconName,
+  iconScale,
   label,
   onDoubleClickHandler,
   position,
@@ -245,6 +247,10 @@ const Icon = ({
         className="w-20 h-20 bg-no-repeat bg-contain bg-center rounded-[5%]"
         style={{
           backgroundImage: `url(/images/icons/icon-${iconName})`,
+          backgroundSize:
+            iconScale !== undefined
+              ? `${Math.round(iconScale * 100)}% ${Math.round(iconScale * 100)}%`
+              : undefined,
           pointerEvents: 'none'
         }}
       />

@@ -11,6 +11,7 @@ export interface AppConfig {
   id: AppId;
   displayName: string;
   iconName: string;
+  iconScale?: number;
   initialSize:
     | AppSize
     | ((parentWidth?: number, parentHeight?: number) => AppSize);
@@ -50,7 +51,7 @@ export const APP_CONFIGS: Record<AppId, AppConfig> = {
   PDF_VIEWER: {
     id: 'PDF_VIEWER',
     displayName: 'PDF Viewer',
-    iconName: 'pdf.svg',
+    iconName: 'pdf.png',
     initialSize: getPDFViewerSize,
     minSize: { width: 375, height: 400 }
   },
@@ -66,6 +67,7 @@ export const APP_CONFIGS: Record<AppId, AppConfig> = {
     id: 'MIM',
     displayName: 'MIM',
     iconName: 'mim.svg',
+    iconScale: 0.8,
     initialSize: { width: 620, height: 500 },
     minSize: { width: 420, height: 360 },
     unique: true,

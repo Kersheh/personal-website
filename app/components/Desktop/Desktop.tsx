@@ -21,24 +21,24 @@ interface WindowItem {
   };
 }
 
-interface DesktopApplicationItem {
-  type: 'application';
+interface DesktopBaseItem {
   id: string;
   iconName: string;
+  iconScale?: number;
   label: string;
-  appName: AppId;
   featureFlag?: FeatureFlag;
 }
 
-interface DesktopFileItem {
+interface DesktopApplicationItem extends DesktopBaseItem {
+  type: 'application';
+  appName: AppId;
+}
+
+interface DesktopFileItem extends DesktopBaseItem {
   type: 'file';
-  id: string;
-  iconName: string;
-  label: string;
   fileName: string;
   filePath: string;
   opensWith: AppId;
-  featureFlag?: FeatureFlag;
 }
 
 type DesktopItem = DesktopApplicationItem | DesktopFileItem;
@@ -52,6 +52,7 @@ const DESKTOP_ITEMS: Array<DesktopItem> = [
     type: 'application',
     id: 'app-terminal',
     iconName: APP_CONFIGS.TERMINAL.iconName,
+    iconScale: APP_CONFIGS.TERMINAL.iconScale,
     label: APP_CONFIGS.TERMINAL.displayName,
     appName: 'TERMINAL'
   },
@@ -59,6 +60,7 @@ const DESKTOP_ITEMS: Array<DesktopItem> = [
     type: 'application',
     id: 'app-mim',
     iconName: APP_CONFIGS.MIM.iconName,
+    iconScale: APP_CONFIGS.MIM.iconScale,
     label: APP_CONFIGS.MIM.displayName,
     appName: 'MIM',
     featureFlag: FeatureFlag.DESKTOP_APP_MIM
@@ -292,6 +294,7 @@ const Desktop = ({ powerOff }: DesktopProps) => {
               <Icon
                 key={item.id}
                 iconName={item.iconName}
+                iconScale={item.iconScale}
                 label={item.label}
                 onDoubleClickHandler={handleDoubleClick}
                 position={position}
