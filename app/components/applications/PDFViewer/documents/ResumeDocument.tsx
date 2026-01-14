@@ -43,7 +43,7 @@ const ResumeDocument = () => {
                   <br />
                   Unit, Integration, and E2E Testing • Functional Programming
                   <br />
-                  Management • Mentored Software Engineer
+                  Management • Mentored Software Engineers
                 </p>
               </div>
             </div>
