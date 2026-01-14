@@ -315,7 +315,7 @@ const Window = ({
             WINDOW_Z_BASE + (isFocused ? WINDOW_FOCUS_BUMP + index : index),
           width: size.width,
           height: size.height,
-          willChange: isAnimating ? 'width, height' : 'auto'
+          willChange: isAnimating ? 'width, height' : 'opacity'
         }}
       >
         <div
