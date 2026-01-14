@@ -63,7 +63,7 @@ const TerminalRow = ({ io, command }: TerminalRowProps) => {
             className="invisible block tracking-[1.5px]"
             style={{ textIndent: promptWidth + 8 }}
           >
-            {command}
+            {command || ' '}
           </span>
           <span
             className="absolute top-0 left-0 tracking-[1.5px]"

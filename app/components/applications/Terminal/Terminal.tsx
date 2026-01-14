@@ -96,6 +96,14 @@ const Terminal = ({
                     if (!inputValue.trim()) {
                       setValue('');
                       setBufferValue('');
+                      setHistory([
+                        ...history,
+                        { std: 'in', msg: '' },
+                        {
+                          std: 'out',
+                          msg: 'Type `help` to see available commands'
+                        }
+                      ]);
                       return;
                     }
 
