@@ -276,15 +276,17 @@ const Desktop = ({ powerOff }: DesktopProps) => {
               iconPositions[item.id] || getDefaultPosition(index);
 
             // build list of all occupied positions except current icon's position
-            const occupiedPositions = visibleDesktopItems.map((desktopItem) => {
-              if (desktopItem.id === item.id) {
-                return null;
-              }
-              return (
-                iconPositions[desktopItem.id] ||
-                getDefaultPosition(visibleDesktopItems.indexOf(desktopItem))
-              );
-            }).filter((pos): pos is { x: number; y: number } => pos !== null);
+            const occupiedPositions = visibleDesktopItems
+              .map((desktopItem) => {
+                if (desktopItem.id === item.id) {
+                  return null;
+                }
+                return (
+                  iconPositions[desktopItem.id] ||
+                  getDefaultPosition(visibleDesktopItems.indexOf(desktopItem))
+                );
+              })
+              .filter((pos): pos is { x: number; y: number } => pos !== null);
 
             return (
               <Icon
