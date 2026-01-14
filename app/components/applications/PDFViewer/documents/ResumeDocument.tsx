@@ -1,13 +1,28 @@
 /* eslint-disable @next/next/no-img-element */
+import email from '@/app/utils/commands/email';
 
 const ResumeDocument = () => {
+  const decodedEmail = email().replace('mailto:', '');
+
   return (
     <div className="space-y-4 text-slate-800 px-8 py-6">
       <header className="space-y-1">
-        <p className="text-xs uppercase tracking-[0.2em] text-slate-500">
-          Resume
-        </p>
-        <h1 className="text-2xl font-semibold text-slate-900">Matt Breckon</h1>
+        <div className="flex items-start justify-between">
+          <div>
+            <p className="text-xs uppercase tracking-[0.2em] text-slate-500">
+              Resume
+            </p>
+            <h1 className="text-2xl font-semibold text-slate-900">
+              Matt Breckon
+            </h1>
+          </div>
+          <div className="space-y-1 text-right">
+            <p className="text-xs text-slate-600 underline">
+              https://matthewbreckon.com
+            </p>
+            <p className="text-xs text-slate-600 print-email">{decodedEmail}</p>
+          </div>
+        </div>
         <p className="text-sm text-slate-600">
           Software Engineer — Web developer, application architect, systems
           engineer

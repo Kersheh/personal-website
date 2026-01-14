@@ -20,6 +20,18 @@
   }
 }
 
+@layer components {
+  .print-email {
+    @apply hidden;
+  }
+
+  @media print {
+    .print-email {
+      @apply block;
+    }
+  }
+}
+
 @utility animate-fadein {
   animation: fadein 2s;
 }
