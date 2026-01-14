@@ -57,6 +57,9 @@ const PDFViewer = ({ height, isFocused, fileData }: PDFViewerProps) => {
   const [zoomInput, setZoomInput] = useState('100');
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  const [isPinching, setIsPinching] = useState(false);
+  const [initialPinchDistance, setInitialPinchDistance] = useState(0);
+  const [initialPinchScale, setInitialPinchScale] = useState(1);
   const viewportRef = useRef<HTMLDivElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
@@ -76,6 +79,14 @@ const PDFViewer = ({ height, isFocused, fileData }: PDFViewerProps) => {
   };
 
   const handleMouseUp = () => setIsDragging(false);
+
+  const getTouchDistance = (touches: React.TouchList) => {
+    const touch1 = touches[0];
+    const touch2 = touches[1];
+    const dx = touch2.clientX - touch1.clientX;
+    const dy = touch2.clientY - touch1.clientY;
+    return Math.sqrt(dx * dx + dy * dy);
+  };
 
   useEffect(() => {
     const node = viewportRef.current;
@@ -202,6 +213,28 @@ const PDFViewer = ({ height, isFocused, fileData }: PDFViewerProps) => {
         }}
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseUp}
+        onTouchStart={(e: React.TouchEvent) => {
+          if (e.touches.length === 2) {
+            e.preventDefault();
+            setIsPinching(true);
+            setInitialPinchDistance(getTouchDistance(e.touches));
+            setInitialPinchScale(scale);
+          }
+        }}
+        onTouchMove={(e: React.TouchEvent) => {
+          if (isPinching && e.touches.length === 2) {
+            e.preventDefault();
+            const currentDistance = getTouchDistance(e.touches);
+            const scaleChange = currentDistance / initialPinchDistance;
+            const newScale = Math.min(
+              Math.max(initialPinchScale * scaleChange, 0.5),
+              3
+            );
+            setScale(newScale);
+            setZoomInput(Math.round(newScale * 100).toString());
+          }
+        }}
+        onTouchEnd={() => setIsPinching(false)}
       >
         <div className="min-w-full inline-flex justify-center">
           <div className="inline-block" ref={viewportRef}>
