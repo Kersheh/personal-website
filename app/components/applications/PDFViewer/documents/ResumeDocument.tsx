@@ -51,14 +51,15 @@ const ResumeDocument = () => {
                   Typescript • React • Next.js • Node • Design Systems • UI/UX •
                   React Native / Expo
                   <br />
-                  Cloud • Datadog • Docker • Springboot • PostgresSQL • CMS
+                  CI/CD • Cloud • Datadog • Docker • Springboot • PostgresSQL •
+                  CMS
                   <br />
                   Applications and Systems Architecture • Framework and Internal
                   Devtool Development
                   <br />
                   Unit, Integration, and E2E Testing • Functional Programming
                   <br />
-                  Management • Mentored Software Engineers
+                  Management • Software Engineer Mentoring
                 </p>
               </div>
             </div>
