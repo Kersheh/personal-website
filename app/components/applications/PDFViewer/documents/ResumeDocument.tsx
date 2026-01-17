@@ -51,8 +51,8 @@ const ResumeDocument = () => {
                   Typescript • React • Next.js • Node • Design Systems • UI/UX •
                   React Native / Expo
                   <br />
-                  CI/CD • Cloud • Datadog • Docker • Springboot • PostgresSQL •
-                  CMS
+                  CI/CD • Cloud • Datadog • Redis • Docker • Springboot •
+                  PostgresSQL • CMS
                   <br />
                   Applications and Systems Architecture • Framework and Internal
                   Devtool Development
