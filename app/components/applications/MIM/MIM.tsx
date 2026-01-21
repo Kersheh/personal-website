@@ -8,6 +8,7 @@ interface ChatMessage {
   username: string;
   message: string;
   timestamp: number;
+  isSystem?: boolean;
 }
 
 interface ChatUser {
@@ -16,6 +17,49 @@ interface ChatUser {
 }
 
 const POLL_INTERVAL = 2500;
+
+const COMMANDS = {
+  help: {
+    description: 'Show available commands',
+    execute: () => {
+      const commandList = Object.entries(COMMANDS)
+        .map(([cmd, info]) => `/${cmd} - ${info.description}`)
+        .join('\n');
+      return `Available commands:\n${commandList}`;
+    }
+  },
+  clear: {
+    description: 'Clear all chat messages',
+    execute: async () => {
+      try {
+        const response = await fetch('/api/chat/clear', {
+          method: 'POST'
+        });
+        const data = await response.json();
+
+        if (data.success) {
+          window.dispatchEvent(new CustomEvent('mim:clear'));
+          return 'Chat cleared successfully.';
+        } else {
+          return `Failed to clear chat: ${data.error}`;
+        }
+      } catch {
+        return 'Failed to clear chat. Please try again.';
+      }
+    }
+  }
+};
+
+const handleCommand = async (command: string): Promise<string | null> => {
+  const trimmed = command.slice(1).trim().toLowerCase();
+  const cmd = COMMANDS[trimmed as keyof typeof COMMANDS];
+
+  if (cmd) {
+    return await cmd.execute();
+  }
+
+  return `Unknown command: /${trimmed}. Type /help for available commands.`;
+};
 
 export default function MIM() {
   const [messages, setMessages] = useState<Array<ChatMessage>>([]);
@@ -142,18 +186,26 @@ export default function MIM() {
               <div
                 key={msg.id}
                 className={`rounded border px-2 py-1 ${
-                  msg.userId === user.userId
-                    ? 'border-sky-700 bg-sky-900 text-sky-100'
-                    : 'border-slate-700 bg-slate-800 text-slate-100'
+                  msg.isSystem
+                    ? 'border-yellow-700 bg-yellow-900/30 text-yellow-100'
+                    : msg.userId === user.userId
+                      ? 'border-sky-700 bg-sky-900 text-sky-100'
+                      : 'border-slate-700 bg-slate-800 text-slate-100'
                 }`}
               >
-                <div className="text-xs font-bold text-slate-200">
-                  {msg.username}
-                  <span className="ml-2 font-normal text-slate-400">
-                    {new Date(msg.timestamp).toLocaleTimeString()}
-                  </span>
+                {!msg.isSystem && (
+                  <div className="text-xs font-bold text-slate-200">
+                    {msg.username}
+                    <span className="ml-2 font-normal text-slate-400">
+                      {new Date(msg.timestamp).toLocaleTimeString()}
+                    </span>
+                  </div>
+                )}
+                <div
+                  className={`break-words ${msg.isSystem ? 'whitespace-pre-line text-xs' : ''}`}
+                >
+                  {msg.message}
                 </div>
-                <div className="break-words">{msg.message}</div>
               </div>
             ))}
             <div ref={messagesEndRef} />
@@ -169,6 +221,26 @@ export default function MIM() {
             return;
           }
 
+          const trimmedMessage = inputMessage.trim();
+
+          if (trimmedMessage.startsWith('/')) {
+            const response = await handleCommand(trimmedMessage);
+            if (response) {
+              const systemMessage: ChatMessage = {
+                id: `system-${Date.now()}`,
+                userId: 'system',
+                username: 'System',
+                message: response,
+                timestamp: Date.now(),
+                isSystem: true
+              };
+              setMessages((prev) => [...prev, systemMessage]);
+              setInputMessage('');
+              inputRef.current?.focus();
+            }
+            return;
+          }
+
           setIsSending(true);
 
           try {
@@ -180,7 +252,7 @@ export default function MIM() {
               body: JSON.stringify({
                 userId: user.userId,
                 username: user.username,
-                message: inputMessage.trim()
+                message: trimmedMessage
               })
             });
 
