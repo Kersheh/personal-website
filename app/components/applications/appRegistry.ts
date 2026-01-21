@@ -1,4 +1,5 @@
 import { FeatureFlag } from '@/app/utils/featureFlags';
+import { MenuSection } from '@/app/utils/types';
 
 export type AppId = 'TERMINAL' | 'PDF_VIEWER' | 'DEVTOOLS' | 'MIM';
 
@@ -18,6 +19,7 @@ export interface AppConfig {
   minSize: AppSize;
   unique?: boolean;
   featureFlag?: FeatureFlag;
+  customMenuSections?: Array<MenuSection>;
 }
 
 const getPDFViewerSize = (
@@ -71,7 +73,20 @@ export const APP_CONFIGS: Record<AppId, AppConfig> = {
     initialSize: { width: 620, height: 500 },
     minSize: { width: 420, height: 360 },
     unique: true,
-    featureFlag: FeatureFlag.DESKTOP_APP_MIM
+    featureFlag: FeatureFlag.DESKTOP_APP_MIM,
+    customMenuSections: [
+      {
+        title: 'App',
+        items: [
+          {
+            label: 'Preferences',
+            onClick: () => {
+              // Preferences action will be implemented when needed
+            }
+          }
+        ]
+      }
+    ]
   }
 };
 

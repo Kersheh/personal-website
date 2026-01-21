@@ -154,8 +154,8 @@ export default function MIM() {
 
   if (isJoining) {
     return (
-      <div className="flex h-full items-center justify-center bg-gray-200 font-mono text-sm">
-        <div className="text-gray-700">Joining chat room...</div>
+      <div className="flex h-full items-center justify-center bg-slate-900 font-mono text-sm">
+        <div className="text-slate-100">Joining chat room...</div>
       </div>
     );
   }

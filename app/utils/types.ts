@@ -12,3 +12,13 @@ export interface Command {
 }
 
 export type CommandRegistry = Record<string, Command>;
+
+export interface MenuItem {
+  label: string;
+  onClick: () => void;
+}
+
+export interface MenuSection {
+  title: 'App' | 'File';
+  items: Array<MenuItem>;
+}

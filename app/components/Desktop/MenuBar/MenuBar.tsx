@@ -2,7 +2,11 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useDesktopApplicationStore } from '@/app/store/desktopApplicationStore';
-import { resolveAppId, AppId } from '@/app/components/applications/appRegistry';
+import {
+  resolveAppId,
+  AppId,
+  getAppConfig
+} from '@/app/components/applications/appRegistry';
 import github from '@/app/utils/commands/github';
 import linkedin from '@/app/utils/commands/linkedin';
 import email from '@/app/utils/commands/email';
@@ -164,20 +168,52 @@ const MenuBar = ({ onPowerOff, onCloseWindow, onOpenWindow }: MenuBarProps) => {
             </button>
             {dropdowns.app && (
               <div className="absolute top-full left-0 mt-1 bg-black/90 backdrop-blur-md border border-white/20 rounded-sm shadow-lg min-w-[160px] z-[3000]">
-                <button
-                  onClick={() => {
-                    const appId = resolveAppId(focusedApp || '');
-                    if (!appId) {
-                      return;
-                    }
-                    const windowIds = getWindowsForApp(appId);
-                    windowIds.forEach((id) => onCloseWindow(id));
-                    setDropdowns((prev) => ({ ...prev, app: false }));
-                  }}
-                  className={MENU_ITEM_WITH_WHITESPACE_CLASS}
-                >
-                  Close Application
-                </button>
+                {(() => {
+                  const appId = resolveAppId(focusedApp || '');
+                  if (!appId) {
+                    return null;
+                  }
+
+                  const appConfig = getAppConfig(appId);
+                  const appMenuItems = appConfig.customMenuSections?.find(
+                    (section) => section.title === 'App'
+                  )?.items;
+
+                  return (
+                    <>
+                      {appMenuItems && appMenuItems.length > 0 && (
+                        <>
+                          {appMenuItems.map((item) => (
+                            <button
+                              key={item.label}
+                              onClick={() => {
+                                item.onClick();
+                                setDropdowns((prev) => ({
+                                  ...prev,
+                                  app: false
+                                }));
+                              }}
+                              className={MENU_ITEM_WITH_WHITESPACE_CLASS}
+                            >
+                              {item.label}
+                            </button>
+                          ))}
+                          <div className="border-t border-white/10 my-1" />
+                        </>
+                      )}
+                      <button
+                        onClick={() => {
+                          const windowIds = getWindowsForApp(appId);
+                          windowIds.forEach((id) => onCloseWindow(id));
+                          setDropdowns((prev) => ({ ...prev, app: false }));
+                        }}
+                        className={MENU_ITEM_WITH_WHITESPACE_CLASS}
+                      >
+                        Close Application
+                      </button>
+                    </>
+                  );
+                })()}
               </div>
             )}
           </div>
@@ -194,19 +230,71 @@ const MenuBar = ({ onPowerOff, onCloseWindow, onOpenWindow }: MenuBarProps) => {
             </button>
             {dropdowns.file && (
               <div className="absolute top-full left-0 mt-1 bg-black/90 backdrop-blur-md border border-white/20 rounded-sm shadow-lg min-w-[160px] z-[3000]">
-                <button
-                  onClick={() => {
-                    const currentId =
-                      useDesktopApplicationStore.getState().focusedWindowId;
-                    if (currentId) {
-                      onCloseWindow(currentId);
-                      setDropdowns((prev) => ({ ...prev, file: false }));
-                    }
-                  }}
-                  className={MENU_ITEM_CLASS}
-                >
-                  Close Window
-                </button>
+                {(() => {
+                  const appId = resolveAppId(focusedApp || '');
+                  if (!appId) {
+                    return (
+                      <button
+                        onClick={() => {
+                          const currentId =
+                            useDesktopApplicationStore.getState()
+                              .focusedWindowId;
+                          if (currentId) {
+                            onCloseWindow(currentId);
+                            setDropdowns((prev) => ({ ...prev, file: false }));
+                          }
+                        }}
+                        className={MENU_ITEM_CLASS}
+                      >
+                        Close Window
+                      </button>
+                    );
+                  }
+
+                  const appConfig = getAppConfig(appId);
+                  const fileMenuItems = appConfig.customMenuSections?.find(
+                    (section) => section.title === 'File'
+                  )?.items;
+
+                  return (
+                    <>
+                      {fileMenuItems && fileMenuItems.length > 0 && (
+                        <>
+                          {fileMenuItems.map((item) => (
+                            <button
+                              key={item.label}
+                              onClick={() => {
+                                item.onClick();
+                                setDropdowns((prev) => ({
+                                  ...prev,
+                                  file: false
+                                }));
+                              }}
+                              className={MENU_ITEM_CLASS}
+                            >
+                              {item.label}
+                            </button>
+                          ))}
+                          <div className="border-t border-white/10 my-1" />
+                        </>
+                      )}
+                      <button
+                        onClick={() => {
+                          const currentId =
+                            useDesktopApplicationStore.getState()
+                              .focusedWindowId;
+                          if (currentId) {
+                            onCloseWindow(currentId);
+                            setDropdowns((prev) => ({ ...prev, file: false }));
+                          }
+                        }}
+                        className={MENU_ITEM_CLASS}
+                      >
+                        Close Window
+                      </button>
+                    </>
+                  );
+                })()}
               </div>
             )}
           </div>
