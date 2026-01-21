@@ -69,20 +69,20 @@ interface DesktopProps {
 const DESKTOP_ITEMS: Array<DesktopItem> = [
   {
     type: 'application',
-    id: 'app-terminal',
-    iconName: APP_CONFIGS.TERMINAL.iconName,
-    iconScale: APP_CONFIGS.TERMINAL.iconScale,
-    label: APP_CONFIGS.TERMINAL.displayName,
-    appName: 'TERMINAL'
-  },
-  {
-    type: 'application',
     id: 'app-mim',
     iconName: APP_CONFIGS.MIM.iconName,
     iconScale: APP_CONFIGS.MIM.iconScale,
     label: APP_CONFIGS.MIM.displayName,
     appName: 'MIM',
     featureFlag: FeatureFlag.DESKTOP_APP_MIM
+  },
+  {
+    type: 'application',
+    id: 'app-terminal',
+    iconName: APP_CONFIGS.TERMINAL.iconName,
+    iconScale: APP_CONFIGS.TERMINAL.iconScale,
+    label: APP_CONFIGS.TERMINAL.displayName,
+    appName: 'TERMINAL'
   },
   {
     type: 'file',
