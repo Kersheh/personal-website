@@ -1,6 +1,7 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import Desktop from '@/app/components/Desktop/Desktop';
+import { dispatchWindowEvent } from '@/app/hooks/useWindowEvent';
 
 global.fetch = jest.fn();
 
@@ -9,10 +10,14 @@ jest.mock('@/app/store/desktopApplicationStore', () => {
     focusedApp: null,
     focusedWindowId: null,
     iconPositions: {},
+    childWindowsByApp: {},
     setFocusedApp: jest.fn(),
     registerWindow: jest.fn(),
     unregisterWindow: jest.fn(),
+    registerChildWindow: jest.fn(),
+    unregisterChildWindow: jest.fn(),
     getWindowsForApp: jest.fn(() => []),
+    isChildWindowOpen: jest.fn(() => false),
     updateIconPosition: jest.fn(),
     getIconPosition: jest.fn(() => undefined)
   };
@@ -285,6 +290,145 @@ describe('<Desktop />', () => {
         const windows = getWindows();
         expect(windows.length).toBe(1);
         expect(isWindowFocused(windows[0])).toBe(true);
+      });
+    });
+  });
+
+  describe('child windows', () => {
+    it('should open a child window when desktop:open-child-window event is dispatched', async () => {
+      render(<Desktop powerOff={mockPowerOff} />);
+
+      await waitFor(() => {
+        expect(getWindows().length).toBe(0);
+      });
+
+      act(() => {
+        dispatchWindowEvent('desktop:open-child-window', {
+          childWindowId: 'MIM_PREFERENCES',
+          parentAppId: 'MIM'
+        });
+      });
+
+      await waitFor(() => {
+        const windows = getWindows();
+        expect(windows.length).toBe(1);
+      });
+    });
+
+    it('should render child window with correct title', async () => {
+      render(<Desktop powerOff={mockPowerOff} />);
+
+      act(() => {
+        dispatchWindowEvent('desktop:open-child-window', {
+          childWindowId: 'MIM_PREFERENCES',
+          parentAppId: 'MIM'
+        });
+      });
+
+      await waitFor(() => {
+        expect(screen.getByText('Preferences')).toBeInTheDocument();
+      });
+    });
+
+    it('should focus child window when opened', async () => {
+      render(<Desktop powerOff={mockPowerOff} />);
+
+      act(() => {
+        dispatchWindowEvent('desktop:open-child-window', {
+          childWindowId: 'MIM_PREFERENCES',
+          parentAppId: 'MIM'
+        });
+      });
+
+      await waitFor(() => {
+        const windows = getWindows();
+        expect(windows.length).toBe(1);
+        expect(isWindowFocused(windows[0])).toBe(true);
+      });
+    });
+
+    it('should close child window when close button is clicked', async () => {
+      const user = userEvent.setup();
+      render(<Desktop powerOff={mockPowerOff} />);
+
+      act(() => {
+        dispatchWindowEvent('desktop:open-child-window', {
+          childWindowId: 'MIM_PREFERENCES',
+          parentAppId: 'MIM'
+        });
+      });
+
+      await waitFor(() => {
+        expect(getWindows().length).toBe(1);
+      });
+
+      const closeButton = document.querySelector(
+        '.bg-carnation'
+      ) as HTMLElement;
+      await user.click(closeButton);
+
+      await waitFor(() => {
+        expect(getWindows().length).toBe(0);
+      });
+    });
+
+    it('should allow both parent app window and child window to be open', async () => {
+      const user = userEvent.setup();
+      render(<Desktop powerOff={mockPowerOff} />);
+
+      const mimIcon = screen.getByText('MIM');
+      await user.dblClick(mimIcon);
+
+      await waitFor(() => {
+        expect(getWindows().length).toBe(1);
+      });
+
+      act(() => {
+        dispatchWindowEvent('desktop:open-child-window', {
+          childWindowId: 'MIM_PREFERENCES',
+          parentAppId: 'MIM'
+        });
+      });
+
+      await waitFor(() => {
+        expect(getWindows().length).toBe(2);
+      });
+    });
+
+    it('should switch focus between parent and child windows', async () => {
+      const user = userEvent.setup();
+      render(<Desktop powerOff={mockPowerOff} />);
+
+      const mimIcon = screen.getByText('MIM');
+      await user.dblClick(mimIcon);
+
+      await waitFor(() => {
+        expect(getWindows().length).toBe(1);
+      });
+
+      act(() => {
+        dispatchWindowEvent('desktop:open-child-window', {
+          childWindowId: 'MIM_PREFERENCES',
+          parentAppId: 'MIM'
+        });
+      });
+
+      await waitFor(() => {
+        const windows = getWindows();
+        expect(windows.length).toBe(2);
+        expect(isWindowUnfocused(windows[0])).toBe(true);
+        expect(isWindowFocused(windows[1])).toBe(true);
+      });
+
+      const windows = getWindows();
+      const parentWindowBar = windows[0].querySelector(
+        '.window-bar'
+      ) as HTMLElement;
+      await user.click(parentWindowBar);
+
+      await waitFor(() => {
+        expect(isWindowFocused(windows[0])).toBe(true);
+        expect(isWindowUnfocused(windows[1])).toBe(true);
       });
     });
   });

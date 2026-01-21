@@ -3,23 +3,42 @@
 import { useState, useRef, useEffect } from 'react';
 import { get } from 'lodash';
 import Window from '../Window/Window';
+import ChildWindow from '../Window/ChildWindow';
 import Icon from './Icon/Icon';
 import MenuBar from './MenuBar/MenuBar';
 import { useDesktopApplicationStore } from '@/app/store/desktopApplicationStore';
 import { isFeatureEnabled, FeatureFlag } from '@/app/utils/featureFlags';
-import { AppId, APP_CONFIGS } from '@/app/components/applications/appRegistry';
+import {
+  AppId,
+  APP_CONFIGS,
+  ChildWindowId
+} from '@/app/components/applications/appRegistry';
+import { useWindowEvent } from '@/app/hooks/useWindowEvent';
+import MIMPreferences from '../applications/MIM/MIMPreferences';
 
 let windowIdCounter = 0;
 
-interface WindowItem {
-  name: AppId;
+interface BaseWindowItem {
   isFocused: boolean;
   id: string;
+}
+
+interface AppWindowItem extends BaseWindowItem {
+  type: 'app';
+  name: AppId;
   fileData?: {
     fileName: string;
     filePath: string;
   };
 }
+
+interface ChildWindowItem extends BaseWindowItem {
+  type: 'child';
+  childWindowId: ChildWindowId;
+  parentAppId: AppId;
+}
+
+type WindowItem = AppWindowItem | ChildWindowItem;
 
 interface DesktopBaseItem {
   id: string;
@@ -90,6 +109,15 @@ const Desktop = ({ powerOff }: DesktopProps) => {
   const unregisterWindow = useDesktopApplicationStore(
     (state) => state.unregisterWindow
   );
+  const registerChildWindow = useDesktopApplicationStore(
+    (state) => state.registerChildWindow
+  );
+  const unregisterChildWindow = useDesktopApplicationStore(
+    (state) => state.unregisterChildWindow
+  );
+  const isChildWindowOpen = useDesktopApplicationStore(
+    (state) => state.isChildWindowOpen
+  );
   const iconPositions = useDesktopApplicationStore(
     (state) => state.iconPositions
   );
@@ -114,13 +142,14 @@ const Desktop = ({ powerOff }: DesktopProps) => {
     };
   };
 
-  const openNewWindow = (name: AppId, fileData?: WindowItem['fileData']) => {
+  const openNewWindow = (name: AppId, fileData?: AppWindowItem['fileData']) => {
     const updatedWindows = windows.map((window) =>
       window !== null ? { ...window, isFocused: false } : null
     );
 
     const newWindowId = `window-${++windowIdCounter}`;
     updatedWindows.push({
+      type: 'app',
       name,
       isFocused: true,
       id: newWindowId,
@@ -134,28 +163,42 @@ const Desktop = ({ powerOff }: DesktopProps) => {
     });
   };
 
-  const handleOpenApp = (appId: AppId) => {
-    const appConfig = APP_CONFIGS[appId];
+  useWindowEvent<{ childWindowId: ChildWindowId; parentAppId: AppId }>(
+    'desktop:open-child-window',
+    (e: CustomEvent<{ childWindowId: ChildWindowId; parentAppId: AppId }>) => {
+      const { childWindowId, parentAppId } = e.detail;
 
-    if (appConfig.featureFlag && !isFeatureEnabled(appConfig.featureFlag)) {
-      return;
-    }
-
-    // if app is unique, check if window already exists
-    if (appConfig.unique) {
-      const existingWindowIndex = windows.findIndex(
-        (w) => w && w.name === appId
-      );
-
-      if (existingWindowIndex !== -1) {
-        // focus existing window
-        updateWindows(existingWindowIndex);
+      // child windows are always unique
+      if (isChildWindowOpen(parentAppId, childWindowId)) {
+        // focus existing child window
+        const existingIndex = windows.findIndex(
+          (w) => w && w.type === 'child' && w.childWindowId === childWindowId
+        );
+        if (existingIndex !== -1) {
+          updateWindows(existingIndex);
+        }
         return;
       }
-    }
 
-    openNewWindow(appId);
-  };
+      const updatedWindows = windows.map((window) =>
+        window !== null ? { ...window, isFocused: false } : null
+      );
+
+      const newWindowId = `child-window-${++windowIdCounter}`;
+      updatedWindows.push({
+        type: 'child',
+        childWindowId,
+        parentAppId,
+        isFocused: true,
+        id: newWindowId
+      });
+      setWindows(updatedWindows);
+
+      queueMicrotask(() => {
+        registerChildWindow(parentAppId, childWindowId, newWindowId);
+      });
+    }
+  );
 
   useEffect(() => {
     const hasAnyFocusedWindow = windows.some((window) => window?.isFocused);
@@ -171,7 +214,11 @@ const Desktop = ({ powerOff }: DesktopProps) => {
     // defer the store update to after the component finishes updating
     queueMicrotask(() => {
       if (windowToClose) {
-        unregisterWindow(windowToClose.name, id);
+        if (windowToClose.type === 'child') {
+          unregisterChildWindow(windowToClose.parentAppId, id);
+        } else {
+          unregisterWindow(windowToClose.name, id);
+        }
       }
     });
 
@@ -234,7 +281,66 @@ const Desktop = ({ powerOff }: DesktopProps) => {
           setTimeout(powerOff, 550);
         }}
         onCloseWindow={handleCloseWindow}
-        onOpenWindow={handleOpenApp}
+        onOpenWindow={(appId: AppId) => {
+          const appConfig = APP_CONFIGS[appId];
+
+          if (
+            appConfig.featureFlag &&
+            !isFeatureEnabled(appConfig.featureFlag)
+          ) {
+            return;
+          }
+
+          // if app is unique, check if window already exists
+          if (appConfig.unique) {
+            const existingWindowIndex = windows.findIndex(
+              (w) => w && w.type === 'app' && w.name === appId
+            );
+
+            if (existingWindowIndex !== -1) {
+              // focus existing window
+              updateWindows(existingWindowIndex);
+              return;
+            }
+          }
+
+          openNewWindow(appId);
+        }}
+        onOpenChildWindow={(
+          childWindowId: ChildWindowId,
+          parentAppId: AppId
+        ) => {
+          // child windows are always unique
+          if (isChildWindowOpen(parentAppId, childWindowId)) {
+            // focus existing child window
+            const existingIndex = windows.findIndex(
+              (w) =>
+                w && w.type === 'child' && w.childWindowId === childWindowId
+            );
+            if (existingIndex !== -1) {
+              updateWindows(existingIndex);
+            }
+            return;
+          }
+
+          const updatedWindows = windows.map((window) =>
+            window !== null ? { ...window, isFocused: false } : null
+          );
+
+          const newWindowId = `child-window-${++windowIdCounter}`;
+          updatedWindows.push({
+            type: 'child',
+            childWindowId,
+            parentAppId,
+            isFocused: true,
+            id: newWindowId
+          });
+          setWindows(updatedWindows);
+
+          queueMicrotask(() => {
+            registerChildWindow(parentAppId, childWindowId, newWindowId);
+          });
+        }}
       />
 
       <div
@@ -255,11 +361,11 @@ const Desktop = ({ powerOff }: DesktopProps) => {
                 // if app is unique, check if window already exists
                 if (appConfig.unique) {
                   const existingWindowIndex = windows.findIndex(
-                    (w) => w && w.name === item.appName
+                    (w) => w && w.type === 'app' && w.name === item.appName
                   );
 
                   if (existingWindowIndex !== -1) {
-                    // Focus existing window
+                    // focus existing window
                     updateWindows(existingWindowIndex);
                     return;
                   }
@@ -309,7 +415,31 @@ const Desktop = ({ powerOff }: DesktopProps) => {
         </div>
 
         {windows.map((item, i) => {
-          return item === null ? null : (
+          if (item === null) {
+            return null;
+          }
+
+          if (item.type === 'child') {
+            return (
+              <ChildWindow
+                key={i}
+                index={i}
+                id={item.id}
+                childWindowId={item.childWindowId}
+                parentAppId={item.parentAppId}
+                isFocused={item.isFocused}
+                updateWindows={updateWindows}
+                parentNode={desktopRef.current}
+                closeWindow={handleCloseWindow}
+              >
+                {item.childWindowId === 'MIM_PREFERENCES' && (
+                  <MIMPreferences height={250} />
+                )}
+              </ChildWindow>
+            );
+          }
+
+          return (
             <Window
               key={i}
               index={i}

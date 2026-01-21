@@ -13,17 +13,23 @@ jest.mock('@/app/utils/commands/email');
 
 jest.mock('@/app/components/applications/appRegistry', () => ({
   resolveAppId: jest.fn((name: string) => name),
+  getAppConfig: jest.fn(() => ({
+    customMenuSections: []
+  })),
+  isChildWindowId: jest.fn(() => false),
   AppId: {}
 }));
 
 const mockSetFocusedApp = jest.fn();
 const mockGetWindowsForApp = jest.fn();
+const mockGetChildWindowsForApp = jest.fn(() => []);
 
 let mockStoreState = {
   focusedApp: null as string | null,
   focusedWindowId: null as string | null,
   setFocusedApp: mockSetFocusedApp,
-  getWindowsForApp: mockGetWindowsForApp
+  getWindowsForApp: mockGetWindowsForApp,
+  getChildWindowsForApp: mockGetChildWindowsForApp
 };
 
 jest.mock('@/app/store/desktopApplicationStore', () => {
@@ -38,6 +44,7 @@ describe('<MenuBar />', () => {
   const mockPowerOff = jest.fn();
   const mockCloseWindow = jest.fn();
   const mockOpenWindow = jest.fn();
+  const mockOpenChildWindow = jest.fn();
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -45,7 +52,8 @@ describe('<MenuBar />', () => {
       focusedApp: null,
       focusedWindowId: null,
       setFocusedApp: mockSetFocusedApp,
-      getWindowsForApp: mockGetWindowsForApp
+      getWindowsForApp: mockGetWindowsForApp,
+      getChildWindowsForApp: mockGetChildWindowsForApp
     };
 
     jest.spyOn(githubModule, 'default').mockReturnValue('https://github.com');
@@ -64,6 +72,7 @@ describe('<MenuBar />', () => {
           onPowerOff={mockPowerOff}
           onCloseWindow={mockCloseWindow}
           onOpenWindow={mockOpenWindow}
+          onOpenChildWindow={mockOpenChildWindow}
         />
       );
 
@@ -89,6 +98,7 @@ describe('<MenuBar />', () => {
           onPowerOff={mockPowerOff}
           onCloseWindow={mockCloseWindow}
           onOpenWindow={mockOpenWindow}
+          onOpenChildWindow={mockOpenChildWindow}
         />
       );
 
@@ -114,6 +124,7 @@ describe('<MenuBar />', () => {
           onPowerOff={mockPowerOff}
           onCloseWindow={mockCloseWindow}
           onOpenWindow={mockOpenWindow}
+          onOpenChildWindow={mockOpenChildWindow}
         />
       );
 
@@ -137,6 +148,7 @@ describe('<MenuBar />', () => {
           onPowerOff={mockPowerOff}
           onCloseWindow={mockCloseWindow}
           onOpenWindow={mockOpenWindow}
+          onOpenChildWindow={mockOpenChildWindow}
         />
       );
 
@@ -155,6 +167,7 @@ describe('<MenuBar />', () => {
           onPowerOff={mockPowerOff}
           onCloseWindow={mockCloseWindow}
           onOpenWindow={mockOpenWindow}
+          onOpenChildWindow={mockOpenChildWindow}
         />
       );
 
@@ -173,6 +186,7 @@ describe('<MenuBar />', () => {
           onPowerOff={mockPowerOff}
           onCloseWindow={mockCloseWindow}
           onOpenWindow={mockOpenWindow}
+          onOpenChildWindow={mockOpenChildWindow}
         />
       );
 
@@ -195,6 +209,7 @@ describe('<MenuBar />', () => {
           onPowerOff={mockPowerOff}
           onCloseWindow={mockCloseWindow}
           onOpenWindow={mockOpenWindow}
+          onOpenChildWindow={mockOpenChildWindow}
         />
       );
 
@@ -219,6 +234,7 @@ describe('<MenuBar />', () => {
           onPowerOff={mockPowerOff}
           onCloseWindow={mockCloseWindow}
           onOpenWindow={mockOpenWindow}
+          onOpenChildWindow={mockOpenChildWindow}
         />
       );
 
@@ -231,7 +247,8 @@ describe('<MenuBar />', () => {
         focusedApp: 'TERMINAL',
         focusedWindowId: 'window-1',
         setFocusedApp: mockSetFocusedApp,
-        getWindowsForApp: jest.fn(() => ['window-1'])
+        getWindowsForApp: jest.fn(() => ['window-1']),
+        getChildWindowsForApp: jest.fn(() => [])
       };
 
       render(
@@ -239,6 +256,7 @@ describe('<MenuBar />', () => {
           onPowerOff={mockPowerOff}
           onCloseWindow={mockCloseWindow}
           onOpenWindow={mockOpenWindow}
+          onOpenChildWindow={mockOpenChildWindow}
         />
       );
 
@@ -251,7 +269,8 @@ describe('<MenuBar />', () => {
         focusedApp: 'TERMINAL',
         focusedWindowId: 'window-1',
         setFocusedApp: mockSetFocusedApp,
-        getWindowsForApp: jest.fn(() => ['window-1'])
+        getWindowsForApp: jest.fn(() => ['window-1']),
+        getChildWindowsForApp: jest.fn(() => [])
       };
 
       render(
@@ -259,6 +278,7 @@ describe('<MenuBar />', () => {
           onPowerOff={mockPowerOff}
           onCloseWindow={mockCloseWindow}
           onOpenWindow={mockOpenWindow}
+          onOpenChildWindow={mockOpenChildWindow}
         />
       );
 
@@ -274,7 +294,8 @@ describe('<MenuBar />', () => {
         focusedApp: 'TERMINAL',
         focusedWindowId: 'window-1',
         setFocusedApp: mockSetFocusedApp,
-        getWindowsForApp: jest.fn(() => ['window-1'])
+        getWindowsForApp: jest.fn(() => ['window-1']),
+        getChildWindowsForApp: jest.fn(() => [])
       };
 
       render(
@@ -282,6 +303,7 @@ describe('<MenuBar />', () => {
           onPowerOff={mockPowerOff}
           onCloseWindow={mockCloseWindow}
           onOpenWindow={mockOpenWindow}
+          onOpenChildWindow={mockOpenChildWindow}
         />
       );
 
@@ -297,7 +319,8 @@ describe('<MenuBar />', () => {
         focusedApp: 'TERMINAL',
         focusedWindowId: 'window-1',
         setFocusedApp: mockSetFocusedApp,
-        getWindowsForApp: jest.fn(() => ['window-1'])
+        getWindowsForApp: jest.fn(() => ['window-1']),
+        getChildWindowsForApp: jest.fn(() => [])
       };
 
       render(
@@ -305,6 +328,7 @@ describe('<MenuBar />', () => {
           onPowerOff={mockPowerOff}
           onCloseWindow={mockCloseWindow}
           onOpenWindow={mockOpenWindow}
+          onOpenChildWindow={mockOpenChildWindow}
         />
       );
 
@@ -322,7 +346,8 @@ describe('<MenuBar />', () => {
         focusedApp: null,
         focusedWindowId: null,
         setFocusedApp: jest.fn(),
-        getWindowsForApp: jest.fn(() => [])
+        getWindowsForApp: jest.fn(() => []),
+        getChildWindowsForApp: jest.fn(() => [])
       };
 
       render(
@@ -330,6 +355,7 @@ describe('<MenuBar />', () => {
           onPowerOff={mockPowerOff}
           onCloseWindow={mockCloseWindow}
           onOpenWindow={mockOpenWindow}
+          onOpenChildWindow={mockOpenChildWindow}
         />
       );
 
@@ -342,7 +368,8 @@ describe('<MenuBar />', () => {
         focusedApp: 'TERMINAL',
         focusedWindowId: 'window-1',
         setFocusedApp: mockSetFocusedApp,
-        getWindowsForApp: jest.fn(() => ['window-1'])
+        getWindowsForApp: jest.fn(() => ['window-1']),
+        getChildWindowsForApp: jest.fn(() => [])
       };
 
       render(
@@ -350,6 +377,7 @@ describe('<MenuBar />', () => {
           onPowerOff={mockPowerOff}
           onCloseWindow={mockCloseWindow}
           onOpenWindow={mockOpenWindow}
+          onOpenChildWindow={mockOpenChildWindow}
         />
       );
 
@@ -362,7 +390,8 @@ describe('<MenuBar />', () => {
         focusedApp: 'TERMINAL',
         focusedWindowId: 'window-1',
         setFocusedApp: mockSetFocusedApp,
-        getWindowsForApp: jest.fn(() => ['window-1'])
+        getWindowsForApp: jest.fn(() => ['window-1']),
+        getChildWindowsForApp: jest.fn(() => [])
       };
 
       render(
@@ -370,6 +399,7 @@ describe('<MenuBar />', () => {
           onPowerOff={mockPowerOff}
           onCloseWindow={mockCloseWindow}
           onOpenWindow={mockOpenWindow}
+          onOpenChildWindow={mockOpenChildWindow}
         />
       );
 
@@ -390,7 +420,8 @@ describe('<MenuBar />', () => {
         focusedApp: 'TERMINAL',
         focusedWindowId: 'window-1',
         setFocusedApp: mockSetFocusedApp,
-        getWindowsForApp: getWindowsForAppMock
+        getWindowsForApp: getWindowsForAppMock,
+        getChildWindowsForApp: jest.fn(() => [])
       };
 
       render(
@@ -398,6 +429,7 @@ describe('<MenuBar />', () => {
           onPowerOff={mockPowerOff}
           onCloseWindow={mockCloseWindow}
           onOpenWindow={mockOpenWindow}
+          onOpenChildWindow={mockOpenChildWindow}
         />
       );
 
@@ -423,7 +455,8 @@ describe('<MenuBar />', () => {
         focusedApp: 'TERMINAL',
         focusedWindowId: 'window-1',
         setFocusedApp: mockSetFocusedApp,
-        getWindowsForApp: getWindowsForAppMock
+        getWindowsForApp: getWindowsForAppMock,
+        getChildWindowsForApp: jest.fn(() => [])
       };
 
       render(
@@ -431,6 +464,7 @@ describe('<MenuBar />', () => {
           onPowerOff={mockPowerOff}
           onCloseWindow={mockCloseWindow}
           onOpenWindow={mockOpenWindow}
+          onOpenChildWindow={mockOpenChildWindow}
         />
       );
 

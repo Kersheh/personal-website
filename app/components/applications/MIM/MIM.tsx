@@ -1,6 +1,12 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import { GearIcon } from '@/app/components/atomic/icons';
+import {
+  useWindowEvent,
+  dispatchWindowEvent
+} from '@/app/hooks/useWindowEvent';
+import { useMIMPreferencesStore } from './store/preferencesStore';
 
 interface ChatMessage {
   id: string;
@@ -71,20 +77,26 @@ export default function MIM() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const hasJoinedRef = useRef(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const use24HourFormat = useMIMPreferencesStore(
+    (state) => state.use24HourFormat
+  );
+
+  const formatTime = (timestamp: number) => {
+    const date = new Date(timestamp);
+    if (use24HourFormat) {
+      return date.toLocaleTimeString([], { hour12: false });
+    }
+    return date.toLocaleTimeString([], { hour12: true });
+  };
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  useEffect(() => {
-    const handleClear = () => {
-      setMessages([]);
-      lastTimestampRef.current = 0;
-    };
-
-    window.addEventListener('mim:clear', handleClear);
-    return () => window.removeEventListener('mim:clear', handleClear);
-  }, []);
+  useWindowEvent('mim:clear', () => {
+    setMessages([]);
+    lastTimestampRef.current = 0;
+  });
 
   useEffect(() => {
     const joinChat = async () => {
@@ -170,11 +182,25 @@ export default function MIM() {
 
   return (
     <div className="flex h-full flex-col bg-slate-900 font-mono text-sm text-slate-100">
-      <div className="border-b-2 border-slate-700 bg-slate-800 px-3 py-2">
+      <div className="border-b-2 border-slate-700 bg-slate-800 px-3 py-2 flex items-center justify-between">
         <div className="text-slate-100">
           Logged in as:{' '}
           <span className="font-bold text-sky-300">{user.username}</span>
         </div>
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            dispatchWindowEvent('desktop:open-child-window', {
+              childWindowId: 'MIM_PREFERENCES',
+              parentAppId: 'MIM'
+            });
+          }}
+          className="p-1 hover:opacity-70 transition-opacity cursor-pointer"
+          aria-label="Open preferences"
+          title="Preferences"
+        >
+          <GearIcon className="w-4 h-4 text-slate-300" />
+        </button>
       </div>
 
       <div className="flex-1 overflow-y-auto p-3">
@@ -197,7 +223,7 @@ export default function MIM() {
                   <div className="text-xs font-bold text-slate-200">
                     {msg.username}
                     <span className="ml-2 font-normal text-slate-400">
-                      {new Date(msg.timestamp).toLocaleTimeString()}
+                      {formatTime(msg.timestamp)}
                     </span>
                   </div>
                 )}

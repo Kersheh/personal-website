@@ -13,9 +13,13 @@ export interface Command {
 
 export type CommandRegistry = Record<string, Command>;
 
+export type MenuItemAction =
+  | { type: 'onClick'; handler: () => void }
+  | { type: 'openChildWindow'; childWindowId: string };
+
 export interface MenuItem {
   label: string;
-  onClick: () => void;
+  action: MenuItemAction;
 }
 
 export interface MenuSection {

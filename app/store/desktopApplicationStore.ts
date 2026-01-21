@@ -1,6 +1,9 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { AppId } from '@/app/components/applications/appRegistry';
+import {
+  AppId,
+  ChildWindowId
+} from '@/app/components/applications/appRegistry';
 
 const APP_VERSION = process.env.APP_VERSION ?? '0.0.0';
 
@@ -16,11 +19,17 @@ const APP_VERSION_PARTS = parseAppVersion(APP_VERSION);
 const APP_VERSION_MAJOR_MINOR =
   APP_VERSION_PARTS.major * 1_000 + APP_VERSION_PARTS.minor;
 
+export interface ChildWindowState {
+  childWindowId: ChildWindowId;
+  windowId: string;
+}
+
 const baseState = () => ({
   appVersion: APP_VERSION,
   focusedApp: null,
   focusedWindowId: null,
   windowsByApp: {},
+  childWindowsByApp: {},
   iconPositions: {}
 });
 
@@ -39,11 +48,23 @@ export interface DesktopApplicationState {
   focusedApp: string | null;
   focusedWindowId: string | null;
   windowsByApp: Partial<Record<AppId, Set<string>>>;
+  childWindowsByApp: Partial<Record<AppId, Set<ChildWindowState>>>;
   iconPositions: Record<string, IconPosition>;
   setFocusedApp: (appName: string | null, windowId?: string | null) => void;
   registerWindow: (appId: AppId, windowId: string) => void;
   unregisterWindow: (appId: AppId, windowId: string) => void;
   getWindowsForApp: (appId: AppId) => Array<string>;
+  registerChildWindow: (
+    parentAppId: AppId,
+    childWindowId: ChildWindowId,
+    windowId: string
+  ) => void;
+  unregisterChildWindow: (parentAppId: AppId, windowId: string) => void;
+  getChildWindowsForApp: (appId: AppId) => Array<ChildWindowState>;
+  isChildWindowOpen: (
+    parentAppId: AppId,
+    childWindowId: ChildWindowId
+  ) => boolean;
   updateIconPosition: (iconId: string, position: IconPosition) => void;
   getIconPosition: (iconId: string) => IconPosition | undefined;
   resetIconPositions: () => void;
@@ -81,6 +102,42 @@ export const useDesktopApplicationStore = create<DesktopApplicationState>()(
       getWindowsForApp: (appId) => {
         const windows = get().windowsByApp[appId];
         return windows ? Array.from(windows) : [];
+      },
+      registerChildWindow: (parentAppId, childWindowId, windowId) =>
+        set((state) => {
+          const newChildWindowsByApp = { ...state.childWindowsByApp };
+          if (!newChildWindowsByApp[parentAppId]) {
+            newChildWindowsByApp[parentAppId] = new Set();
+          }
+          newChildWindowsByApp[parentAppId]?.add({ childWindowId, windowId });
+          return { childWindowsByApp: newChildWindowsByApp };
+        }),
+      unregisterChildWindow: (parentAppId, windowId) =>
+        set((state) => {
+          const newChildWindowsByApp = { ...state.childWindowsByApp };
+          const childWindows = newChildWindowsByApp[parentAppId];
+          if (childWindows) {
+            const toDelete = Array.from(childWindows).find(
+              (cw) => cw.windowId === windowId
+            );
+            if (toDelete) {
+              childWindows.delete(toDelete);
+            }
+          }
+          return { childWindowsByApp: newChildWindowsByApp };
+        }),
+      getChildWindowsForApp: (appId) => {
+        const childWindows = get().childWindowsByApp[appId];
+        return childWindows ? Array.from(childWindows) : [];
+      },
+      isChildWindowOpen: (parentAppId, childWindowId) => {
+        const childWindows = get().childWindowsByApp[parentAppId];
+        if (!childWindows) {
+          return false;
+        }
+        return Array.from(childWindows).some(
+          (cw) => cw.childWindowId === childWindowId
+        );
       },
       updateIconPosition: (iconId, position) =>
         set((state) => ({

@@ -2,10 +2,19 @@ import { FeatureFlag } from '@/app/utils/featureFlags';
 import { MenuSection } from '@/app/utils/types';
 
 export type AppId = 'TERMINAL' | 'PDF_VIEWER' | 'DEVTOOLS' | 'MIM';
+export type ChildWindowId = 'MIM_PREFERENCES';
 
 interface AppSize {
   width: number;
   height: number;
+}
+
+export interface ChildWindowConfig {
+  id: ChildWindowId;
+  parentAppId: AppId;
+  displayName: string;
+  size: AppSize;
+  minSize: AppSize;
 }
 
 export interface AppConfig {
@@ -80,8 +89,9 @@ export const APP_CONFIGS: Record<AppId, AppConfig> = {
         items: [
           {
             label: 'Preferences',
-            onClick: () => {
-              // Preferences action will be implemented when needed
+            action: {
+              type: 'openChildWindow',
+              childWindowId: 'MIM_PREFERENCES'
             }
           }
         ]
@@ -108,3 +118,20 @@ export const resolveAppId = (name: string): AppId | null => {
 
   return match.id;
 };
+
+export const CHILD_WINDOW_CONFIGS: Record<ChildWindowId, ChildWindowConfig> = {
+  MIM_PREFERENCES: {
+    id: 'MIM_PREFERENCES',
+    parentAppId: 'MIM',
+    displayName: 'Preferences',
+    size: { width: 360, height: 280 },
+    minSize: { width: 300, height: 200 }
+  }
+};
+
+export const getChildWindowConfig = (
+  childWindowId: ChildWindowId
+): ChildWindowConfig => CHILD_WINDOW_CONFIGS[childWindowId];
+
+export const isChildWindowId = (id: string): id is ChildWindowId =>
+  id in CHILD_WINDOW_CONFIGS;

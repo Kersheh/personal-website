@@ -5,7 +5,9 @@ import { useDesktopApplicationStore } from '@/app/store/desktopApplicationStore'
 import {
   resolveAppId,
   AppId,
-  getAppConfig
+  ChildWindowId,
+  getAppConfig,
+  isChildWindowId
 } from '@/app/components/applications/appRegistry';
 import github from '@/app/utils/commands/github';
 import linkedin from '@/app/utils/commands/linkedin';
@@ -22,6 +24,7 @@ interface MenuBarProps {
   onPowerOff: () => void;
   onCloseWindow: (id: string) => void;
   onOpenWindow: (appId: AppId) => void;
+  onOpenChildWindow: (childWindowId: ChildWindowId, parentAppId: AppId) => void;
 }
 
 const MENU_ITEM_CLASS =
@@ -29,13 +32,21 @@ const MENU_ITEM_CLASS =
 const MENU_ITEM_WITH_ICON_CLASS = `flex items-center gap-3 ${MENU_ITEM_CLASS}`;
 const MENU_ITEM_WITH_WHITESPACE_CLASS = `${MENU_ITEM_CLASS} whitespace-nowrap`;
 
-const MenuBar = ({ onPowerOff, onCloseWindow, onOpenWindow }: MenuBarProps) => {
+const MenuBar = ({
+  onPowerOff,
+  onCloseWindow,
+  onOpenWindow,
+  onOpenChildWindow
+}: MenuBarProps) => {
   const focusedApp = useDesktopApplicationStore((state) => state.focusedApp);
   const focusedWindowId = useDesktopApplicationStore(
     (state) => state.focusedWindowId
   );
   const getWindowsForApp = useDesktopApplicationStore(
     (state) => state.getWindowsForApp
+  );
+  const getChildWindowsForApp = useDesktopApplicationStore(
+    (state) => state.getChildWindowsForApp
   );
   const [dropdowns, setDropdowns] = useState({
     file: false,
@@ -179,6 +190,23 @@ const MenuBar = ({ onPowerOff, onCloseWindow, onOpenWindow }: MenuBarProps) => {
                     (section) => section.title === 'App'
                   )?.items;
 
+                  const handleMenuItemClick = (
+                    item: (typeof appMenuItems)[0]
+                  ) => {
+                    if (!item) {
+                      return;
+                    }
+                    if (item.action.type === 'onClick') {
+                      item.action.handler();
+                    } else if (
+                      item.action.type === 'openChildWindow' &&
+                      isChildWindowId(item.action.childWindowId)
+                    ) {
+                      onOpenChildWindow(item.action.childWindowId, appId);
+                    }
+                    setDropdowns((prev) => ({ ...prev, app: false }));
+                  };
+
                   return (
                     <>
                       {appMenuItems && appMenuItems.length > 0 && (
@@ -186,13 +214,7 @@ const MenuBar = ({ onPowerOff, onCloseWindow, onOpenWindow }: MenuBarProps) => {
                           {appMenuItems.map((item) => (
                             <button
                               key={item.label}
-                              onClick={() => {
-                                item.onClick();
-                                setDropdowns((prev) => ({
-                                  ...prev,
-                                  app: false
-                                }));
-                              }}
+                              onClick={() => handleMenuItemClick(item)}
                               className={MENU_ITEM_WITH_WHITESPACE_CLASS}
                             >
                               {item.label}
@@ -204,7 +226,11 @@ const MenuBar = ({ onPowerOff, onCloseWindow, onOpenWindow }: MenuBarProps) => {
                       <button
                         onClick={() => {
                           const windowIds = getWindowsForApp(appId);
+                          const childWindows = getChildWindowsForApp(appId);
                           windowIds.forEach((id) => onCloseWindow(id));
+                          childWindows.forEach((cw) =>
+                            onCloseWindow(cw.windowId)
+                          );
                           setDropdowns((prev) => ({ ...prev, app: false }));
                         }}
                         className={MENU_ITEM_WITH_WHITESPACE_CLASS}
@@ -256,6 +282,23 @@ const MenuBar = ({ onPowerOff, onCloseWindow, onOpenWindow }: MenuBarProps) => {
                     (section) => section.title === 'File'
                   )?.items;
 
+                  const handleFileMenuItemClick = (
+                    item: (typeof fileMenuItems)[0]
+                  ) => {
+                    if (!item) {
+                      return;
+                    }
+                    if (item.action.type === 'onClick') {
+                      item.action.handler();
+                    } else if (
+                      item.action.type === 'openChildWindow' &&
+                      isChildWindowId(item.action.childWindowId)
+                    ) {
+                      onOpenChildWindow(item.action.childWindowId, appId);
+                    }
+                    setDropdowns((prev) => ({ ...prev, file: false }));
+                  };
+
                   return (
                     <>
                       {fileMenuItems && fileMenuItems.length > 0 && (
@@ -263,13 +306,7 @@ const MenuBar = ({ onPowerOff, onCloseWindow, onOpenWindow }: MenuBarProps) => {
                           {fileMenuItems.map((item) => (
                             <button
                               key={item.label}
-                              onClick={() => {
-                                item.onClick();
-                                setDropdowns((prev) => ({
-                                  ...prev,
-                                  file: false
-                                }));
-                              }}
+                              onClick={() => handleFileMenuItemClick(item)}
                               className={MENU_ITEM_CLASS}
                             >
                               {item.label}
