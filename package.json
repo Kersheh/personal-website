@@ -25,6 +25,7 @@
   "dependencies": {
     "lodash": "^4.17.21",
     "next": "^16.1.1",
+    "obscenity": "^0.4.6",
     "react": "^19.2.3",
     "react-dom": "^19.2.3",
     "react-draggable": "^4.5.0",

@@ -3,6 +3,7 @@ export const runtime = 'nodejs';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { chatCache } from '../cache';
+import { filterContent } from '@/app/utils/contentFilter';
 
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
@@ -47,13 +48,15 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const { cleaned } = filterContent(message);
+
     const existingUser = chatCache.getUser(userId);
 
     if (!existingUser && username && typeof username === 'string') {
       chatCache.addUser(userId, username);
     }
 
-    const chatMessage = chatCache.addMessage(userId, message.trim());
+    const chatMessage = chatCache.addMessage(userId, cleaned.trim());
 
     if (!chatMessage) {
       return NextResponse.json(
