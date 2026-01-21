@@ -2,6 +2,8 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import Desktop from '@/app/components/Desktop/Desktop';
 
+global.fetch = jest.fn();
+
 jest.mock('@/app/store/desktopApplicationStore', () => {
   const store = {
     focusedApp: null,
@@ -35,6 +37,19 @@ describe('<Desktop />', () => {
 
   beforeEach(() => {
     mockPowerOff.mockClear();
+    (global.fetch as jest.Mock).mockResolvedValue({
+      json: async () => ({
+        success: true,
+        userId: 'test-user',
+        username: 'TestUser',
+        messages: [],
+        timestamp: Date.now()
+      })
+    });
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
   });
 
   it('should open a window when double-clicking Terminal icon', async () => {

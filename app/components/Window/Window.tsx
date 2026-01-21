@@ -398,9 +398,7 @@ const Window = ({
 
           {appId === 'DEVTOOLS' && <Devtools height={size.height - 30} />}
 
-          {appId === 'MIM' && (
-            <MIM height={size.height - 30} isFocused={isFocused} />
-          )}
+          {appId === 'MIM' && <MIM />}
         </div>
 
         {/* Resize handles */}
