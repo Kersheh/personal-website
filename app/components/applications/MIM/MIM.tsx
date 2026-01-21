@@ -7,6 +7,7 @@ import {
   dispatchWindowEvent
 } from '@/app/hooks/useWindowEvent';
 import { useMIMPreferencesStore } from './store/preferencesStore';
+import { getTheme } from './themes';
 
 interface ChatMessage {
   id: string;
@@ -80,6 +81,8 @@ export default function MIM() {
   const use24HourFormat = useMIMPreferencesStore(
     (state) => state.use24HourFormat
   );
+  const themeId = useMIMPreferencesStore((state) => state.theme);
+  const theme = getTheme(themeId);
 
   const formatTime = (timestamp: number) => {
     const date = new Date(timestamp);
@@ -166,26 +169,50 @@ export default function MIM() {
 
   if (isJoining) {
     return (
-      <div className="flex h-full items-center justify-center bg-slate-900 font-mono text-sm">
-        <div className="text-slate-100">Joining chat room...</div>
+      <div
+        className="flex h-full items-center justify-center font-mono text-sm"
+        style={{ backgroundColor: theme.colors.bg, color: theme.colors.text }}
+      >
+        <div>Joining chat room...</div>
       </div>
     );
   }
 
   if (!user) {
     return (
-      <div className="flex h-full items-center justify-center bg-slate-900 font-mono text-sm text-red-300">
+      <div
+        className="flex h-full items-center justify-center font-mono text-sm"
+        style={{
+          backgroundColor: theme.colors.bg,
+          color: theme.colors.textMessageSystem
+        }}
+      >
         <div>Failed to join chat room</div>
       </div>
     );
   }
 
   return (
-    <div className="flex h-full flex-col bg-slate-900 font-mono text-sm text-slate-100">
-      <div className="border-b-2 border-slate-700 bg-slate-800 px-3 py-2 flex items-center justify-between">
-        <div className="text-slate-100">
+    <div
+      className="flex h-full flex-col font-mono text-sm"
+      style={{ backgroundColor: theme.colors.bg, color: theme.colors.text }}
+    >
+      <div
+        className="border-b-2 px-3 py-2 flex items-center justify-between"
+        style={{
+          backgroundColor: theme.colors.bgHeader,
+          borderColor: theme.colors.borderHeader,
+          color: theme.colors.textHeader
+        }}
+      >
+        <div>
           Logged in as:{' '}
-          <span className="font-bold text-sky-300">{user.username}</span>
+          <span
+            className="font-bold"
+            style={{ color: theme.colors.textUsername }}
+          >
+            {user.username}
+          </span>
         </div>
         <button
           onClick={(e) => {
@@ -198,42 +225,76 @@ export default function MIM() {
           className="p-1 hover:opacity-70 transition-opacity cursor-pointer"
           aria-label="Open preferences"
           title="Preferences"
+          style={{ color: theme.colors.textTimestamp }}
         >
-          <GearIcon className="w-4 h-4 text-slate-300" />
+          <GearIcon className="w-4 h-4" />
         </button>
       </div>
 
       <div className="flex-1 overflow-y-auto p-3">
         {messages.length === 0 ? (
-          <div className="text-slate-500">No messages yet. Start chatting!</div>
+          <div style={{ color: theme.colors.textPlaceholder }}>
+            No messages yet. Start chatting!
+          </div>
         ) : (
           <div className="space-y-2">
-            {messages.map((msg) => (
-              <div
-                key={msg.id}
-                className={`rounded border px-2 py-1 ${
-                  msg.isSystem
-                    ? 'border-yellow-700 bg-yellow-900/30 text-yellow-100'
-                    : msg.userId === user.userId
-                      ? 'border-sky-700 bg-sky-900 text-sky-100'
-                      : 'border-slate-700 bg-slate-800 text-slate-100'
-                }`}
-              >
-                {!msg.isSystem && (
-                  <div className="text-xs font-bold text-slate-200">
-                    {msg.username}
-                    <span className="ml-2 font-normal text-slate-400">
-                      {formatTime(msg.timestamp)}
-                    </span>
-                  </div>
-                )}
+            {messages.map((msg) => {
+              const getMessageStyles = () => {
+                if (msg.isSystem) {
+                  return {
+                    bg: theme.colors.bgMessageSystem,
+                    border: theme.colors.borderMessageSystem,
+                    text: theme.colors.textMessageSystem
+                  };
+                }
+                if (msg.userId === user.userId) {
+                  return {
+                    bg: theme.colors.bgMessageOwn,
+                    border: theme.colors.borderMessageOwn,
+                    text: theme.colors.textMessageOwn
+                  };
+                }
+                return {
+                  bg: theme.colors.bgMessageDefault,
+                  border: theme.colors.borderMessageDefault,
+                  text: theme.colors.text
+                };
+              };
+
+              const messageStyles = getMessageStyles();
+
+              return (
                 <div
-                  className={`break-words ${msg.isSystem ? 'whitespace-pre-line text-xs' : ''}`}
+                  key={msg.id}
+                  className="rounded border px-2 py-1"
+                  style={{
+                    backgroundColor: messageStyles.bg,
+                    borderColor: messageStyles.border,
+                    color: messageStyles.text
+                  }}
                 >
-                  {msg.message}
+                  {!msg.isSystem && (
+                    <div
+                      className="text-xs font-bold"
+                      style={{ color: theme.colors.textUsername }}
+                    >
+                      {msg.username}
+                      <span
+                        className="ml-2 font-normal"
+                        style={{ color: theme.colors.textTimestamp }}
+                      >
+                        {formatTime(msg.timestamp)}
+                      </span>
+                    </div>
+                  )}
+                  <div
+                    className={`break-words ${msg.isSystem ? 'whitespace-pre-line text-xs' : ''}`}
+                  >
+                    {msg.message}
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
             <div ref={messagesEndRef} />
           </div>
         )}
@@ -298,7 +359,11 @@ export default function MIM() {
             inputRef.current?.focus();
           }
         }}
-        className="border-t-2 border-slate-700 bg-slate-800 p-3"
+        className="border-t-2 p-3"
+        style={{
+          backgroundColor: theme.colors.bgHeader,
+          borderColor: theme.colors.borderHeader
+        }}
       >
         <div className="flex gap-2">
           <input
@@ -308,12 +373,22 @@ export default function MIM() {
             onChange={(e) => setInputMessage(e.target.value)}
             placeholder="Type a message..."
             maxLength={500}
-            className="flex-1 border-2 border-slate-600 bg-slate-800 px-2 py-1 text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-sky-500"
+            className="flex-1 border-2 px-2 py-1 focus:outline-none focus:ring-2"
+            style={{
+              backgroundColor: theme.colors.bgInput,
+              borderColor: theme.colors.borderInput,
+              color: theme.colors.text
+            }}
           />
           <button
             type="submit"
             disabled={!inputMessage.trim() || isSending}
-            className="border-2 border-slate-500 bg-slate-700 px-4 py-1 text-slate-100 hover:bg-slate-600 disabled:cursor-not-allowed disabled:border-slate-700 disabled:bg-slate-800 disabled:text-slate-500"
+            className="border-2 px-4 py-1 hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-50 transition-opacity"
+            style={{
+              backgroundColor: theme.colors.bgInput,
+              borderColor: theme.colors.borderInput,
+              color: theme.colors.text
+            }}
           >
             Send
           </button>
