@@ -207,6 +207,16 @@ const Desktop = ({ powerOff }: DesktopProps) => {
     }
   }, [windows, setFocusedApp]);
 
+  useEffect(() => {
+    const handleShutdown = () => {
+      setPowerOn(false);
+      setTimeout(powerOff, 550);
+    };
+
+    window.addEventListener('desktop:shutdown', handleShutdown);
+    return () => window.removeEventListener('desktop:shutdown', handleShutdown);
+  }, [powerOff]);
+
   const handleCloseWindow = (id: string) => {
     const { focusedWindowId } = useDesktopApplicationStore.getState();
     const windowToClose = windows.find((window) => window && window.id === id);

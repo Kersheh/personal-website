@@ -3,6 +3,7 @@ import linkedin from './commands/linkedin';
 import email from './commands/email';
 import exit from './commands/exit';
 import clear from './commands/clear';
+import shutdown from './commands/shutdown';
 import { CommandRegistry } from './types';
 
 export const COMMANDS: CommandRegistry = {
@@ -55,6 +56,11 @@ export const COMMANDS: CommandRegistry = {
     cmd: 'exit',
     description: 'Close this terminal',
     run: exit
+  },
+  shutdown: {
+    cmd: 'shutdown',
+    description: 'Power off the system',
+    run: shutdown
   }
 };
 
