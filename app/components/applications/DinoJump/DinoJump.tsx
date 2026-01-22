@@ -58,8 +58,7 @@ interface GameState {
 
 const CANVAS_WIDTH = 800;
 const GROUND_HEIGHT = 50;
-const DINO_WIDTH = 44;
-const DINO_HEIGHT = 47;
+const DINO_HEIGHT = 72;
 const DINO_X = 50;
 const GRAVITY = 0.8;
 const JUMP_VELOCITY = 12;
@@ -211,43 +210,47 @@ const DinoJump = ({ height }: DinoJumpProps) => {
 
     const drawDino = () => {
       const dinoScreenY = groundY - DINO_HEIGHT - state.dino.y;
+      // scale factor to convert from 64px SVG to game size
+      const s = 1.5;
+      // offset to position dino correctly (SVG starts at x=2, we want tail starting left of DINO_X)
+      const ox = DINO_X - 45;
+      const oy = dinoScreenY;
 
       ctx.fillStyle = '#535353';
 
-      // tail
-      ctx.fillRect(DINO_X - 48, dinoScreenY + 22, 6, 3);
-      ctx.fillRect(DINO_X - 44, dinoScreenY + 20, 8, 4);
-      ctx.fillRect(DINO_X - 38, dinoScreenY + 17, 10, 6);
-      ctx.fillRect(DINO_X - 30, dinoScreenY + 15, 12, 8);
-      ctx.fillRect(DINO_X - 20, dinoScreenY + 14, 14, 12);
-      ctx.fillRect(DINO_X - 10, dinoScreenY + 12, 16, 16);
+      // tail (matches SVG exactly, scaled)
+      ctx.fillRect(ox + 2 * s, oy + 38 * s, 4 * s, 2 * s);
+      ctx.fillRect(ox + 5 * s, oy + 36 * s, 5 * s, 3 * s);
+      ctx.fillRect(ox + 9 * s, oy + 34 * s, 6 * s, 4 * s);
+      ctx.fillRect(ox + 14 * s, oy + 32 * s, 7 * s, 5 * s);
+      ctx.fillRect(ox + 19 * s, oy + 30 * s, 8 * s, 7 * s);
+      ctx.fillRect(ox + 25 * s, oy + 28 * s, 9 * s, 9 * s);
 
       // body
-      ctx.fillRect(DINO_X - 4, dinoScreenY + 10, 24, 28);
-      ctx.fillRect(DINO_X + 4, dinoScreenY + 6, 22, 32);
-      ctx.fillRect(DINO_X + 14, dinoScreenY + 4, 16, 34);
+      ctx.fillRect(ox + 32 * s, oy + 26 * s, 12 * s, 14 * s);
+      ctx.fillRect(ox + 36 * s, oy + 24 * s, 11 * s, 16 * s);
+      ctx.fillRect(ox + 41 * s, oy + 22 * s, 8 * s, 18 * s);
 
       // neck
-      ctx.fillRect(DINO_X + 22, dinoScreenY + 2, 14, 12);
-      ctx.fillRect(DINO_X + 26, dinoScreenY - 6, 12, 14);
-      ctx.fillRect(DINO_X + 30, dinoScreenY - 16, 10, 16);
-      ctx.fillRect(DINO_X + 32, dinoScreenY - 26, 8, 14);
+      ctx.fillRect(ox + 45 * s, oy + 20 * s, 7 * s, 8 * s);
+      ctx.fillRect(ox + 47 * s, oy + 15 * s, 6 * s, 9 * s);
+      ctx.fillRect(ox + 49 * s, oy + 9 * s, 5 * s, 10 * s);
+      ctx.fillRect(ox + 50 * s, oy + 4 * s, 4 * s, 9 * s);
 
       // head
-      ctx.fillRect(DINO_X + 30, dinoScreenY - 32, 16, 14);
-      ctx.fillRect(DINO_X + 28, dinoScreenY - 30, 4, 10);
-      ctx.fillRect(DINO_X + 44, dinoScreenY - 30, 4, 10);
-      ctx.fillRect(DINO_X + 32, dinoScreenY - 34, 12, 4);
+      ctx.fillRect(ox + 49 * s, oy + 2 * s, 8 * s, 7 * s);
+      ctx.fillRect(ox + 48 * s, oy + 3 * s, 3 * s, 5 * s);
+      ctx.fillRect(ox + 56 * s, oy + 3 * s, 3 * s, 5 * s);
+      ctx.fillRect(ox + 51 * s, oy + 1 * s, 6 * s, 3 * s);
 
       // beak
-      ctx.fillRect(DINO_X + 46, dinoScreenY - 28, 6, 6);
-      ctx.fillRect(DINO_X + 50, dinoScreenY - 26, 4, 4);
-      ctx.fillRect(DINO_X + 44, dinoScreenY - 22, 8, 4);
-      ctx.fillRect(DINO_X + 46, dinoScreenY - 20, 6, 2);
+      ctx.fillRect(ox + 57 * s, oy + 4 * s, 4 * s, 4 * s);
+      ctx.fillRect(ox + 59 * s, oy + 5 * s, 3 * s, 3 * s);
+      ctx.fillRect(ox + 56 * s, oy + 7 * s, 5 * s, 2 * s);
 
       // eye
       ctx.fillStyle = '#fff';
-      ctx.fillRect(DINO_X + 40, dinoScreenY - 30, 4, 4);
+      ctx.fillRect(ox + 54 * s, oy + 3 * s, 2 * s, 2 * s);
 
       ctx.fillStyle = '#535353';
 
@@ -259,27 +262,27 @@ const DinoJump = ({ height }: DinoJumpProps) => {
       ) {
         const legPhase = Math.floor(state.game.score / 5) % 2;
         if (legPhase === 0) {
-          // front legs
-          ctx.fillRect(DINO_X + 22, dinoScreenY + 38, 6, 14);
-          ctx.fillRect(DINO_X + 14, dinoScreenY + 38, 6, 10);
+          // front legs (alternating heights)
+          ctx.fillRect(ox + 45 * s, oy + 40 * s, 3 * s, 10 * s);
+          ctx.fillRect(ox + 40 * s, oy + 40 * s, 3 * s, 6 * s);
           // back legs
-          ctx.fillRect(DINO_X - 6, dinoScreenY + 38, 6, 10);
-          ctx.fillRect(DINO_X + 2, dinoScreenY + 38, 6, 14);
+          ctx.fillRect(ox + 28 * s, oy + 40 * s, 3 * s, 6 * s);
+          ctx.fillRect(ox + 33 * s, oy + 40 * s, 3 * s, 10 * s);
         } else {
           // front legs
-          ctx.fillRect(DINO_X + 22, dinoScreenY + 38, 6, 10);
-          ctx.fillRect(DINO_X + 14, dinoScreenY + 38, 6, 14);
+          ctx.fillRect(ox + 45 * s, oy + 40 * s, 3 * s, 6 * s);
+          ctx.fillRect(ox + 40 * s, oy + 40 * s, 3 * s, 10 * s);
           // back legs
-          ctx.fillRect(DINO_X - 6, dinoScreenY + 38, 6, 14);
-          ctx.fillRect(DINO_X + 2, dinoScreenY + 38, 6, 10);
+          ctx.fillRect(ox + 28 * s, oy + 40 * s, 3 * s, 10 * s);
+          ctx.fillRect(ox + 33 * s, oy + 40 * s, 3 * s, 6 * s);
         }
       } else {
-        // front legs
-        ctx.fillRect(DINO_X + 22, dinoScreenY + 38, 6, 14);
-        ctx.fillRect(DINO_X + 14, dinoScreenY + 38, 6, 14);
+        // front legs (static)
+        ctx.fillRect(ox + 45 * s, oy + 40 * s, 3 * s, 8 * s);
+        ctx.fillRect(ox + 40 * s, oy + 40 * s, 3 * s, 8 * s);
         // back legs
-        ctx.fillRect(DINO_X - 6, dinoScreenY + 38, 6, 14);
-        ctx.fillRect(DINO_X + 2, dinoScreenY + 38, 6, 14);
+        ctx.fillRect(ox + 28 * s, oy + 40 * s, 3 * s, 8 * s);
+        ctx.fillRect(ox + 33 * s, oy + 40 * s, 3 * s, 8 * s);
       }
     };
 
@@ -517,8 +520,9 @@ const DinoJump = ({ height }: DinoJumpProps) => {
     };
 
     const checkCollision = (): boolean => {
-      const dinoLeft = DINO_X + 5;
-      const dinoRight = DINO_X + DINO_WIDTH - 5;
+      // hitbox covers the dino's body area (not tail or head)
+      const dinoLeft = DINO_X - 3;
+      const dinoRight = DINO_X + 25;
       const dinoTop = state.dino.y + 10;
       const dinoBottom = state.dino.y;
 
