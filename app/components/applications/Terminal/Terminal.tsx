@@ -4,8 +4,9 @@ import { useState, useRef, KeyboardEvent, ChangeEvent, useEffect } from 'react';
 import { isArray } from 'lodash';
 import TerminalRow from './TerminalRow/TerminalRow';
 import TerminalInfo from './TerminalInfo/TerminalInfo';
-import commands from '@/app/utils/commands';
+import commands, { COMMANDS } from '@/app/utils/commands';
 import { useFileSystemStore } from '@/app/store/fileSystemStore';
+import { DESKTOP_ITEMS } from '@/app/core/Desktop/desktopItems';
 
 interface HistoryItem {
   std: 'in' | 'out';
@@ -55,6 +56,97 @@ const Terminal = ({
 
   const contentHeight = Math.max(120, height ?? 360);
 
+  // tab completion helper
+  const handleTabCompletion = () => {
+    const input = value.trim();
+    if (!input) {
+      return;
+    }
+
+    const parts = input.split(' ');
+    const isFirstWord = parts.length === 1;
+
+    if (isFirstWord) {
+      // command completion
+      const partial = parts[0];
+      const matchingCommands = Object.keys(COMMANDS).filter((cmd) =>
+        cmd.startsWith(partial)
+      );
+
+      if (matchingCommands.length === 1) {
+        setValue(matchingCommands[0] + ' ');
+        setBufferValue(matchingCommands[0] + ' ');
+      } else if (matchingCommands.length > 1) {
+        // show all matching commands
+        setHistory([
+          ...history,
+          { std: 'in', msg: value },
+          { std: 'out', msg: matchingCommands.join('  ') }
+        ]);
+      }
+    } else {
+      // file/directory completion
+      const command = parts[0];
+      const currentDirectory = useFileSystemStore.getState().currentDirectory;
+      const desktopItems = useFileSystemStore.getState().desktopItems;
+
+      // only complete files for commands that work with files/directories
+      const fileCommands = ['rm', 'cd', 'ls'];
+      if (!fileCommands.includes(command)) {
+        return;
+      }
+
+      let completionOptions: Array<string> = [];
+
+      if (command === 'cd' && currentDirectory === '~') {
+        completionOptions = ['Desktop'];
+      } else if (
+        (command === 'rm' || command === 'ls') &&
+        currentDirectory === '~/Desktop'
+      ) {
+        // get file/directory names from desktop items
+        const itemMap = DESKTOP_ITEMS.reduce<Record<string, string>>(
+          (acc, item) => {
+            if (desktopItems.includes(item.id)) {
+              acc[item.id] = item.label;
+            }
+            return acc;
+          },
+          {}
+        );
+        completionOptions = Object.values(itemMap);
+      }
+
+      if (completionOptions.length === 0) {
+        return;
+      }
+
+      // get the partial argument (last word in input)
+      const partial = parts[parts.length - 1];
+      const matchingOptions = completionOptions.filter((opt) =>
+        opt.toLowerCase().startsWith(partial.toLowerCase())
+      );
+
+      if (matchingOptions.length === 1) {
+        const match = matchingOptions[0];
+        const needsQuotes = match.includes(' ');
+        const completedArg = needsQuotes ? `'${match}'` : match;
+
+        // replace last word with completion
+        const newValue = [...parts.slice(0, -1), completedArg].join(' ') + ' ';
+        setValue(newValue);
+        setBufferValue(newValue);
+      } else if (matchingOptions.length > 1) {
+        // show all matching options
+        setHistory([
+          ...history,
+          { std: 'in', msg: value },
+          { std: 'out', msg: matchingOptions.join('  ') }
+        ]);
+      }
+    }
+  };
+
   return (
     <div className="[&_a]:text-white/70 [&_a:hover]:text-[#009fef]">
       <div
@@ -95,6 +187,11 @@ const Terminal = ({
               autoCapitalize="off"
               onKeyDown={async (e: KeyboardEvent<HTMLTextAreaElement>) => {
                 switch (e.key) {
+                  case 'Tab':
+                    e.preventDefault();
+                    handleTabCompletion();
+                    break;
+
                   case 'Enter':
                     e.preventDefault();
                     const inputValue = (e.target as HTMLTextAreaElement).value;

@@ -3,10 +3,21 @@ import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
 import Terminal from '../Terminal';
 import commands from '@/app/utils/commands';
+import { useFileSystemStore } from '@/app/store/fileSystemStore';
 
 jest.mock('@/app/utils/commands', () => ({
-  submit: jest.fn()
+  submit: jest.fn(),
+  COMMANDS: {
+    github: { cmd: 'github', description: 'Open my GitHub profile' },
+    linkedin: { cmd: 'linkedin', description: 'Open my LinkedIn profile' },
+    help: { cmd: 'help', description: 'Show this help message' },
+    ls: { cmd: 'ls', description: 'List directory contents' },
+    cd: { cmd: 'cd', description: 'Change directory' },
+    rm: { cmd: 'rm', description: 'Remove files or directories' }
+  }
 }));
+
+jest.mock('@/app/store/fileSystemStore');
 
 describe('<Terminal />', () => {
   const mockCloseWindow = jest.fn();
@@ -15,6 +26,22 @@ describe('<Terminal />', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     (commands.submit as jest.Mock).mockResolvedValue('output');
+
+    const mockGetState = jest.fn(() => ({
+      currentDirectory: '~',
+      desktopItems: ['app-mim', 'app-paint', 'app-terminal', 'file-resume'],
+      setCurrentDirectory: jest.fn(),
+      removeDesktopItem: jest.fn(),
+      restoreAllDesktopItems: jest.fn(),
+      ensureTerminalExists: jest.fn()
+    }));
+
+    (useFileSystemStore as unknown as jest.Mock).mockReturnValue({
+      currentDirectory: '~',
+      desktopItems: []
+    });
+
+    useFileSystemStore.getState = mockGetState;
   });
 
   describe('Enter key - command submit and arguments', () => {
@@ -312,6 +339,188 @@ describe('<Terminal />', () => {
         );
         expect(emailButton).toBeInTheDocument();
         expect(emailButton).toHaveClass('cursor-pointer');
+      });
+    });
+  });
+
+  describe('Tab completion', () => {
+    describe('command completion', () => {
+      it('should autocomplete command with single match', async () => {
+        render(
+          <Terminal
+            autoFocus={true}
+            closeWindow={mockCloseWindow}
+            windowId={windowId}
+          />
+        );
+
+        const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
+        await userEvent.type(textarea, 'git');
+        await userEvent.keyboard('{Tab}');
+
+        await waitFor(() => {
+          expect(textarea.value).toBe('github ');
+        });
+      });
+
+      it('should show multiple matches when ambiguous', async () => {
+        render(
+          <Terminal
+            autoFocus={true}
+            closeWindow={mockCloseWindow}
+            windowId={windowId}
+          />
+        );
+
+        const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
+        await userEvent.type(textarea, 'l');
+        await userEvent.keyboard('{Tab}');
+
+        await waitFor(() => {
+          expect(screen.getByText(/linkedin/)).toBeInTheDocument();
+          expect(screen.getByText(/ls/)).toBeInTheDocument();
+        });
+      });
+
+      it('should not complete if no matches', async () => {
+        render(
+          <Terminal
+            autoFocus={true}
+            closeWindow={mockCloseWindow}
+            windowId={windowId}
+          />
+        );
+
+        const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
+        await userEvent.type(textarea, 'xyz');
+        await userEvent.keyboard('{Tab}');
+
+        await waitFor(() => {
+          expect(textarea.value).toBe('xyz');
+        });
+      });
+    });
+
+    describe('file/directory completion', () => {
+      it('should autocomplete Desktop in home directory with cd', async () => {
+        render(
+          <Terminal
+            autoFocus={true}
+            closeWindow={mockCloseWindow}
+            windowId={windowId}
+          />
+        );
+
+        const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
+        await userEvent.type(textarea, 'cd De');
+        await userEvent.keyboard('{Tab}');
+
+        await waitFor(() => {
+          expect(textarea.value).toBe('cd Desktop ');
+        });
+      });
+
+      it('should autocomplete file names in Desktop directory with rm', async () => {
+        const mockGetState = jest.fn(() => ({
+          currentDirectory: '~/Desktop',
+          desktopItems: ['app-mim', 'app-paint', 'app-terminal', 'file-resume'],
+          setCurrentDirectory: jest.fn(),
+          removeDesktopItem: jest.fn(),
+          restoreAllDesktopItems: jest.fn(),
+          ensureTerminalExists: jest.fn()
+        }));
+        useFileSystemStore.getState = mockGetState;
+
+        render(
+          <Terminal
+            autoFocus={true}
+            closeWindow={mockCloseWindow}
+            windowId={windowId}
+          />
+        );
+
+        const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
+        await userEvent.type(textarea, 'rm Pai');
+        await userEvent.keyboard('{Tab}');
+
+        await waitFor(() => {
+          expect(textarea.value).toBe('rm Paint ');
+        });
+      });
+
+      it('should wrap file names with spaces in quotes', async () => {
+        const mockGetState = jest.fn(() => ({
+          currentDirectory: '~/Desktop',
+          desktopItems: ['app-dino-jump'],
+          setCurrentDirectory: jest.fn(),
+          removeDesktopItem: jest.fn(),
+          restoreAllDesktopItems: jest.fn(),
+          ensureTerminalExists: jest.fn()
+        }));
+        useFileSystemStore.getState = mockGetState;
+
+        render(
+          <Terminal
+            autoFocus={true}
+            closeWindow={mockCloseWindow}
+            windowId={windowId}
+          />
+        );
+
+        const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
+        await userEvent.type(textarea, 'rm Din');
+        await userEvent.keyboard('{Tab}');
+
+        await waitFor(() => {
+          expect(textarea.value).toBe("rm 'Dino Jump' ");
+        });
+      });
+
+      it('should show multiple file matches when ambiguous', async () => {
+        const mockGetState = jest.fn(() => ({
+          currentDirectory: '~/Desktop',
+          desktopItems: ['app-mim', 'app-paint', 'app-terminal'],
+          setCurrentDirectory: jest.fn(),
+          removeDesktopItem: jest.fn(),
+          restoreAllDesktopItems: jest.fn(),
+          ensureTerminalExists: jest.fn()
+        }));
+        useFileSystemStore.getState = mockGetState;
+
+        render(
+          <Terminal
+            autoFocus={true}
+            closeWindow={mockCloseWindow}
+            windowId={windowId}
+          />
+        );
+
+        const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
+        await userEvent.type(textarea, 'rm P');
+        await userEvent.keyboard('{Tab}');
+
+        await waitFor(() => {
+          const outputText = screen.getAllByText(/Paint/);
+          expect(outputText.length).toBeGreaterThan(0);
+        });
+      });
+
+      it('should not complete files for non-file commands', async () => {
+        render(
+          <Terminal
+            autoFocus={true}
+            closeWindow={mockCloseWindow}
+            windowId={windowId}
+          />
+        );
+
+        const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
+        await userEvent.type(textarea, 'help De');
+        await userEvent.keyboard('{Tab}');
+
+        await waitFor(() => {
+          expect(textarea.value).toBe('help De');
+        });
       });
     });
   });
