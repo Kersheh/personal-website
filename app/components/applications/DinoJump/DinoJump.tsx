@@ -27,6 +27,14 @@ interface Cloud {
   variant: number;
 }
 
+interface Bird {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  flapPhase: number;
+}
+
 interface GameState {
   dino: {
     y: number;
@@ -53,6 +61,7 @@ interface GameState {
   environment: {
     dirt: Array<DirtFleck>;
     clouds: Array<Cloud>;
+    birds: Array<Bird>;
   };
 }
 
@@ -97,7 +106,8 @@ const DinoJump = ({ height }: DinoJumpProps) => {
     },
     environment: {
       dirt: [],
-      clouds: []
+      clouds: [],
+      birds: []
     }
   });
   const animationRef = useRef<number>(0);
@@ -142,6 +152,7 @@ const DinoJump = ({ height }: DinoJumpProps) => {
     state.difficulty.speed = BASE_SPEED;
     state.environment.dirt = [];
     state.environment.clouds = [];
+    state.environment.birds = [];
 
     // spawn initial clouds
     for (let i = 0; i < 3; i++) {
@@ -210,9 +221,8 @@ const DinoJump = ({ height }: DinoJumpProps) => {
 
     const drawDino = () => {
       const dinoScreenY = groundY - DINO_HEIGHT - state.dino.y;
-      // scale factor to convert from 64px SVG to game size
+      // scale factor
       const s = 1.5;
-      // offset to position dino correctly (SVG starts at x=2, we want tail starting left of DINO_X)
       const ox = DINO_X - 45;
       const oy = dinoScreenY;
 
@@ -435,6 +445,140 @@ const DinoJump = ({ height }: DinoJumpProps) => {
       ctx.fillRect(sunX - r + 10, sunY - r, r * 2 - 20, r * 2);
     };
 
+    const drawBirds = () => {
+      ctx.fillStyle = '#535353';
+      for (const bird of state.environment.birds) {
+        const { x, y, width, height, flapPhase } = bird;
+
+        // simpleshaped bird with connected silhouette
+        if (flapPhase < 15) {
+          // W shape (wings up)
+          // left wing outer
+          ctx.fillRect(x, y + height * 0.15, width * 0.18, height * 0.12);
+          ctx.fillRect(
+            x + width * 0.05,
+            y + height * 0.05,
+            width * 0.13,
+            height * 0.15
+          );
+          // left wing connection to body
+          ctx.fillRect(
+            x + width * 0.15,
+            y + height * 0.15,
+            width * 0.18,
+            height * 0.2
+          );
+          ctx.fillRect(
+            x + width * 0.25,
+            y + height * 0.25,
+            width * 0.1,
+            height * 0.15
+          );
+          // center body
+          ctx.fillRect(
+            x + width * 0.35,
+            y + height * 0.3,
+            width * 0.3,
+            height * 0.25
+          );
+          ctx.fillRect(
+            x + width * 0.4,
+            y + height * 0.25,
+            width * 0.2,
+            height * 0.3
+          );
+          // right wing connection to body
+          ctx.fillRect(
+            x + width * 0.65,
+            y + height * 0.25,
+            width * 0.1,
+            height * 0.15
+          );
+          ctx.fillRect(
+            x + width * 0.67,
+            y + height * 0.15,
+            width * 0.18,
+            height * 0.2
+          );
+          // right wing outer
+          ctx.fillRect(
+            x + width * 0.82,
+            y + height * 0.05,
+            width * 0.13,
+            height * 0.15
+          );
+          ctx.fillRect(
+            x + width * 0.82,
+            y + height * 0.15,
+            width * 0.18,
+            height * 0.12
+          );
+        } else {
+          // M shape (wings down)
+          // left wing outer
+          ctx.fillRect(x, y + height * 0.35, width * 0.18, height * 0.12);
+          ctx.fillRect(
+            x + width * 0.05,
+            y + height * 0.42,
+            width * 0.13,
+            height * 0.13
+          );
+          // left wing connection to body
+          ctx.fillRect(
+            x + width * 0.15,
+            y + height * 0.25,
+            width * 0.18,
+            height * 0.2
+          );
+          ctx.fillRect(
+            x + width * 0.25,
+            y + height * 0.2,
+            width * 0.1,
+            height * 0.15
+          );
+          // center body
+          ctx.fillRect(
+            x + width * 0.35,
+            y + height * 0.15,
+            width * 0.3,
+            height * 0.25
+          );
+          ctx.fillRect(
+            x + width * 0.4,
+            y + height * 0.15,
+            width * 0.2,
+            height * 0.3
+          );
+          // right wing connection to body
+          ctx.fillRect(
+            x + width * 0.65,
+            y + height * 0.2,
+            width * 0.1,
+            height * 0.15
+          );
+          ctx.fillRect(
+            x + width * 0.67,
+            y + height * 0.25,
+            width * 0.18,
+            height * 0.2
+          );
+          // right wing outer
+          ctx.fillRect(
+            x + width * 0.82,
+            y + height * 0.42,
+            width * 0.13,
+            height * 0.13
+          );
+          ctx.fillRect(
+            x + width * 0.82,
+            y + height * 0.35,
+            width * 0.18,
+            height * 0.12
+          );
+        }
+      }
+    };
+
     const drawClouds = () => {
       ctx.fillStyle = '#b0b0b0';
       for (const cloud of state.environment.clouds) {
@@ -526,6 +670,7 @@ const DinoJump = ({ height }: DinoJumpProps) => {
       const dinoTop = state.dino.y + 10;
       const dinoBottom = state.dino.y;
 
+      // check cactus collisions
       for (const obstacle of state.obstacles.list) {
         const obsLeft = obstacle.x + 3;
         const obsRight = obstacle.x + obstacle.width - 3;
@@ -540,6 +685,28 @@ const DinoJump = ({ height }: DinoJumpProps) => {
           return true;
         }
       }
+
+      // check bird collisions
+      for (const bird of state.environment.birds) {
+        const birdLeft = bird.x + 8;
+        const birdRight = bird.x + bird.width - 8;
+        const birdTop = bird.y + 5;
+        const birdBottom = bird.y + bird.height - 5;
+
+        // convert bird screen Y to dino coordinate system
+        const birdTopHeight = groundY - birdBottom;
+        const birdBottomHeight = groundY - birdTop;
+
+        if (
+          dinoRight > birdLeft &&
+          dinoLeft < birdRight &&
+          state.dino.y < birdBottomHeight &&
+          state.dino.y + DINO_HEIGHT > birdTopHeight
+        ) {
+          return true;
+        }
+      }
+
       return false;
     };
 
@@ -634,6 +801,53 @@ const DinoJump = ({ height }: DinoJumpProps) => {
         }
       }
 
+      // spawn and move birds
+      if (Math.random() < 0.004) {
+        // check if there's a cactus in the spawn area
+        const birdX = CANVAS_WIDTH;
+        const birdY = 100 + Math.floor(Math.random() * 50);
+        const birdGroundHeight = groundY - birdY;
+
+        // check if any obstacle would be near this bird's position
+        let canSpawn = true;
+        for (const obstacle of state.obstacles.list) {
+          const horizontalDistance = Math.abs(obstacle.x - birdX);
+          // if obstacle is within 200px and bird would be at similar height
+          if (
+            horizontalDistance < 200 &&
+            birdGroundHeight < obstacle.height + 20
+          ) {
+            canSpawn = false;
+            break;
+          }
+        }
+
+        if (canSpawn) {
+          state.environment.birds.push({
+            x: birdX,
+            y: birdY,
+            width: 20 + Math.floor(Math.random() * 10),
+            height: 15 + Math.floor(Math.random() * 5),
+            flapPhase: 0
+          });
+        }
+      }
+      // move birds and remove one off-screen per frame
+      let removedBird = false;
+      for (let i = 0; i < state.environment.birds.length; i++) {
+        state.environment.birds[i].x -= state.difficulty.speed;
+        state.environment.birds[i].flapPhase =
+          (state.environment.birds[i].flapPhase + 1) % 30;
+        if (
+          !removedBird &&
+          state.environment.birds[i].x + state.environment.birds[i].width < -10
+        ) {
+          state.environment.birds.splice(i, 1);
+          removedBird = true;
+          i--;
+        }
+      }
+
       // collision detection
       if (checkCollision()) {
         state.game.isGameOver = true;
@@ -673,6 +887,7 @@ const DinoJump = ({ height }: DinoJumpProps) => {
       drawGround();
       drawDino();
       drawObstacles();
+      drawBirds();
       drawScore();
 
       if (state.game.isWon) {
@@ -703,7 +918,7 @@ const DinoJump = ({ height }: DinoJumpProps) => {
         e.preventDefault();
         const state = gameStateRef.current;
         if (state.game.isGameOver || state.game.isWon) {
-          // Reset and start
+          // reset and start
           state.dino.y = 0;
           state.dino.velocity = 0;
           state.dino.isJumping = false;
