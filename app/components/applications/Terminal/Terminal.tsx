@@ -5,6 +5,7 @@ import { isArray } from 'lodash';
 import TerminalRow from './TerminalRow/TerminalRow';
 import TerminalInfo from './TerminalInfo/TerminalInfo';
 import commands from '@/app/utils/commands';
+import { useFileSystemStore } from '@/app/store/fileSystemStore';
 
 interface HistoryItem {
   std: 'in' | 'out';
@@ -33,6 +34,11 @@ const Terminal = ({
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const promptRef = useRef<HTMLSpanElement>(null);
   const [promptWidth, setPromptWidth] = useState(0);
+
+  // reset directory to home on mount
+  useEffect(() => {
+    useFileSystemStore.getState().setCurrentDirectory('~');
+  }, []);
 
   useEffect(() => {
     if (scrollContainerRef.current) {
@@ -68,7 +74,7 @@ const Terminal = ({
           <div className="min-w-0 w-full relative">
             <span
               className="invisible whitespace-pre-wrap break-all tracking-[1.5px] block"
-              style={{ textIndent: promptWidth }}
+              style={{ textIndent: promptWidth + 8 }}
             >
               {value || ' '}
             </span>

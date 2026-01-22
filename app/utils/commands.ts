@@ -4,6 +4,11 @@ import email from './commands/email';
 import exit from './commands/exit';
 import clear from './commands/clear';
 import shutdown from './commands/shutdown';
+import ls from './commands/ls';
+import cd from './commands/cd';
+import pwd from './commands/pwd';
+import rm from './commands/rm';
+import restore from './commands/restore';
 import { CommandRegistry } from './types';
 
 export const COMMANDS: CommandRegistry = {
@@ -21,6 +26,31 @@ export const COMMANDS: CommandRegistry = {
     cmd: 'email',
     description: 'Send me an email',
     run: email
+  },
+  ls: {
+    cmd: 'ls',
+    description: 'List directory contents',
+    run: ls
+  },
+  cd: {
+    cmd: 'cd',
+    description: 'Change directory',
+    run: cd
+  },
+  pwd: {
+    cmd: 'pwd',
+    description: 'Print working directory',
+    run: pwd
+  },
+  rm: {
+    cmd: 'rm',
+    description: 'Remove files or directories',
+    run: rm
+  },
+  restore: {
+    cmd: 'restore',
+    description: 'Restore system to last backup',
+    run: restore
   },
   clear: {
     cmd: 'clear',
@@ -74,9 +104,38 @@ const submit = async (
   input: string,
   options: SubmitOptions = {}
 ): Promise<string> => {
-  const parts = input.trim().split(/\s+/);
-  const command = parts[0];
-  const args = parts.slice(1);
+  const trimmedInput = input.trim();
+
+  // parse command and arguments, respecting quotes
+  const { parts, current } = [...trimmedInput].reduce<{
+    parts: Array<string>;
+    current: string;
+    inQuotes: boolean;
+    quoteChar: string;
+  }>(
+    (state, char) => {
+      if ((char === '"' || char === "'") && !state.inQuotes) {
+        return { ...state, inQuotes: true, quoteChar: char };
+      }
+
+      if (char === state.quoteChar && state.inQuotes) {
+        return { ...state, inQuotes: false, quoteChar: '' };
+      }
+
+      if (char === ' ' && !state.inQuotes) {
+        return state.current
+          ? { ...state, parts: [...state.parts, state.current], current: '' }
+          : state;
+      }
+
+      return { ...state, current: state.current + char };
+    },
+    { parts: [], current: '', inQuotes: false, quoteChar: '' }
+  );
+
+  const allParts = current ? [...parts, current] : parts;
+  const command = allParts[0];
+  const args = allParts.slice(1);
 
   try {
     return await COMMANDS[command].run({ ...options, args });

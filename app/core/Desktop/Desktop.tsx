@@ -7,7 +7,8 @@ import ChildWindow from '@/app/core/Window/ChildWindow';
 import Icon from './Icon/Icon';
 import MenuBar from './MenuBar/MenuBar';
 import { useDesktopApplicationStore } from '@/app/store/desktopApplicationStore';
-import { isFeatureEnabled, FeatureFlag } from '@/app/utils/featureFlags';
+import { useFileSystemStore } from '@/app/store/fileSystemStore';
+import { isFeatureEnabled } from '@/app/utils/featureFlags';
 import {
   AppId,
   APP_CONFIGS,
@@ -15,6 +16,7 @@ import {
 } from '@/app/components/applications/appRegistry';
 import { useWindowEvent } from '@/app/hooks/useWindowEvent';
 import MIMPreferences from '@/app/components/applications/MIM/MIMPreferences';
+import { DESKTOP_ITEMS } from './desktopItems';
 
 let windowIdCounter = 0;
 
@@ -40,76 +42,9 @@ interface ChildWindowItem extends BaseWindowItem {
 
 type WindowItem = AppWindowItem | ChildWindowItem;
 
-interface DesktopBaseItem {
-  id: string;
-  iconName: string;
-  iconScale?: number;
-  label: string;
-  featureFlag?: FeatureFlag;
-}
-
-interface DesktopApplicationItem extends DesktopBaseItem {
-  type: 'application';
-  appName: AppId;
-}
-
-interface DesktopFileItem extends DesktopBaseItem {
-  type: 'file';
-  fileName: string;
-  filePath: string;
-  opensWith: AppId;
-}
-
-type DesktopItem = DesktopApplicationItem | DesktopFileItem;
-
 interface DesktopProps {
   powerOff: () => void;
 }
-
-const DESKTOP_ITEMS: Array<DesktopItem> = [
-  {
-    type: 'application',
-    id: 'app-mim',
-    iconName: APP_CONFIGS.MIM.iconName,
-    iconScale: APP_CONFIGS.MIM.iconScale,
-    label: APP_CONFIGS.MIM.displayName,
-    appName: 'MIM',
-    featureFlag: FeatureFlag.DESKTOP_APP_MIM
-  },
-  {
-    type: 'application',
-    id: 'app-paint',
-    iconName: APP_CONFIGS.PAINT.iconName,
-    iconScale: APP_CONFIGS.PAINT.iconScale,
-    label: APP_CONFIGS.PAINT.displayName,
-    appName: 'PAINT'
-  },
-  {
-    type: 'application',
-    id: 'app-dino-jump',
-    iconName: APP_CONFIGS.DINO_JUMP.iconName,
-    iconScale: APP_CONFIGS.DINO_JUMP.iconScale,
-    label: APP_CONFIGS.DINO_JUMP.displayName,
-    appName: 'DINO_JUMP'
-  },
-  {
-    type: 'application',
-    id: 'app-terminal',
-    iconName: APP_CONFIGS.TERMINAL.iconName,
-    iconScale: APP_CONFIGS.TERMINAL.iconScale,
-    label: APP_CONFIGS.TERMINAL.displayName,
-    appName: 'TERMINAL'
-  },
-  {
-    type: 'file',
-    id: 'file-resume',
-    iconName: APP_CONFIGS.PDF_VIEWER.iconName,
-    label: 'resume.pdf',
-    fileName: 'resume.pdf',
-    filePath: '/documents/resume.pdf',
-    opensWith: 'PDF_VIEWER'
-  }
-];
 
 const Desktop = ({ powerOff }: DesktopProps) => {
   const [windows, setWindows] = useState<Array<WindowItem | null>>([]);
@@ -140,6 +75,25 @@ const Desktop = ({ powerOff }: DesktopProps) => {
   const updateIconPosition = useDesktopApplicationStore(
     (state) => state.updateIconPosition
   );
+  const desktopItems = useFileSystemStore((state) => state.desktopItems);
+
+  // listen for system restore event to trigger power cycle
+  useWindowEvent('system-restore', () => {
+    setTimeout(() => {
+      setPowerOn(false);
+      setWindows([]);
+    }, 1000);
+
+    // restore system state during power off period
+    setTimeout(() => {
+      useFileSystemStore.getState().restoreAllDesktopItems();
+      useDesktopApplicationStore.getState().resetIconPositions();
+    }, 1500);
+
+    setTimeout(() => {
+      setPowerOn(true);
+    }, 2000);
+  });
 
   // calculate default positions for icons that don't have saved positions
   const getDefaultPosition = (index: number) => {
@@ -148,13 +102,13 @@ const Desktop = ({ powerOff }: DesktopProps) => {
     const START_X = 20;
     const START_Y = 20;
 
-    // Custom layout:
+    // custom layout:
     // [MIM]      [x] [resume]
     // [Paint]    [x] [x]
     // [DinoJump] [x] [x]
     // [Terminal] [x] [x]
     if (index < 4) {
-      // Apps in column 0, rows 0-3
+      // apps in column 0, rows 0-3
       return {
         x: START_X,
         y: START_Y + index * ICON_HEIGHT
@@ -285,7 +239,9 @@ const Desktop = ({ powerOff }: DesktopProps) => {
   };
 
   const visibleDesktopItems = DESKTOP_ITEMS.filter(
-    (item) => !item.featureFlag || isFeatureEnabled(item.featureFlag)
+    (item) =>
+      (!item.featureFlag || isFeatureEnabled(item.featureFlag)) &&
+      desktopItems.includes(item.id)
   );
 
   return (
@@ -389,7 +345,7 @@ const Desktop = ({ powerOff }: DesktopProps) => {
         }}
       >
         <div className="relative w-full h-full">
-          {visibleDesktopItems.map((item, index) => {
+          {visibleDesktopItems.map((item) => {
             const handleDoubleClick = () => {
               if (item.type === 'application') {
                 const appConfig = APP_CONFIGS[item.appName];
@@ -416,8 +372,13 @@ const Desktop = ({ powerOff }: DesktopProps) => {
               }
             };
 
+            // use original index from DESKTOP_ITEMS to maintain consistent positioning
+            const originalIndex = DESKTOP_ITEMS.findIndex(
+              (i) => i.id === item.id
+            );
+
             const position =
-              iconPositions[item.id] || getDefaultPosition(index);
+              iconPositions[item.id] || getDefaultPosition(originalIndex);
 
             // build list of all occupied positions except current icon's position
             const occupiedPositions = visibleDesktopItems
@@ -425,9 +386,14 @@ const Desktop = ({ powerOff }: DesktopProps) => {
                 if (desktopItem.id === item.id) {
                   return null;
                 }
+
+                const desktopItemOriginalIndex = DESKTOP_ITEMS.findIndex(
+                  (i) => i.id === desktopItem.id
+                );
+
                 return (
                   iconPositions[desktopItem.id] ||
-                  getDefaultPosition(visibleDesktopItems.indexOf(desktopItem))
+                  getDefaultPosition(desktopItemOriginalIndex)
                 );
               })
               .filter((pos): pos is { x: number; y: number } => pos !== null);

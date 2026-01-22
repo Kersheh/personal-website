@@ -1,8 +1,11 @@
 import { CommandOptions } from '@/app/utils/types';
 
-export default function clear({ clearHistory }: CommandOptions = {}): string {
+const clear = ({ clearHistory }: CommandOptions = {}) => {
   if (clearHistory) {
     clearHistory();
   }
+
   return '';
-}
+};
+
+export default clear;
