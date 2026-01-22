@@ -1,6 +1,6 @@
 import { render, screen, waitFor, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import Desktop from '@/app/components/Desktop/Desktop';
+import Desktop from '@/app/core/Desktop/Desktop';
 import { dispatchWindowEvent } from '@/app/hooks/useWindowEvent';
 
 global.fetch = jest.fn();

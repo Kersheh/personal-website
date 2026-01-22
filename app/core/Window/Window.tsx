@@ -2,11 +2,11 @@
 
 import { useState, useEffect, useRef } from 'react';
 import Draggable from 'react-draggable';
-import Terminal from '../applications/Terminal/Terminal';
-import PDFViewer from '../applications/PDFViewer/PDFViewer';
-import Devtools from '../applications/Devtools/Devtools';
-import MIM from '../applications/MIM/MIM';
-import Paint from '../applications/Paint/Paint';
+import Terminal from '@/app/components/applications/Terminal/Terminal';
+import PDFViewer from '@/app/components/applications/PDFViewer/PDFViewer';
+import Devtools from '@/app/components/applications/Devtools/Devtools';
+import MIM from '@/app/components/applications/MIM/MIM';
+import Paint from '@/app/components/applications/Paint/Paint';
 import WindowButton from './WindowButton/WindowButton';
 import { useDesktopApplicationStore } from '@/app/store/desktopApplicationStore';
 import {

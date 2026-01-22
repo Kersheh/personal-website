@@ -14,7 +14,6 @@ export interface ChildWindowConfig {
   parentAppId: AppId;
   displayName: string;
   size: AppSize;
-  minSize: AppSize;
 }
 
 export interface AppConfig {
@@ -148,8 +147,7 @@ export const CHILD_WINDOW_CONFIGS: Record<ChildWindowId, ChildWindowConfig> = {
     id: 'MIM_PREFERENCES',
     parentAppId: 'MIM',
     displayName: 'Preferences',
-    size: { width: 360, height: 280 },
-    minSize: { width: 300, height: 200 }
+    size: { width: 360, height: 420 }
   }
 };
 

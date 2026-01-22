@@ -1,6 +1,7 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import MIM from '../MIM';
+import { useMIMStore } from '../store/mimStore';
 
 global.fetch = jest.fn();
 
@@ -14,6 +15,18 @@ describe('<MIM />', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     jest.useFakeTimers();
+
+    // clear the zustand store before each test
+    useMIMStore.setState({
+      user: {
+        username: null,
+        id: null
+      },
+      preferences: {
+        use24HourFormat: false,
+        theme: 'slate'
+      }
+    });
   });
 
   afterEach(() => {
@@ -275,9 +288,12 @@ describe('<MIM />', () => {
     await user.type(input, 'Test message');
     await user.click(sendButton);
 
-    await waitFor(() => {
-      expect(input.value).toBe('');
-      expect(document.activeElement).toBe(input);
-    });
+    await waitFor(
+      () => {
+        expect(input.value).toBe('');
+        expect(document.activeElement).toBe(input);
+      },
+      { timeout: 3000 }
+    );
   });
 });

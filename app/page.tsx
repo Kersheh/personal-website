@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Desktop from './components/Desktop/Desktop';
+import Desktop from './core/Desktop/Desktop';
 import ButtonPower from './components/ButtonPower/ButtonPower';
 
 const Home = () => {

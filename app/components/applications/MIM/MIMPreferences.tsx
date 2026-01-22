@@ -1,7 +1,7 @@
 'use client';
 
-import { useMemo } from 'react';
-import { useMIMPreferencesStore } from './store/preferencesStore';
+import { useMemo, useState } from 'react';
+import { useMIMStore } from './store/mimStore';
 import { getTheme, getThemeList } from './themes';
 
 const EXAMPLE_TIMESTAMP = Date.now();
@@ -11,14 +11,16 @@ interface MIMPreferencesProps {
 }
 
 const MIMPreferences = ({ height }: MIMPreferencesProps) => {
-  const use24HourFormat = useMIMPreferencesStore(
-    (state) => state.use24HourFormat
+  const use24HourFormat = useMIMStore(
+    (state) => state.preferences.use24HourFormat
   );
-  const toggleUse24HourFormat = useMIMPreferencesStore(
+  const toggleUse24HourFormat = useMIMStore(
     (state) => state.toggleUse24HourFormat
   );
-  const themeId = useMIMPreferencesStore((state) => state.theme);
-  const setTheme = useMIMPreferencesStore((state) => state.setTheme);
+  const themeId = useMIMStore((state) => state.preferences.theme);
+  const setTheme = useMIMStore((state) => state.setTheme);
+  const username = useMIMStore((state) => state.user.username);
+  const [isChanging, setIsChanging] = useState(false);
 
   const theme = getTheme(themeId);
   const themeList = getThemeList();
@@ -37,14 +39,14 @@ const MIMPreferences = ({ height }: MIMPreferencesProps) => {
 
   return (
     <div
-      className="font-mono text-sm p-4 overflow-auto"
+      className="font-mono text-sm p-4 overflow-y-auto flex flex-col"
       style={{
         height: `${contentHeight}px`,
         backgroundColor: theme.colors.bg,
         color: theme.colors.text
       }}
     >
-      <div className="space-y-6">
+      <div className="space-y-6 flex-shrink-0">
         <div>
           <h3
             className="text-sm font-semibold mb-4 pb-2"
@@ -103,6 +105,63 @@ const MIMPreferences = ({ height }: MIMPreferencesProps) => {
           >
             Times will display as {exampleTime}
           </p>
+        </div>
+
+        <div>
+          <h3
+            className="text-sm font-semibold mb-4 pb-2"
+            style={{
+              color: theme.colors.textHeader,
+              borderBottom: `1px solid ${theme.colors.borderHeader}`
+            }}
+          >
+            User
+          </h3>
+          {username && (
+            <p
+              className="text-xs mb-3"
+              style={{ color: theme.colors.textTimestamp }}
+            >
+              Current username:{' '}
+              <span style={{ color: theme.colors.text, fontWeight: 'bold' }}>
+                {username}
+              </span>
+            </p>
+          )}
+          <button
+            onClick={async () => {
+              setIsChanging(true);
+
+              try {
+                const response = await fetch('/api/chat/join', {
+                  method: 'POST'
+                });
+                const data = await response.json();
+
+                if (data.success) {
+                  useMIMStore.setState((state) => ({
+                    user: {
+                      ...state.user,
+                      username: data.username,
+                      id: data.userId
+                    }
+                  }));
+                }
+              } catch (error) {
+                console.error('Failed to change username:', error);
+              } finally {
+                setIsChanging(false);
+              }
+            }}
+            disabled={isChanging}
+            className="px-3 py-1 text-xs rounded transition-opacity hover:opacity-80 disabled:opacity-50 disabled:cursor-not-allowed"
+            style={{
+              backgroundColor: theme.colors.accent,
+              color: theme.colors.bg
+            }}
+          >
+            {isChanging ? 'Changing...' : 'Change Username'}
+          </button>
         </div>
       </div>
     </div>

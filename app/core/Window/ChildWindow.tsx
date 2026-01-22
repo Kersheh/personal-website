@@ -1,6 +1,13 @@
 'use client';
 
-import { useState, useEffect, useRef, ReactNode } from 'react';
+import {
+  useState,
+  useEffect,
+  useRef,
+  ReactNode,
+  cloneElement,
+  isValidElement
+} from 'react';
 import Draggable from 'react-draggable';
 import WindowButton from './WindowButton/WindowButton';
 import { useDesktopApplicationStore } from '@/app/store/desktopApplicationStore';
@@ -139,10 +146,14 @@ const ChildWindow = ({
 
         <div
           style={{
-            height: size.height - 30
+            height: size.height - 30,
+            display: 'flex',
+            flexDirection: 'column'
           }}
         >
-          {children}
+          {isValidElement(children)
+            ? cloneElement(children, { height: size.height - 30 } as never)
+            : children}
         </div>
       </div>
     </Draggable>

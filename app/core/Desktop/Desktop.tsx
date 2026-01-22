@@ -2,8 +2,8 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { get } from 'lodash';
-import Window from '../Window/Window';
-import ChildWindow from '../Window/ChildWindow';
+import Window from '@/app/core/Window/Window';
+import ChildWindow from '@/app/core/Window/ChildWindow';
 import Icon from './Icon/Icon';
 import MenuBar from './MenuBar/MenuBar';
 import { useDesktopApplicationStore } from '@/app/store/desktopApplicationStore';
@@ -14,7 +14,7 @@ import {
   ChildWindowId
 } from '@/app/components/applications/appRegistry';
 import { useWindowEvent } from '@/app/hooks/useWindowEvent';
-import MIMPreferences from '../applications/MIM/MIMPreferences';
+import MIMPreferences from '@/app/components/applications/MIM/MIMPreferences';
 
 let windowIdCounter = 0;
 

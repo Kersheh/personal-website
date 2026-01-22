@@ -6,7 +6,7 @@ import {
   useWindowEvent,
   dispatchWindowEvent
 } from '@/app/hooks/useWindowEvent';
-import { useMIMPreferencesStore } from './store/preferencesStore';
+import { useMIMStore } from './store/mimStore';
 import { getTheme } from './themes';
 
 interface ChatMessage {
@@ -36,7 +36,7 @@ const COMMANDS = {
     }
   },
   clear: {
-    description: 'Clear all chat messages',
+    description: 'Clear all chat messages (for all users)',
     execute: async () => {
       try {
         const response = await fetch('/api/chat/clear', {
@@ -78,11 +78,15 @@ export default function MIM() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const hasJoinedRef = useRef(false);
   const inputRef = useRef<HTMLInputElement>(null);
-  const use24HourFormat = useMIMPreferencesStore(
-    (state) => state.use24HourFormat
+  const use24HourFormat = useMIMStore(
+    (state) => state.preferences.use24HourFormat
   );
-  const themeId = useMIMPreferencesStore((state) => state.theme);
+  const themeId = useMIMStore((state) => state.preferences.theme);
   const theme = getTheme(themeId);
+  const cachedUsername = useMIMStore((state) => state.user.username);
+  const cachedUserId = useMIMStore((state) => state.user.id);
+  const setStoredUsername = useMIMStore((state) => state.setUsername);
+  const setStoredUserId = useMIMStore((state) => state.setUserId);
 
   const formatTime = (timestamp: number) => {
     const date = new Date(timestamp);
@@ -107,6 +111,14 @@ export default function MIM() {
         return;
       }
 
+      // try to use cached user first
+      if (cachedUsername && cachedUserId) {
+        setUser({ userId: cachedUserId, username: cachedUsername });
+        setIsJoining(false);
+        hasJoinedRef.current = true;
+        return;
+      }
+
       hasJoinedRef.current = true;
 
       try {
@@ -117,6 +129,8 @@ export default function MIM() {
 
         if (data.success) {
           setUser({ userId: data.userId, username: data.username });
+          setStoredUsername(data.username);
+          setStoredUserId(data.userId);
           setIsJoining(false);
         }
       } catch (error) {
@@ -127,7 +141,19 @@ export default function MIM() {
     };
 
     joinChat();
-  }, []);
+  }, [cachedUsername, cachedUserId, setStoredUsername, setStoredUserId]);
+
+  // update user when cached values change (e.g., when username is changed in preferences)
+  useEffect(() => {
+    if (
+      user &&
+      cachedUsername &&
+      cachedUserId &&
+      user.username !== cachedUsername
+    ) {
+      setUser({ userId: cachedUserId, username: cachedUsername });
+    }
+  }, [cachedUsername, cachedUserId, user]);
 
   useEffect(() => {
     if (!user) {
