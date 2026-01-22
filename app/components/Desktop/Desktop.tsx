@@ -78,6 +78,14 @@ const DESKTOP_ITEMS: Array<DesktopItem> = [
   },
   {
     type: 'application',
+    id: 'app-paint',
+    iconName: APP_CONFIGS.PAINT.iconName,
+    iconScale: APP_CONFIGS.PAINT.iconScale,
+    label: APP_CONFIGS.PAINT.displayName,
+    appName: 'PAINT'
+  },
+  {
+    type: 'application',
     id: 'app-terminal',
     iconName: APP_CONFIGS.TERMINAL.iconName,
     iconScale: APP_CONFIGS.TERMINAL.iconScale,

@@ -1,7 +1,7 @@
 import { FeatureFlag } from '@/app/utils/featureFlags';
 import { MenuSection } from '@/app/utils/types';
 
-export type AppId = 'TERMINAL' | 'PDF_VIEWER' | 'DEVTOOLS' | 'MIM';
+export type AppId = 'TERMINAL' | 'PDF_VIEWER' | 'DEVTOOLS' | 'MIM' | 'PAINT';
 export type ChildWindowId = 'MIM_PREFERENCES';
 
 interface AppSize {
@@ -97,6 +97,13 @@ export const APP_CONFIGS: Record<AppId, AppConfig> = {
         ]
       }
     ]
+  },
+  PAINT: {
+    id: 'PAINT',
+    displayName: 'Paint',
+    iconName: 'paint-flat.png',
+    initialSize: { width: 800, height: 600 },
+    minSize: { width: 400, height: 300 }
   }
 };
 

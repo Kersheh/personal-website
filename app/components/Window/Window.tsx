@@ -6,6 +6,7 @@ import Terminal from '../applications/Terminal/Terminal';
 import PDFViewer from '../applications/PDFViewer/PDFViewer';
 import Devtools from '../applications/Devtools/Devtools';
 import MIM from '../applications/MIM/MIM';
+import Paint from '../applications/Paint/Paint';
 import WindowButton from './WindowButton/WindowButton';
 import { useDesktopApplicationStore } from '@/app/store/desktopApplicationStore';
 import {
@@ -399,6 +400,8 @@ const Window = ({
           {appId === 'DEVTOOLS' && <Devtools height={size.height - 30} />}
 
           {appId === 'MIM' && <MIM />}
+
+          {appId === 'PAINT' && <Paint height={size.height - 30} />}
         </div>
 
         {/* Resize handles */}
