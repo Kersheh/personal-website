@@ -115,6 +115,33 @@ const Paint = ({ height }: PaintProps) => {
     return () => window.removeEventListener('resize', resizeCanvas);
   }, [contentHeight]);
 
+  useEffect(() => {
+    const handleSaveImage = () => {
+      const canvas = canvasRef.current;
+      if (!canvas) {
+        return;
+      }
+
+      canvas.toBlob((blob) => {
+        if (!blob) {
+          return;
+        }
+
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `painting-${Date.now()}.png`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+      });
+    };
+
+    window.addEventListener('paint:saveImage', handleSaveImage);
+    return () => window.removeEventListener('paint:saveImage', handleSaveImage);
+  }, []);
+
   const getCanvasCoords = (
     e: MouseEvent<HTMLCanvasElement> | globalThis.MouseEvent
   ) => {

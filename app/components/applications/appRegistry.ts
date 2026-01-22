@@ -103,7 +103,24 @@ export const APP_CONFIGS: Record<AppId, AppConfig> = {
     displayName: 'Paint',
     iconName: 'paint-flat.png',
     initialSize: { width: 800, height: 600 },
-    minSize: { width: 400, height: 300 }
+    minSize: { width: 400, height: 300 },
+    customMenuSections: [
+      {
+        title: 'File',
+        items: [
+          {
+            label: 'Save image',
+            action: {
+              type: 'onClick',
+              handler: () => {
+                const event = new CustomEvent('paint:saveImage');
+                window.dispatchEvent(event);
+              }
+            }
+          }
+        ]
+      }
+    ]
   }
 };
 
