@@ -1,68 +1,22 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
+import { GameState, Obstacle } from './types';
+import {
+  drawDino,
+  drawObstacles,
+  drawGround,
+  drawSun,
+  drawBirds,
+  drawClouds,
+  drawScore,
+  drawStartScreen,
+  drawGameOver,
+  drawYouWin
+} from './draw';
 
 interface DinoJumpProps {
   height: number;
-}
-
-interface Obstacle {
-  x: number;
-  width: number;
-  height: number;
-  variant: number;
-}
-
-interface DirtFleck {
-  x: number;
-  size: number;
-  offset: number;
-}
-
-interface Cloud {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-  variant: number;
-}
-
-interface Bird {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-  flapPhase: number;
-}
-
-interface GameState {
-  dino: {
-    y: number;
-    velocity: number;
-    isJumping: boolean;
-    isHoldingJump: boolean;
-    jumpHoldFrames: number;
-  };
-  game: {
-    isRunning: boolean;
-    isGameOver: boolean;
-    isWon: boolean;
-    score: number;
-    highScore: number;
-    frameCount: number;
-  };
-  obstacles: {
-    list: Array<Obstacle>;
-    nextIn: number;
-  };
-  difficulty: {
-    speed: number;
-  };
-  environment: {
-    dirt: Array<DirtFleck>;
-    clouds: Array<Cloud>;
-    birds: Array<Bird>;
-  };
 }
 
 const CANVAS_WIDTH = 800;
@@ -81,6 +35,7 @@ const HIGH_SCORE_KEY = 'dino-jump-high-score';
 
 const DinoJump = ({ height }: DinoJumpProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const animationRef = useRef<number>(0);
   const gameStateRef = useRef<GameState>({
     dino: {
       y: 0,
@@ -110,7 +65,6 @@ const DinoJump = ({ height }: DinoJumpProps) => {
       birds: []
     }
   });
-  const animationRef = useRef<number>(0);
 
   // load high score from localStorage on mount
   useEffect(() => {
@@ -218,450 +172,6 @@ const DinoJump = ({ height }: DinoJumpProps) => {
     }
 
     const state = gameStateRef.current;
-
-    const drawDino = () => {
-      const dinoScreenY = groundY - DINO_HEIGHT - state.dino.y;
-      // scale factor
-      const s = 1.5;
-      const ox = DINO_X - 45;
-      const oy = dinoScreenY;
-
-      ctx.fillStyle = '#535353';
-
-      // tail (matches SVG exactly, scaled)
-      ctx.fillRect(ox + 2 * s, oy + 38 * s, 4 * s, 2 * s);
-      ctx.fillRect(ox + 5 * s, oy + 36 * s, 5 * s, 3 * s);
-      ctx.fillRect(ox + 9 * s, oy + 34 * s, 6 * s, 4 * s);
-      ctx.fillRect(ox + 14 * s, oy + 32 * s, 7 * s, 5 * s);
-      ctx.fillRect(ox + 19 * s, oy + 30 * s, 8 * s, 7 * s);
-      ctx.fillRect(ox + 25 * s, oy + 28 * s, 9 * s, 9 * s);
-
-      // body
-      ctx.fillRect(ox + 32 * s, oy + 26 * s, 12 * s, 14 * s);
-      ctx.fillRect(ox + 36 * s, oy + 24 * s, 11 * s, 16 * s);
-      ctx.fillRect(ox + 41 * s, oy + 22 * s, 8 * s, 18 * s);
-
-      // neck
-      ctx.fillRect(ox + 45 * s, oy + 20 * s, 7 * s, 8 * s);
-      ctx.fillRect(ox + 47 * s, oy + 15 * s, 6 * s, 9 * s);
-      ctx.fillRect(ox + 49 * s, oy + 9 * s, 5 * s, 10 * s);
-      ctx.fillRect(ox + 50 * s, oy + 4 * s, 4 * s, 9 * s);
-
-      // head
-      ctx.fillRect(ox + 49 * s, oy + 2 * s, 8 * s, 7 * s);
-      ctx.fillRect(ox + 48 * s, oy + 3 * s, 3 * s, 5 * s);
-      ctx.fillRect(ox + 56 * s, oy + 3 * s, 3 * s, 5 * s);
-      ctx.fillRect(ox + 51 * s, oy + 1 * s, 6 * s, 3 * s);
-
-      // beak
-      ctx.fillRect(ox + 57 * s, oy + 4 * s, 4 * s, 4 * s);
-      ctx.fillRect(ox + 59 * s, oy + 5 * s, 3 * s, 3 * s);
-      ctx.fillRect(ox + 56 * s, oy + 7 * s, 5 * s, 2 * s);
-
-      // eye
-      ctx.fillStyle = '#fff';
-      ctx.fillRect(ox + 54 * s, oy + 3 * s, 2 * s, 2 * s);
-
-      ctx.fillStyle = '#535353';
-
-      // legs with animation
-      if (
-        state.game.isRunning &&
-        !state.dino.isJumping &&
-        !state.game.isGameOver
-      ) {
-        const legPhase = Math.floor(state.game.score / 5) % 2;
-        if (legPhase === 0) {
-          // front legs (alternating heights)
-          ctx.fillRect(ox + 45 * s, oy + 40 * s, 3 * s, 10 * s);
-          ctx.fillRect(ox + 40 * s, oy + 40 * s, 3 * s, 6 * s);
-          // back legs
-          ctx.fillRect(ox + 28 * s, oy + 40 * s, 3 * s, 6 * s);
-          ctx.fillRect(ox + 33 * s, oy + 40 * s, 3 * s, 10 * s);
-        } else {
-          // front legs
-          ctx.fillRect(ox + 45 * s, oy + 40 * s, 3 * s, 6 * s);
-          ctx.fillRect(ox + 40 * s, oy + 40 * s, 3 * s, 10 * s);
-          // back legs
-          ctx.fillRect(ox + 28 * s, oy + 40 * s, 3 * s, 10 * s);
-          ctx.fillRect(ox + 33 * s, oy + 40 * s, 3 * s, 6 * s);
-        }
-      } else {
-        // front legs (static)
-        ctx.fillRect(ox + 45 * s, oy + 40 * s, 3 * s, 8 * s);
-        ctx.fillRect(ox + 40 * s, oy + 40 * s, 3 * s, 8 * s);
-        // back legs
-        ctx.fillRect(ox + 28 * s, oy + 40 * s, 3 * s, 8 * s);
-        ctx.fillRect(ox + 33 * s, oy + 40 * s, 3 * s, 8 * s);
-      }
-    };
-
-    const drawObstacles = () => {
-      ctx.fillStyle = '#535353';
-      for (const obstacle of state.obstacles.list) {
-        const obstacleY = groundY - obstacle.height;
-        const w = obstacle.width;
-        const h = obstacle.height;
-
-        if (obstacle.variant === 0) {
-          // single cactus with arms bending up
-          ctx.fillRect(obstacle.x, obstacleY, w, h);
-          ctx.fillRect(obstacle.x - 6, obstacleY + h * 0.4, 6, 4);
-          ctx.fillRect(obstacle.x - 6, obstacleY + h * 0.15, 4, h * 0.25 + 4);
-          ctx.fillRect(obstacle.x + w, obstacleY + h * 0.55, 6, 4);
-          ctx.fillRect(
-            obstacle.x + w + 2,
-            obstacleY + h * 0.3,
-            4,
-            h * 0.25 + 4
-          );
-        } else if (obstacle.variant === 1) {
-          // double cactus with arms
-          ctx.fillRect(obstacle.x, obstacleY + 10, w, h - 10);
-          ctx.fillRect(obstacle.x - 5, obstacleY + h * 0.5, 5, 4);
-          ctx.fillRect(obstacle.x - 5, obstacleY + h * 0.3, 4, h * 0.2 + 4);
-          ctx.fillRect(obstacle.x + w + 6, obstacleY, w, h);
-          ctx.fillRect(obstacle.x + w * 2 + 6, obstacleY + h * 0.45, 5, 4);
-          ctx.fillRect(
-            obstacle.x + w * 2 + 7,
-            obstacleY + h * 0.2,
-            4,
-            h * 0.25 + 4
-          );
-        } else if (obstacle.variant === 2) {
-          // triple cactus cluster with arms
-          ctx.fillRect(obstacle.x, obstacleY + 6, w - 2, h - 6);
-          ctx.fillRect(obstacle.x - 4, obstacleY + h * 0.5, 4, 3);
-          ctx.fillRect(obstacle.x - 4, obstacleY + h * 0.35, 3, h * 0.15 + 3);
-          ctx.fillRect(obstacle.x + w + 3, obstacleY, w, h);
-          ctx.fillRect(obstacle.x + w * 2 + 3, obstacleY + h * 0.4, 5, 4);
-          ctx.fillRect(
-            obstacle.x + w * 2 + 4,
-            obstacleY + h * 0.15,
-            4,
-            h * 0.25 + 4
-          );
-          ctx.fillRect(obstacle.x + w * 2 + 10, obstacleY + 12, w - 2, h - 12);
-          ctx.fillRect(obstacle.x + w * 3 + 10, obstacleY + h * 0.55, 4, 3);
-          ctx.fillRect(
-            obstacle.x + w * 3 + 10,
-            obstacleY + h * 0.4,
-            3,
-            h * 0.15 + 3
-          );
-        } else if (obstacle.variant === 3) {
-          // wide/stocky cactus with arms on both sides
-          const wideW = w * 1.4;
-          ctx.fillRect(obstacle.x, obstacleY, wideW, h);
-          ctx.fillRect(obstacle.x - 7, obstacleY + h * 0.35, 7, 5);
-          ctx.fillRect(obstacle.x - 7, obstacleY + h * 0.1, 5, h * 0.25 + 5);
-          ctx.fillRect(obstacle.x + wideW, obstacleY + h * 0.5, 7, 5);
-          ctx.fillRect(
-            obstacle.x + wideW + 2,
-            obstacleY + h * 0.25,
-            5,
-            h * 0.25 + 5
-          );
-          ctx.fillRect(obstacle.x - 4, obstacleY + h * 0.15, 4, 4);
-        } else {
-          // tall thin cactus with arms on opposite sides
-          const thinW = w * 0.7;
-          ctx.fillRect(obstacle.x, obstacleY - 5, thinW, h + 5);
-          ctx.fillRect(obstacle.x - 6, obstacleY + h * 0.55, 6, 4);
-          ctx.fillRect(obstacle.x - 6, obstacleY + h * 0.35, 4, h * 0.2 + 4);
-          ctx.fillRect(obstacle.x + thinW, obstacleY + h * 0.25, 5, 4);
-          ctx.fillRect(
-            obstacle.x + thinW + 1,
-            obstacleY + h * 0.05,
-            4,
-            h * 0.2 + 4
-          );
-        }
-      }
-    };
-
-    const drawGround = () => {
-      ctx.strokeStyle = '#535353';
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.moveTo(0, groundY);
-      ctx.lineTo(CANVAS_WIDTH, groundY);
-      ctx.stroke();
-
-      // draw dirt flecks
-      ctx.fillStyle = '#a0a0a0';
-      for (const dirt of state.environment.dirt) {
-        ctx.fillRect(dirt.x, groundY + 5 + dirt.offset, dirt.size, dirt.size);
-      }
-    };
-
-    const drawSun = () => {
-      const sunX = CANVAS_WIDTH - 120;
-      const sunY = 100;
-      const r = 24;
-
-      // heat rays emanating from sun
-      ctx.fillStyle = '#c0c0c0';
-      // top ray
-      ctx.fillRect(sunX - 2, sunY - r - 18, 4, 12);
-      ctx.fillRect(sunX - 1, sunY - r - 22, 2, 6);
-      // bottom ray
-      ctx.fillRect(sunX - 2, sunY + r + 6, 4, 12);
-      ctx.fillRect(sunX - 1, sunY + r + 16, 2, 6);
-      // left ray
-      ctx.fillRect(sunX - r - 18, sunY - 2, 12, 4);
-      ctx.fillRect(sunX - r - 22, sunY - 1, 6, 2);
-      // right ray
-      ctx.fillRect(sunX + r + 6, sunY - 2, 12, 4);
-      ctx.fillRect(sunX + r + 16, sunY - 1, 6, 2);
-      // diagonal rays (top-left)
-      ctx.fillRect(sunX - r - 8, sunY - r - 8, 8, 3);
-      ctx.fillRect(sunX - r - 8, sunY - r - 8, 3, 8);
-      // diagonal rays (top-right)
-      ctx.fillRect(sunX + r, sunY - r - 8, 8, 3);
-      ctx.fillRect(sunX + r + 5, sunY - r - 8, 3, 8);
-      // diagonal rays (bottom-left)
-      ctx.fillRect(sunX - r - 8, sunY + r + 5, 8, 3);
-      ctx.fillRect(sunX - r - 8, sunY + r, 3, 8);
-      // diagonal rays (bottom-right)
-      ctx.fillRect(sunX + r, sunY + r + 5, 8, 3);
-      ctx.fillRect(sunX + r + 5, sunY + r, 3, 8);
-
-      // outer glow ring
-      ctx.fillStyle = '#d0d0d0';
-      ctx.fillRect(sunX - r - 4, sunY - r + 6, r * 2 + 8, r * 2 - 12);
-      ctx.fillRect(sunX - r + 6, sunY - r - 4, r * 2 - 12, r * 2 + 8);
-      ctx.fillRect(sunX - r - 2, sunY - r + 2, r * 2 + 4, r * 2 - 4);
-      ctx.fillRect(sunX - r + 2, sunY - r - 2, r * 2 - 4, r * 2 + 4);
-
-      // main sun body (rounder circle approximation)
-      ctx.fillStyle = '#a0a0a0';
-      // core square
-      ctx.fillRect(sunX - r + 4, sunY - r + 4, r * 2 - 8, r * 2 - 8);
-      // extend edges for roundness
-      ctx.fillRect(sunX - r + 2, sunY - r + 6, r * 2 - 4, r * 2 - 12);
-      ctx.fillRect(sunX - r + 6, sunY - r + 2, r * 2 - 12, r * 2 - 4);
-      ctx.fillRect(sunX - r, sunY - r + 10, r * 2, r * 2 - 20);
-      ctx.fillRect(sunX - r + 10, sunY - r, r * 2 - 20, r * 2);
-    };
-
-    const drawBirds = () => {
-      ctx.fillStyle = '#535353';
-      for (const bird of state.environment.birds) {
-        const { x, y, width, height, flapPhase } = bird;
-
-        // simpleshaped bird with connected silhouette
-        if (flapPhase < 15) {
-          // W shape (wings up)
-          // left wing outer
-          ctx.fillRect(x, y + height * 0.15, width * 0.18, height * 0.12);
-          ctx.fillRect(
-            x + width * 0.05,
-            y + height * 0.05,
-            width * 0.13,
-            height * 0.15
-          );
-          // left wing connection to body
-          ctx.fillRect(
-            x + width * 0.15,
-            y + height * 0.15,
-            width * 0.18,
-            height * 0.2
-          );
-          ctx.fillRect(
-            x + width * 0.25,
-            y + height * 0.25,
-            width * 0.1,
-            height * 0.15
-          );
-          // center body
-          ctx.fillRect(
-            x + width * 0.35,
-            y + height * 0.3,
-            width * 0.3,
-            height * 0.25
-          );
-          ctx.fillRect(
-            x + width * 0.4,
-            y + height * 0.25,
-            width * 0.2,
-            height * 0.3
-          );
-          // right wing connection to body
-          ctx.fillRect(
-            x + width * 0.65,
-            y + height * 0.25,
-            width * 0.1,
-            height * 0.15
-          );
-          ctx.fillRect(
-            x + width * 0.67,
-            y + height * 0.15,
-            width * 0.18,
-            height * 0.2
-          );
-          // right wing outer
-          ctx.fillRect(
-            x + width * 0.82,
-            y + height * 0.05,
-            width * 0.13,
-            height * 0.15
-          );
-          ctx.fillRect(
-            x + width * 0.82,
-            y + height * 0.15,
-            width * 0.18,
-            height * 0.12
-          );
-        } else {
-          // M shape (wings down)
-          // left wing outer
-          ctx.fillRect(x, y + height * 0.35, width * 0.18, height * 0.12);
-          ctx.fillRect(
-            x + width * 0.05,
-            y + height * 0.42,
-            width * 0.13,
-            height * 0.13
-          );
-          // left wing connection to body
-          ctx.fillRect(
-            x + width * 0.15,
-            y + height * 0.25,
-            width * 0.18,
-            height * 0.2
-          );
-          ctx.fillRect(
-            x + width * 0.25,
-            y + height * 0.2,
-            width * 0.1,
-            height * 0.15
-          );
-          // center body
-          ctx.fillRect(
-            x + width * 0.35,
-            y + height * 0.15,
-            width * 0.3,
-            height * 0.25
-          );
-          ctx.fillRect(
-            x + width * 0.4,
-            y + height * 0.15,
-            width * 0.2,
-            height * 0.3
-          );
-          // right wing connection to body
-          ctx.fillRect(
-            x + width * 0.65,
-            y + height * 0.2,
-            width * 0.1,
-            height * 0.15
-          );
-          ctx.fillRect(
-            x + width * 0.67,
-            y + height * 0.25,
-            width * 0.18,
-            height * 0.2
-          );
-          // right wing outer
-          ctx.fillRect(
-            x + width * 0.82,
-            y + height * 0.42,
-            width * 0.13,
-            height * 0.13
-          );
-          ctx.fillRect(
-            x + width * 0.82,
-            y + height * 0.35,
-            width * 0.18,
-            height * 0.12
-          );
-        }
-      }
-    };
-
-    const drawClouds = () => {
-      ctx.fillStyle = '#b0b0b0';
-      for (const cloud of state.environment.clouds) {
-        const { x, y, width, height, variant } = cloud;
-
-        if (variant === 0) {
-          // fluffy rounded cloud
-          ctx.fillRect(x, y, width, height);
-          ctx.fillRect(x + 10, y - 8, width * 0.6, height);
-          ctx.fillRect(x - 8, y + 5, width * 0.4, height * 0.6);
-          ctx.fillRect(x + width - 10, y - 4, width * 0.3, height * 0.8);
-        } else if (variant === 1) {
-          // elongated wispy cloud
-          ctx.fillRect(x, y, width, height * 0.7);
-          ctx.fillRect(x + width * 0.2, y - 4, width * 0.6, height * 0.8);
-          ctx.fillRect(x + width * 0.5, y + 2, width * 0.4, height * 0.6);
-        } else if (variant === 2) {
-          // compact bumpy cloud
-          ctx.fillRect(x, y, width * 0.7, height);
-          ctx.fillRect(x + width * 0.3, y - 6, width * 0.5, height * 0.9);
-          ctx.fillRect(x + width * 0.6, y - 3, width * 0.4, height * 0.8);
-          ctx.fillRect(x + width * 0.2, y + 4, width * 0.3, height * 0.5);
-        } else {
-          // scattered puffy cloud
-          ctx.fillRect(x, y + 3, width * 0.5, height * 0.7);
-          ctx.fillRect(x + width * 0.35, y, width * 0.4, height);
-          ctx.fillRect(x + width * 0.6, y + 2, width * 0.35, height * 0.8);
-        }
-      }
-    };
-
-    const drawScore = () => {
-      ctx.fillStyle = '#535353';
-      ctx.font = 'bold 16px monospace';
-      ctx.textAlign = 'right';
-      ctx.fillText(
-        `HI ${state.game.highScore.toString().padStart(5, '0')}`,
-        CANVAS_WIDTH - 100,
-        30
-      );
-      ctx.fillText(
-        state.game.score.toString().padStart(5, '0'),
-        CANVAS_WIDTH - 20,
-        30
-      );
-    };
-
-    const drawStartScreen = () => {
-      ctx.fillStyle = '#535353';
-      ctx.font = '16px monospace';
-      ctx.textAlign = 'center';
-      ctx.fillText(
-        'Press SPACE or click to start',
-        CANVAS_WIDTH / 2,
-        canvasHeight / 2
-      );
-    };
-
-    const drawGameOver = () => {
-      ctx.fillStyle = '#535353';
-      ctx.font = 'bold 24px monospace';
-      ctx.textAlign = 'center';
-      ctx.fillText('GAME OVER', CANVAS_WIDTH / 2, canvasHeight / 2 - 20);
-      ctx.font = '14px monospace';
-      ctx.fillText(
-        'Press SPACE or click to restart',
-        CANVAS_WIDTH / 2,
-        canvasHeight / 2 + 10
-      );
-    };
-
-    const drawYouWin = () => {
-      ctx.fillStyle = '#535353';
-      ctx.font = 'bold 24px monospace';
-      ctx.textAlign = 'center';
-      ctx.fillText('YOU WIN!', CANVAS_WIDTH / 2, canvasHeight / 2 - 20);
-      ctx.font = '14px monospace';
-      ctx.fillText(
-        'Press SPACE or click to play again',
-        CANVAS_WIDTH / 2,
-        canvasHeight / 2 + 10
-      );
-    };
 
     const checkCollision = (): boolean => {
       // hitbox covers the dino's body area (not tail or head)
@@ -790,6 +300,7 @@ const DinoJump = ({ height }: DinoJumpProps) => {
           variant: Math.floor(Math.random() * 4)
         });
       }
+
       // move clouds and remove one off-screen per frame
       let removedCloud = false;
       for (let i = 0; i < state.environment.clouds.length; i++) {
@@ -805,18 +316,16 @@ const DinoJump = ({ height }: DinoJumpProps) => {
       if (Math.random() < 0.004) {
         // check if there's a cactus in the spawn area
         const birdX = CANVAS_WIDTH;
-        const birdY = 100 + Math.floor(Math.random() * 50);
-        const birdGroundHeight = groundY - birdY;
+        // spawn birds 90-180 pixels above ground (some reachable, some aesthetic)
+        const birdGroundHeight = 90 + Math.floor(Math.random() * 90);
+        const birdY = groundY - birdGroundHeight;
 
-        // check if any obstacle would be near this bird's position
+        // prevent birds from spawning near cacti (check right side of screen only)
         let canSpawn = true;
         for (const obstacle of state.obstacles.list) {
-          const horizontalDistance = Math.abs(obstacle.x - birdX);
-          // if obstacle is within 200px and bird would be at similar height
-          if (
-            horizontalDistance < 200 &&
-            birdGroundHeight < obstacle.height + 20
-          ) {
+          // only check obstacles that would overlap with the spawning bird
+          // bird spawns at right edge, check if any cactus is within 300px of right edge
+          if (obstacle.x > CANVAS_WIDTH - 300) {
             canSpawn = false;
             break;
           }
@@ -832,6 +341,7 @@ const DinoJump = ({ height }: DinoJumpProps) => {
           });
         }
       }
+
       // move birds and remove one off-screen per frame
       let removedBird = false;
       for (let i = 0; i < state.environment.birds.length; i++) {
@@ -882,20 +392,30 @@ const DinoJump = ({ height }: DinoJumpProps) => {
     const render = () => {
       ctx.clearRect(0, 0, CANVAS_WIDTH, canvasHeight);
 
-      drawSun();
-      drawClouds();
-      drawGround();
-      drawDino();
-      drawObstacles();
-      drawBirds();
-      drawScore();
+      const drawContext = {
+        ctx,
+        state,
+        groundY,
+        canvasHeight,
+        canvasWidth: CANVAS_WIDTH,
+        dinoHeight: DINO_HEIGHT,
+        dinoX: DINO_X
+      };
+
+      drawSun(drawContext);
+      drawClouds(drawContext);
+      drawGround(drawContext);
+      drawDino(drawContext);
+      drawObstacles(drawContext);
+      drawBirds(drawContext);
+      drawScore(drawContext);
 
       if (state.game.isWon) {
-        drawYouWin();
+        drawYouWin(drawContext);
       } else if (state.game.isGameOver) {
-        drawGameOver();
+        drawGameOver(drawContext);
       } else if (!state.game.isRunning) {
-        drawStartScreen();
+        drawStartScreen(drawContext);
       }
     };
 
@@ -984,7 +504,7 @@ const DinoJump = ({ height }: DinoJumpProps) => {
         onMouseLeave={releaseJump}
         onTouchStart={handleInput}
         onTouchEnd={releaseJump}
-        className="border border-gray-200 cursor-pointer"
+        className="border border-gray-200 cursor-pointer select-none touch-none [-webkit-touch-callout:none]"
         style={{ maxWidth: '100%' }}
       />
     </div>

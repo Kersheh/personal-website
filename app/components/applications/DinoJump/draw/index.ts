@@ -1,0 +1,10 @@
+export { drawDino } from './drawDino';
+export { drawObstacles } from './drawObstacles';
+export { drawGround } from './drawGround';
+export { drawSun } from './drawSun';
+export { drawBirds } from './drawBirds';
+export { drawClouds } from './drawClouds';
+export { drawScore } from './drawScore';
+export { drawStartScreen } from './drawStartScreen';
+export { drawGameOver } from './drawGameOver';
+export { drawYouWin } from './drawYouWin';
