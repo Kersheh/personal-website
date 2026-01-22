@@ -53,6 +53,7 @@ const MenuBar = ({
     app: false,
     social: false
   });
+  const [currentTime, setCurrentTime] = useState(new Date());
   const fileDropdownRef = useRef<HTMLDivElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const socialDropdownRef = useRef<HTMLDivElement>(null);
@@ -91,6 +92,23 @@ const MenuBar = ({
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setDropdowns({ file: false, app: false, social: false });
   }, [focusedApp]);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, []);
+
+  const formatTime = (date: Date) => {
+    const hours = date.getHours();
+    const minutes = date.getMinutes();
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    const displayHours = hours % 12 || 12;
+    const displayMinutes = minutes.toString().padStart(2, '0');
+    return `${displayHours}:${displayMinutes} ${ampm}`;
+  };
 
   return (
     <div
@@ -340,6 +358,9 @@ const MenuBar = ({
 
       {/* Right side - System controls */}
       <div className="flex items-center gap-4">
+        <div className="text-white/80 text-sm font-['Courier_new','Courier',monospace] select-none">
+          {formatTime(currentTime)}
+        </div>
         <button
           onClick={onPowerOff}
           className="text-white/70 hover:text-white/90 transition-colors p-1 cursor-pointer"
