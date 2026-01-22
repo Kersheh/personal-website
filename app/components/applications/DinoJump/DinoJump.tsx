@@ -198,10 +198,10 @@ const DinoJump = ({ height }: DinoJumpProps) => {
 
       // check bird collisions
       for (const bird of state.environment.birds) {
-        const birdLeft = bird.x + 8;
-        const birdRight = bird.x + bird.width - 8;
-        const birdTop = bird.y + 5;
-        const birdBottom = bird.y + bird.height - 5;
+        const birdLeft = bird.x + 12;
+        const birdRight = bird.x + bird.width - 12;
+        const birdTop = bird.y + 8;
+        const birdBottom = bird.y + bird.height - 8;
 
         // convert bird screen Y to dino coordinate system
         const birdTopHeight = groundY - birdBottom;
@@ -316,16 +316,19 @@ const DinoJump = ({ height }: DinoJumpProps) => {
       if (Math.random() < 0.004) {
         // check if there's a cactus in the spawn area
         const birdX = CANVAS_WIDTH;
-        // spawn birds 90-180 pixels above ground (some reachable, some aesthetic)
-        const birdGroundHeight = 90 + Math.floor(Math.random() * 90);
+        // spawn birds 90-210 pixels above ground (some reachable, some aesthetic)
+        const birdGroundHeight = 90 + Math.floor(Math.random() * 120);
         const birdY = groundY - birdGroundHeight;
 
-        // prevent birds from spawning near cacti (check right side of screen only)
+        // prevent birds from spawning near cacti to ensure they're dodgeable
         let canSpawn = true;
         for (const obstacle of state.obstacles.list) {
-          // only check obstacles that would overlap with the spawning bird
-          // bird spawns at right edge, check if any cactus is within 300px of right edge
-          if (obstacle.x > CANVAS_WIDTH - 300) {
+          // check if any cactus is within 550px of right edge or approaching
+          // this gives enough spacing for player to react to both obstacles
+          if (
+            obstacle.x > CANVAS_WIDTH - 550 &&
+            obstacle.x < CANVAS_WIDTH + 100
+          ) {
             canSpawn = false;
             break;
           }
