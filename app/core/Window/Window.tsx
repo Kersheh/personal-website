@@ -7,6 +7,7 @@ import PDFViewer from '@/app/components/applications/PDFViewer/PDFViewer';
 import Devtools from '@/app/components/applications/Devtools/Devtools';
 import MIM from '@/app/components/applications/MIM/MIM';
 import Paint from '@/app/components/applications/Paint/Paint';
+import DinoJump from '@/app/components/applications/DinoJump/DinoJump';
 import WindowButton from './WindowButton/WindowButton';
 import { useDesktopApplicationStore } from '@/app/store/desktopApplicationStore';
 import {
@@ -402,6 +403,8 @@ const Window = ({
           {appId === 'MIM' && <MIM />}
 
           {appId === 'PAINT' && <Paint height={size.height - 30} />}
+
+          {appId === 'DINO_JUMP' && <DinoJump height={size.height - 30} />}
         </div>
 
         {/* Resize handles */}

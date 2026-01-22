@@ -1,7 +1,13 @@
 import { FeatureFlag } from '@/app/utils/featureFlags';
 import { MenuSection } from '@/app/utils/types';
 
-export type AppId = 'TERMINAL' | 'PDF_VIEWER' | 'DEVTOOLS' | 'MIM' | 'PAINT';
+export type AppId =
+  | 'TERMINAL'
+  | 'PDF_VIEWER'
+  | 'DEVTOOLS'
+  | 'MIM'
+  | 'PAINT'
+  | 'DINO_JUMP';
 export type ChildWindowId = 'MIM_PREFERENCES';
 
 interface AppSize {
@@ -113,6 +119,31 @@ export const APP_CONFIGS: Record<AppId, AppConfig> = {
               type: 'onClick',
               handler: () => {
                 const event = new CustomEvent('paint:saveImage');
+                window.dispatchEvent(event);
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  DINO_JUMP: {
+    id: 'DINO_JUMP',
+    displayName: 'Dino Jump',
+    iconName: 'dino.svg',
+    initialSize: { width: 850, height: 550 },
+    minSize: { width: 600, height: 400 },
+    unique: true,
+    customMenuSections: [
+      {
+        title: 'App',
+        items: [
+          {
+            label: 'Reset High Score',
+            action: {
+              type: 'onClick',
+              handler: () => {
+                const event = new CustomEvent('dinoJump:resetHighScore');
                 window.dispatchEvent(event);
               }
             }

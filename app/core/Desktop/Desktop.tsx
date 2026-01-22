@@ -86,6 +86,14 @@ const DESKTOP_ITEMS: Array<DesktopItem> = [
   },
   {
     type: 'application',
+    id: 'app-dino-jump',
+    iconName: APP_CONFIGS.DINO_JUMP.iconName,
+    iconScale: APP_CONFIGS.DINO_JUMP.iconScale,
+    label: APP_CONFIGS.DINO_JUMP.displayName,
+    appName: 'DINO_JUMP'
+  },
+  {
+    type: 'application',
     id: 'app-terminal',
     iconName: APP_CONFIGS.TERMINAL.iconName,
     iconScale: APP_CONFIGS.TERMINAL.iconScale,
@@ -139,15 +147,25 @@ const Desktop = ({ powerOff }: DesktopProps) => {
     const ICON_HEIGHT = 120; // 80px + text + padding + gap
     const START_X = 20;
     const START_Y = 20;
-    const ICONS_PER_COLUMN = 4;
 
-    const col = Math.floor(index / ICONS_PER_COLUMN);
-    const row = index % ICONS_PER_COLUMN;
-
-    return {
-      x: START_X + col * ICON_WIDTH,
-      y: START_Y + row * ICON_HEIGHT
-    };
+    // Custom layout:
+    // [MIM]      [x] [resume]
+    // [Paint]    [x] [x]
+    // [DinoJump] [x] [x]
+    // [Terminal] [x] [x]
+    if (index < 4) {
+      // Apps in column 0, rows 0-3
+      return {
+        x: START_X,
+        y: START_Y + index * ICON_HEIGHT
+      };
+    } else {
+      // resume.pdf in column 2, row 0
+      return {
+        x: START_X + 2 * ICON_WIDTH,
+        y: START_Y
+      };
+    }
   };
 
   const openNewWindow = (name: AppId, fileData?: AppWindowItem['fileData']) => {
