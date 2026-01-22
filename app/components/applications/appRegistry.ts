@@ -7,8 +7,12 @@ export type AppId =
   | 'DEVTOOLS'
   | 'MIM'
   | 'PAINT'
-  | 'DINO_JUMP';
-export type ChildWindowId = 'MIM_PREFERENCES';
+  | 'DINO_JUMP'
+  | 'CALENDAR';
+export type ChildWindowId =
+  | 'MIM_PREFERENCES'
+  | 'CALENDAR_EVENT_FORM'
+  | 'CALENDAR_EVENT_VIEWER';
 
 interface AppSize {
   width: number;
@@ -151,6 +155,14 @@ export const APP_CONFIGS: Record<AppId, AppConfig> = {
         ]
       }
     ]
+  },
+  CALENDAR: {
+    id: 'CALENDAR',
+    displayName: 'Calendar',
+    iconName: 'iterm.png',
+    initialSize: { width: 480, height: 540 },
+    minSize: { width: 400, height: 500 },
+    unique: true
   }
 };
 
@@ -179,6 +191,18 @@ export const CHILD_WINDOW_CONFIGS: Record<ChildWindowId, ChildWindowConfig> = {
     parentAppId: 'MIM',
     displayName: 'Preferences',
     size: { width: 360, height: 420 }
+  },
+  CALENDAR_EVENT_FORM: {
+    id: 'CALENDAR_EVENT_FORM',
+    parentAppId: 'CALENDAR',
+    displayName: 'Add Event',
+    size: { width: 400, height: 380 }
+  },
+  CALENDAR_EVENT_VIEWER: {
+    id: 'CALENDAR_EVENT_VIEWER',
+    parentAppId: 'CALENDAR',
+    displayName: 'Events',
+    size: { width: 400, height: 450 }
   }
 };
 

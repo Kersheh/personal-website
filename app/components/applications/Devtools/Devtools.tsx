@@ -1,6 +1,7 @@
 'use client';
 
 import { useDesktopApplicationStore } from '@/app/store/desktopApplicationStore';
+import { useCalendarStore } from '@/app/components/applications/Calendar/store/calendarStore';
 import { dispatchWindowEvent } from '@/app/hooks/useWindowEvent';
 
 interface DevtoolsProps {
@@ -11,6 +12,7 @@ const Devtools = ({ height }: DevtoolsProps) => {
   const resetIconPositions = useDesktopApplicationStore(
     (state) => state.resetIconPositions
   );
+  const clearAllEvents = useCalendarStore((state) => state.clearAllEvents);
 
   const contentHeight = Math.max(200, height ?? 400);
 
@@ -26,9 +28,19 @@ const Devtools = ({ height }: DevtoolsProps) => {
           </h3>
           <button
             onClick={() => resetIconPositions()}
-            className="px-3 py-1.5 bg-white/10 hover:bg-white/20 text-white/90 text-xs border border-white/20 transition-colors font-['Courier_new','Courier',monospace]"
+            className="px-3 py-1.5 bg-white/10 hover:bg-white/20 text-white/90 text-xs border border-white/20 transition-colors font-['Courier_new','Courier',monospace] cursor-pointer"
           >
             Reset Icon Positions
+          </button>
+        </div>
+
+        <div>
+          <h3 className="text-sm font-semibold text-white/90 mb-2">Calendar</h3>
+          <button
+            onClick={() => clearAllEvents()}
+            className="px-3 py-1.5 bg-white/10 hover:bg-white/20 text-white/90 text-xs border border-white/20 transition-colors font-['Courier_new','Courier',monospace] cursor-pointer"
+          >
+            Clear All Calendar Events
           </button>
         </div>
 
@@ -36,7 +48,7 @@ const Devtools = ({ height }: DevtoolsProps) => {
           <h3 className="text-sm font-semibold text-white/90 mb-2">System</h3>
           <button
             onClick={() => dispatchWindowEvent('system-restore')}
-            className="px-3 py-1.5 bg-white/10 hover:bg-white/20 text-white/90 text-xs border border-white/20 transition-colors font-['Courier_new','Courier',monospace]"
+            className="px-3 py-1.5 bg-white/10 hover:bg-white/20 text-white/90 text-xs border border-white/20 transition-colors font-['Courier_new','Courier',monospace] cursor-pointer"
           >
             Restore System to Last Backup
           </button>

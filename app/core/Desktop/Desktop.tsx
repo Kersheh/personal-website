@@ -12,10 +12,13 @@ import { isFeatureEnabled } from '@/app/utils/featureFlags';
 import {
   AppId,
   APP_CONFIGS,
-  ChildWindowId
+  ChildWindowId,
+  getAppConfig
 } from '@/app/components/applications/appRegistry';
 import { useWindowEvent } from '@/app/hooks/useWindowEvent';
 import MIMPreferences from '@/app/components/applications/MIM/MIMPreferences';
+import CalendarEventForm from '@/app/components/applications/Calendar/CalendarEventForm';
+import CalendarEventViewer from '@/app/components/applications/Calendar/CalendarEventViewer';
 import { DESKTOP_ITEMS } from './desktopItems';
 
 let windowIdCounter = 0;
@@ -38,6 +41,7 @@ interface ChildWindowItem extends BaseWindowItem {
   type: 'child';
   childWindowId: ChildWindowId;
   parentAppId: AppId;
+  additionalData?: Record<string, unknown>;
 }
 
 type WindowItem = AppWindowItem | ChildWindowItem;
@@ -145,19 +149,47 @@ const Desktop = ({ powerOff }: DesktopProps) => {
 
   useWindowEvent<{ childWindowId: ChildWindowId; parentAppId: AppId }>(
     'desktop:open-child-window',
-    (e: CustomEvent<{ childWindowId: ChildWindowId; parentAppId: AppId }>) => {
-      const { childWindowId, parentAppId } = e.detail;
+    (
+      e: CustomEvent<{
+        childWindowId: ChildWindowId;
+        parentAppId: AppId;
+        [key: string]: unknown;
+      }>
+    ) => {
+      const { childWindowId, parentAppId, ...additionalData } = e.detail;
 
-      // child windows are always unique
-      if (isChildWindowOpen(parentAppId, childWindowId)) {
-        // focus existing child window
-        const existingIndex = windows.findIndex(
-          (w) => w && w.type === 'child' && w.childWindowId === childWindowId
-        );
-        if (existingIndex !== -1) {
-          updateWindows(existingIndex);
+      // close existing calendar child windows before opening a new one
+      if (
+        childWindowId === 'CALENDAR_EVENT_VIEWER' ||
+        childWindowId === 'CALENDAR_EVENT_FORM'
+      ) {
+        const existingCalendarWindows = windows
+          .map((w, idx) => ({ window: w, index: idx }))
+          .filter(
+            ({ window }) =>
+              window &&
+              window.type === 'child' &&
+              (window.childWindowId === 'CALENDAR_EVENT_VIEWER' ||
+                window.childWindowId === 'CALENDAR_EVENT_FORM')
+          );
+
+        existingCalendarWindows.forEach(({ window }) => {
+          if (window) {
+            handleCloseWindow(window.id);
+          }
+        });
+      } else {
+        // child windows are always unique (except calendar windows which we handle above)
+        if (isChildWindowOpen(parentAppId, childWindowId)) {
+          // focus existing child window
+          const existingIndex = windows.findIndex(
+            (w) => w && w.type === 'child' && w.childWindowId === childWindowId
+          );
+          if (existingIndex !== -1) {
+            updateWindows(existingIndex);
+          }
+          return;
         }
-        return;
       }
 
       const updatedWindows = windows.map((window) =>
@@ -165,17 +197,22 @@ const Desktop = ({ powerOff }: DesktopProps) => {
       );
 
       const newWindowId = `child-window-${++windowIdCounter}`;
+      const newWindowIndex = updatedWindows.length;
       updatedWindows.push({
         type: 'child',
         childWindowId,
         parentAppId,
         isFocused: true,
-        id: newWindowId
+        id: newWindowId,
+        additionalData
       });
       setWindows(updatedWindows);
 
       queueMicrotask(() => {
         registerChildWindow(parentAppId, childWindowId, newWindowId);
+        setFocusedApp(getAppConfig(parentAppId).displayName, newWindowId);
+        // force update windows to properly focus the new child window
+        updateWindows(newWindowIndex);
       });
     }
   );
@@ -435,7 +472,23 @@ const Desktop = ({ powerOff }: DesktopProps) => {
                 closeWindow={handleCloseWindow}
               >
                 {item.childWindowId === 'MIM_PREFERENCES' && (
-                  <MIMPreferences height={250} />
+                  <MIMPreferences height={390} />
+                )}
+                {item.childWindowId === 'CALENDAR_EVENT_FORM' && (
+                  <CalendarEventForm
+                    selectedDate={
+                      (item.additionalData?.selectedDate as string) || ''
+                    }
+                    onClose={() => handleCloseWindow(item.id)}
+                  />
+                )}
+                {item.childWindowId === 'CALENDAR_EVENT_VIEWER' && (
+                  <CalendarEventViewer
+                    selectedDate={
+                      (item.additionalData?.selectedDate as string) || ''
+                    }
+                    onClose={() => handleCloseWindow(item.id)}
+                  />
                 )}
               </ChildWindow>
             );

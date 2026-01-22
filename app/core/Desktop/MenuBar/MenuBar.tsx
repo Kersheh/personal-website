@@ -358,9 +358,12 @@ const MenuBar = ({
 
       {/* Right side - System controls */}
       <div className="flex items-center gap-4">
-        <div className="text-white/80 text-sm font-['Courier_new','Courier',monospace] select-none">
+        <button
+          onClick={() => onOpenWindow('CALENDAR')}
+          className="text-white/80 text-sm font-['Courier_new','Courier',monospace] select-none hover:text-white transition-colors cursor-pointer"
+        >
           {formatTime(currentTime)}
-        </div>
+        </button>
         <button
           onClick={onPowerOff}
           className="text-white/70 hover:text-white/90 transition-colors p-1 cursor-pointer"
