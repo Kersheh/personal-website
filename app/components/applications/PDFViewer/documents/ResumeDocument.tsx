@@ -123,8 +123,6 @@ const ResumeDocument = () => {
             </div>
           </div>
 
-          <div className="w-3/4 mx-auto border-t border-slate-300" />
-
           <div className="space-y-2">
             <div className="flex items-start gap-3">
               <img
@@ -181,43 +179,66 @@ const ResumeDocument = () => {
           Education
         </h2>
 
-        <div className="space-y-2">
-          <div className="flex items-start gap-3">
-            <img
-              src="/images/uofg-logo.png"
-              alt="University of Guelph"
-              className="w-8 h-8 rounded"
-            />
-            <div className="flex-1">
-              <div className="flex items-start justify-between">
-                <div>
-                  <h3 className="text-sm font-semibold text-slate-900">
-                    University of Guelph
-                  </h3>
-                  <p className="text-sm text-slate-700">
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <div className="flex items-start gap-3">
+              <img
+                src="/images/uofg-logo.png"
+                alt="University of Guelph"
+                className="w-8 h-8 rounded"
+              />
+              <div>
+                <h3 className="text-sm font-semibold text-slate-900">
+                  University of Guelph
+                </h3>
+                <p className="text-xs text-slate-500">
+                  Guelph, Ontario, Canada
+                </p>
+                <p className="text-xs text-slate-600 mt-1">
+                  C • Java • Python • Javascript • Compilers • Heuristic AI •
+                  Machine Learning • Functional Programming
+                </p>
+              </div>
+            </div>
+
+            <div className="space-y-3 mt-4">
+              <div>
+                <div className="flex items-baseline justify-between">
+                  <h4 className="text-sm font-medium text-slate-800">
                     Bachelor&apos;s Degree, Honours, Computer Science
-                  </p>
+                  </h4>
+                  <p className="text-xs text-slate-500">2014 - 2017</p>
                 </div>
-                <p className="text-xs text-slate-500">2014 - 2017</p>
               </div>
             </div>
           </div>
 
-          <div className="flex items-start gap-3">
-            <img
-              src="/images/ryerson-logo.png"
-              alt="Ryerson University"
-              className="w-8 h-8 rounded"
-            />
-            <div className="flex-1">
-              <div className="flex items-start justify-between">
-                <div>
-                  <h3 className="text-sm font-semibold text-slate-900">
-                    Ryerson University
-                  </h3>
-                  <p className="text-sm text-slate-700">Computer Engineering</p>
+          <div className="space-y-2">
+            <div className="flex items-start gap-3">
+              <img
+                src="/images/ryerson-logo.png"
+                alt="Ryerson University"
+                className="w-8 h-8 rounded"
+              />
+              <div>
+                <h3 className="text-sm font-semibold text-slate-900">
+                  Ryerson University
+                </h3>
+                <p className="text-xs text-slate-500">
+                  Toronto, Ontario, Canada
+                </p>
+                <p className="text-xs text-slate-600 mt-1">C • Java</p>
+              </div>
+            </div>
+
+            <div className="space-y-3 mt-4">
+              <div>
+                <div className="flex items-baseline justify-between">
+                  <h4 className="text-sm font-medium text-slate-800">
+                    Computer Engineering
+                  </h4>
+                  <p className="text-xs text-slate-500">2011 - 2014</p>
                 </div>
-                <p className="text-xs text-slate-500">2011 - 2014</p>
               </div>
             </div>
           </div>
